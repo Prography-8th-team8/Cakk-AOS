@@ -42,6 +42,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
 androidx-splashScreen = "androidx.core:core-splashscreen:1.0.0-beta02"
 androidx-test-junit = "androidx.test.ext:junit:1.1.5"
+androidx-test-espresso = "androidx.test.espresso:espresso-core:3.5.1"
 androidx-security = "androidx.security:security-crypto:1.0.0"
 ## Lifecycle
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
@@ -67,6 +68,7 @@ dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", versi
 dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "dagger" }
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "dagger" }
 ## etc
+material = "com.google.android.material:material:1.8.0"
 coil-core = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
