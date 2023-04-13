@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = libs.versions.complieSdk.get().toInt()
     defaultConfig {
         applicationId = "org.prography.cakk"
-        minSdk = 26
-        targetSdk = 33
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -57,14 +57,15 @@ dependencies {
     implementation(project(":presentation"))
     implementation(project(":domain"))
 
-    implementation(libs.bundles.androidx)
-    implementation(libs.bundles.androidx.lifeycle)
-    implementation(libs.bundles.kotlin)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.junit)
+    implementation(libs.androidx.test.junit)
+    implementation(libs.androidx.test.espresso)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.bundles.dagger)
     kapt(libs.bundles.compiler)
-    implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.timber)
-    implementation(libs.junit)
 }
 
 ktlint {
