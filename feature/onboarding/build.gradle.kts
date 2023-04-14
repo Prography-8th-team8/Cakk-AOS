@@ -11,6 +11,9 @@ android {
     }
 }
 dependencies {
+    implementation(project(":data"))
+    implementation(project(":core:utility"))
+    implementation(project(":core:base"))
 
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

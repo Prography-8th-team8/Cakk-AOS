@@ -35,6 +35,9 @@ android {
 
 dependencies {
     implementation(project(":data"))
+    implementation(project(":feature:onboarding"))
+    implementation(project(":feature:home"))
+    implementation(project(":core:utility"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
