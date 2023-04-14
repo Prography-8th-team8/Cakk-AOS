@@ -39,13 +39,14 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":core:utility"))
 
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.junit)
-    implementation(libs.androidx.test.junit)
-    implementation(libs.androidx.test.espresso)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.bundles.dagger)
+    implementation(libs.timber)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.espresso)
     kapt(libs.bundles.compiler)
 }
