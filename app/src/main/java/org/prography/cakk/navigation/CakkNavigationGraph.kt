@@ -13,7 +13,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = GraphLabels.ROOT,
-        startDestination = CakkDestination.Home.route,
+        startDestination = CakkDestination.Home.route
     ) {
         composable(route = CakkDestination.Home.route) {
             HomeScreen()
