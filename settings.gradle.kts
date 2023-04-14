@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "Cakk"
 include("app")
 include(":data")
+include(":feature:onboarding")
