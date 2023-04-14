@@ -1,14 +1,14 @@
+allprojects {
+    afterEvaluate {
+        project.apply("$rootDir/gradle/common.gradle")
+    }
+}
+
 buildscript {
     dependencies {
         classpath(libs.plugin.hilt)
         classpath(libs.plugin.androidGradle)
         classpath(libs.plugin.kotlin)
-    }
-}
-
-allprojects {
-    afterEvaluate {
-        project.apply("$rootDir/gradle/common.gradle")
     }
 }
 
