@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.bundles.dagger)
     implementation(libs.timber)
+    implementation(libs.bundles.androidx.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
