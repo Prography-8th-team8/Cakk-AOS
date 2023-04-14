@@ -6,6 +6,12 @@ buildscript {
     }
 }
 
+allprojects {
+    afterEvaluate {
+        project.apply("$rootDir/gradle/common.gradle")
+    }
+}
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application) apply false

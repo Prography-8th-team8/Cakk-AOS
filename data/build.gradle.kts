@@ -8,10 +8,10 @@ plugins {
 
 android {
     namespace = "org.prography.cakk.data"
-    compileSdk = libs.versions.complieSdk.get().toInt()
+    compileSdk = 33
 
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
+        minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }

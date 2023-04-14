@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    compileSdk = libs.versions.complieSdk.get().toInt()
+    compileSdk = 33
     defaultConfig {
         applicationId = "org.prography.cakk"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
+        minSdk = 26
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
