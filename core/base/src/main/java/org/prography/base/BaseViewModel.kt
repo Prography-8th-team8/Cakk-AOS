@@ -1,25 +1,41 @@
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import org.prography.base.BaseIntent
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import org.prography.base.BaseAction
 import org.prography.base.BaseSideEffect
 import org.prography.base.BaseState
 
-abstract class BaseViewModel<INTENT : BaseIntent, STATE : BaseState, SE : BaseSideEffect> : ViewModel() {
-    protected val intentChannel: Channel<INTENT> = Channel()
-    private val sideEffectsChannel: Channel<SE> = Channel()
+abstract class BaseViewModel<ACTION : BaseAction, STATE : BaseState, SE : BaseSideEffect>(
+    initialState: STATE
+) : ViewModel() {
+    private val actionChannel: Channel<ACTION> = Channel()
+    val state: StateFlow<STATE> = actionChannel.receiveAsFlow()
+        .runningFold(initialState, ::reduceState)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, initialState)
 
-    abstract val state: StateFlow<STATE>
-    val sideEffects = sideEffectsChannel.receiveAsFlow()
+    private val sideEffectChannel: Channel<SE> = Channel(Channel.UNLIMITED)
+    val sideEffect: Flow<SE> = sideEffectChannel.receiveAsFlow()
 
-    suspend fun sendIntent(intent: INTENT){
-        intentChannel.send(intent)
+    fun sendAction(action: ACTION) {
+        viewModelScope.launch{
+            actionChannel.send(action)
+        }
+    }
+    abstract fun reduceState(currentState: STATE, action: ACTION) : STATE
+
+    protected fun sendSideEffect(sideEffect: SE){
+        viewModelScope.launch {
+            sideEffectChannel.send(sideEffect)
+        }
     }
 
-    abstract fun reduceState(state: STATE, intent: INTENT): STATE
+    fun withState(intent: (STATE) -> Unit) = intent(state.value)
 
-    protected suspend fun sendSideEffect(sideEffect: SE){
-        sideEffectsChannel.send(sideEffect)
+    override fun onCleared() {
+        super.onCleared()
+        actionChannel.close()
+        sideEffectChannel.close()
     }
 }
