@@ -38,14 +38,28 @@ dependencies {
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:home"))
     implementation(project(":core:utility"))
+    implementation(project(":core:designsystem"))
 
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.junit)
-    implementation(libs.androidx.test.junit)
-    implementation(libs.androidx.test.espresso)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.bundles.dagger)
+    implementation(libs.timber)
+    implementation(libs.bundles.androidx.compose)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.espresso)
     kapt(libs.bundles.compiler)
+}
+
+ktlint {
+    android.set(true)
+    coloredOutput.set(true)
+    verbose.set(true)
+    outputToConsole.set(true)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
 }

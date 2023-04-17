@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "org.prography.onboarding"
+    namespace = "org.prography.designsystem"
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
@@ -26,13 +26,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":data"))
-    implementation(project(":core:utility"))
-    implementation(project(":core:base"))
-
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.junit)
-    androidTestImplementation(libs.androidx.test.espresso)
 }
