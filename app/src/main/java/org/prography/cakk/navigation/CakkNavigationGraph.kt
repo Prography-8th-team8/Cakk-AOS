@@ -1,6 +1,8 @@
 package org.prography.cakk.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +19,10 @@ fun CakkNavigationGraph(navController: NavHostController) {
         startDestination = CakkDestination.Splash.route,
     ) {
         composable(route = CakkDestination.Splash.route) {
-            SplashScreen(navController)
+            SplashScreen(
+                navHostController = navController,
+                modifier = Modifier.fillMaxSize(),
+            )
         }
 
         composable(route = CakkDestination.Home.route) {
