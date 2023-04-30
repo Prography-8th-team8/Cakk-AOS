@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import org.prography.home.HomeScreen
 import org.prography.onboarding.OnBoardingScreen
+import org.prography.splash.SplashScreen
 import org.prography.utility.navgraph.GraphLabels
 
 @Composable
@@ -13,11 +14,16 @@ fun CakkNavigationGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = GraphLabels.ROOT,
-        startDestination = CakkDestination.Home.route
+        startDestination = CakkDestination.Splash.route,
     ) {
+        composable(route = CakkDestination.Splash.route) {
+            SplashScreen(navController)
+        }
+
         composable(route = CakkDestination.Home.route) {
             HomeScreen()
         }
+
         composable(route = CakkDestination.OnBoarding.route) {
             OnBoardingScreen()
         }
