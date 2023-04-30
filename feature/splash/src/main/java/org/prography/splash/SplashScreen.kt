@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -19,27 +20,35 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.delay
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import org.prography.designsystem.ui.theme.pretendard
 
 @Composable
-fun SplashScreen(
-    modifier: Modifier = Modifier,
-    navHostController: NavHostController = rememberNavController(),
-) {
-    LaunchedEffect(Unit) {
-        delay(2000)
-        navHostController.navigate("home") {
-            popUpTo("splash") {
-                inclusive = true
-            }
-        }
-    }
-
+fun SplashScreen(navHostController: NavHostController = rememberNavController()) {
     Box(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
+        val lottieComposition by rememberLottieComposition(spec = LottieCompositionSpec.Asset("grid_animation.json"))
+        val logoAnimationState = animateLottieCompositionAsState(lottieComposition)
+
+        LottieAnimation(
+            composition = lottieComposition,
+            progress = { logoAnimationState.progress },
+            contentScale = ContentScale.FillHeight,
+        )
+
+        if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
+            navHostController.navigate("home") {
+                popUpTo("splash") {
+                    inclusive = true
+                }
+            }
+        }
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painter = painterResource(id = R.drawable.ic_logo),
@@ -61,11 +70,7 @@ fun SplashScreen(
     }
 }
 
-@Preview(
-    widthDp = 540,
-    heightDp = 1320,
-    showBackground = true,
-)
+@Preview
 @Composable
 private fun SplashScreenPreview() {
     SplashScreen()
