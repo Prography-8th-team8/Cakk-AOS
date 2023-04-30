@@ -27,6 +27,8 @@ android {
 
 dependencies {
     implementation(project(":core:designsystem"))
+
+    implementation(libs.lottie)
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
     testImplementation(libs.junit)

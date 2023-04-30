@@ -15,7 +15,7 @@ kotlin = "1.8.10"
 dagger = "2.45"
 coil = "2.3.0"
 timber = "5.0.1"
-lottie = "5.2.0"
+lottie = "6.0.0"
 kotlin-coroutine = "1.6.4"
 ktlint = "11.3.1"
 
@@ -71,7 +71,7 @@ dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", ve
 material = "com.google.android.material:material:1.8.0"
 coil-core = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
-lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
+lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 junit = "junit:junit:4.13.2"
 
 [bundles]
