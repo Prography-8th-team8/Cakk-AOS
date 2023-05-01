@@ -1,4 +1,4 @@
-package org.prography.cakk.navigation
+package org.prography.utility.navigation.destination
 
 sealed class CakkDestination(
     val route: String

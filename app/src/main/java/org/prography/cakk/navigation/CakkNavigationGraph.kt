@@ -7,7 +7,8 @@ import androidx.navigation.compose.composable
 import org.prography.home.HomeScreen
 import org.prography.onboarding.OnBoardingScreen
 import org.prography.splash.SplashScreen
-import org.prography.utility.navgraph.GraphLabels
+import org.prography.utility.navigation.destination.CakkDestination
+import org.prography.utility.navigation.graph.GraphLabels
 
 @Composable
 fun CakkNavigationGraph(navController: NavHostController) {

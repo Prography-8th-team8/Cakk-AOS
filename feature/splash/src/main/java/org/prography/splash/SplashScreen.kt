@@ -25,6 +25,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import org.prography.designsystem.ui.theme.pretendard
+import org.prography.utility.navigation.destination.CakkDestination
 
 @Composable
 fun SplashScreen(navHostController: NavHostController = rememberNavController()) {
@@ -42,8 +43,8 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
         )
 
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
-            navHostController.navigate("home") {
-                popUpTo("splash") {
+            navHostController.navigate(CakkDestination.Home.route) {
+                popUpTo(CakkDestination.Splash.route) {
                     inclusive = true
                 }
             }
