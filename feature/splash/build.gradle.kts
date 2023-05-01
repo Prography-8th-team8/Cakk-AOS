@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "org.prography.utility"
+    namespace = "org.prography.splash"
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
@@ -26,10 +26,13 @@ android {
 }
 
 dependencies {
-    implementation(libs.timber)
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:utility"))
+
+    implementation(libs.lottie)
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.espresso)
 }
