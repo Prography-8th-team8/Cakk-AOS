@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,6 +22,8 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import org.prography.designsystem.ui.theme.Light_Cobalt_Blue
+import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
@@ -58,10 +59,10 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
             Spacer(modifier = Modifier.size((26.2).dp))
             Text(
                 modifier = Modifier
-                    .background(Color(0xFF98A4E7), RoundedCornerShape(20.dp))
+                    .background(Light_Cobalt_Blue, RoundedCornerShape(20.dp))
                     .padding(12.dp),
                 text = stringResource(R.string.splash_logo_description),
-                color = Color.White,
+                color = White,
                 fontSize = 14.dp.toSp(),
                 letterSpacing = (-0.05).em,
                 fontFamily = pretendard,
