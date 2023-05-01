@@ -15,7 +15,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = GraphLabels.ROOT,
-        startDestination = CakkDestination.Splash.route
+        startDestination = CakkDestination.Splash.route,
     ) {
         composable(route = CakkDestination.Splash.route) {
             SplashScreen(navHostController = navController)

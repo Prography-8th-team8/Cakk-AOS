@@ -1,7 +1,7 @@
 package org.prography.utility.navigation.destination
 
 sealed class CakkDestination(
-    val route: String
+    val route: String,
 ) {
     object Splash : CakkDestination(route = SPLASH)
     object Home : CakkDestination(route = HOME)
