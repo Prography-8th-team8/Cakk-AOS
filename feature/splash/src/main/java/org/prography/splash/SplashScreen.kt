@@ -17,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
@@ -25,6 +24,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import org.prography.designsystem.ui.theme.pretendard
+import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
 
 @Composable
@@ -62,7 +62,7 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
                     .padding(12.dp),
                 text = stringResource(R.string.splash_logo_description),
                 color = Color.White,
-                fontSize = 14.sp,
+                fontSize = 14.dp.toSp(),
                 letterSpacing = (-0.05).em,
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Bold,
