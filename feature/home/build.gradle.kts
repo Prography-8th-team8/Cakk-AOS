@@ -1,5 +1,10 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.kotlin.konan.properties.Properties
+
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.library)
@@ -12,6 +17,7 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "NAVER_API_MAP_KEY", properties.getProperty("NAVER_API_MAP_KEY"))
     }
     buildFeatures {
         compose = true
