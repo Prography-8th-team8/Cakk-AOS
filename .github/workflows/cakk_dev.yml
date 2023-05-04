@@ -34,6 +34,14 @@ jobs:
 
       - name: Change gradlew permissions
         run: chmod +x ./gradlew
+        
+      - name: Touch local properties
+        run: touch local.properties
+        
+      - name: Access NAVER_API_MAP_KEY
+        env:
+            USER_PREFERENCES_NAME: ${{ secrets.NAVER_API_MAP_KEY }}
+        run: echo "NAVER_API_MAP_KEY=\"$NAVER_API_MAP_KEY\"" >> local.properties
 
       - name: Lint Check
         run: ./gradlew ktlintCheck
