@@ -4,6 +4,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.secrets.gradle)
 }
 
 android {
@@ -32,6 +33,7 @@ dependencies {
 
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
+    implementation(libs.naver.map)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
