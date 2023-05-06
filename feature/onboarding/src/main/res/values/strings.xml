@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_title">내게 맞는 케이크샵은 어디에 있을까요?</string>
+    <string name="onboarding_subtitle">서울의 케이크샵을 지역별로 정리했어요.</string>
+    <string name="onboarding_not_find_region">찾는 지역이 없으신가요?</string>
+    <string name="onboarding_request_region">지역 요청하기</string>
+</resources>
