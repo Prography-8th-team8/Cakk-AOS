@@ -4,6 +4,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ktlint)
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -33,7 +36,11 @@ dependencies {
 
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
+    implementation(libs.bundles.androidx.lifeycle)
+    implementation(libs.androidx.compose.hilt.navigation)
     testImplementation(libs.junit)
+    implementation(libs.bundles.dagger)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
+    kapt(libs.bundles.compiler)
 }

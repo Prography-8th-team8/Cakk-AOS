@@ -19,6 +19,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.prography.designsystem.ui.theme.Black
@@ -27,18 +29,11 @@ import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
 
 @Composable
-fun OnBoardingScreen(navHostController: NavHostController = rememberNavController()) {
-    val list = listOf(
-        RegionItem(0, "도봉 강북 성북 노원", 43, Color(0x1A2448FF)),
-        RegionItem(1, "동대문 중랑 성동 광진", 45, Color(0x33FF857D)),
-        RegionItem(2, "은평 마포 서대문", 77, Color(0x26FF5CBE)),
-        RegionItem(3, "종로 중구 용산", 20, Color(0x33FEDC4D)),
-        RegionItem(4, "강서 양천 영등포 구로", 34, Color(0x66FF857D)),
-        RegionItem(5, "동작 관악 금천", 28, Color(0x332448FF)),
-        RegionItem(6, "서초 강남", 48, Color(0x4DFEDC4D)),
-        RegionItem(7, "강동 송파", 48, Color(0x4DFF5CBE))
-    )
-
+fun OnBoardingScreen(
+    navHostController: NavHostController = rememberNavController(),
+    viewModel: OnBoardingViewModel = hiltViewModel(),
+) {
+    val state = viewModel.regions.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier.fillMaxSize().background(White),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -72,13 +67,15 @@ fun OnBoardingScreen(navHostController: NavHostController = rememberNavControlle
             modifier = Modifier.padding(top = 38.dp, start = 6.dp, end = 6.dp),
             columns = GridCells.Fixed(2)
         ) {
-            items(list, key = { it.id }) {
+            items(state.value, key = { it.id }) {
                 OnBoardingRegionItem(
                     modifier = Modifier.size(170.dp, 120.dp),
                     region = it.region,
                     count = it.count,
                     color = it.color,
-                    onClick = {}
+                    onClick = {
+                        // Home으로 이동
+                    }
                 )
             }
         }
@@ -94,7 +91,10 @@ fun OnBoardingScreen(navHostController: NavHostController = rememberNavControlle
         )
 
         Text(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = 8.dp)
+                .clickable {
+                    // 지역 요청 API 호출 ,
+                },
             text = stringResource(R.string.onboarding_request_region),
             color = Black,
             fontSize = 14.dp.toSp(),
@@ -143,7 +143,7 @@ private fun OnBoardingRegionItem(
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 24.dp, start = 20.dp, end = 20.dp),
-                text = "${count}개",
+                text = stringResource(id = R.string.onboarding_region_item_count, count),
                 textAlign = TextAlign.End,
                 color = Black,
                 fontSize = 20.dp.toSp(),
