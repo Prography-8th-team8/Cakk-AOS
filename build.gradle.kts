@@ -9,6 +9,7 @@ buildscript {
         classpath(libs.plugin.hilt)
         classpath(libs.plugin.androidGradle)
         classpath(libs.plugin.kotlin)
+        classpath(libs.plugin.secrets.gradle)
     }
 }
 
@@ -18,6 +19,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.secrets.gradle) apply false
 }
 
 tasks {
