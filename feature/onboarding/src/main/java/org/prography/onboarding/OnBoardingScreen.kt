@@ -27,6 +27,7 @@ import org.prography.designsystem.ui.theme.Black
 import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
+import org.prography.utility.navigation.destination.CakkDestination
 
 @Composable
 fun OnBoardingScreen(
@@ -74,7 +75,12 @@ fun OnBoardingScreen(
                     count = it.count,
                     color = it.color,
                     onClick = {
-                        // Home으로 이동
+                        // Home으로 이동, 추후 데이터까지 전달
+                        navHostController.navigate(CakkDestination.Home.route) {
+                            popUpTo(CakkDestination.OnBoarding.route) {
+                                inclusive = true
+                            }
+                        }
                     }
                 )
             }
