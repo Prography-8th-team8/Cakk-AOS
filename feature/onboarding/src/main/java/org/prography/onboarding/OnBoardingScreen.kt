@@ -32,7 +32,7 @@ import org.prography.utility.navigation.destination.CakkDestination
 @Composable
 fun OnBoardingScreen(
     navHostController: NavHostController = rememberNavController(),
-    viewModel: OnBoardingViewModel = hiltViewModel(),
+    viewModel: OnBoardingViewModel = hiltViewModel()
 ) {
     val state = viewModel.regions.collectAsStateWithLifecycle()
     Column(
@@ -118,7 +118,7 @@ private fun OnBoardingRegionItem(
     region: String,
     count: Int,
     color: Color,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     Box(
         modifier = modifier

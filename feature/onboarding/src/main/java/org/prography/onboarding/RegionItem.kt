@@ -6,5 +6,5 @@ data class RegionItem(
     val id: Int,
     val region: String,
     val count: Int,
-    val color: Color,
+    val color: Color
 )
