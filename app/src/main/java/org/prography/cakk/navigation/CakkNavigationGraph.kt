@@ -26,7 +26,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
         }
 
         composable(route = CakkDestination.OnBoarding.route) {
-            OnBoardingScreen()
+            OnBoardingScreen(navHostController = navController)
         }
     }
 }
