@@ -1,12 +1,16 @@
 package org.prography.home
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +69,86 @@ fun HomeDetailScreen(
             fontFamily = pretendard,
             letterSpacing = (-0.03).em
         )
+
+        HomeDetailTab(
+            modifier = Modifier
+                .padding(top = 32.dp)
+                .fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun HomeDetailTab(
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier.height(intrinsicSize = IntrinsicSize.Max)) {
+        HomeDetailTabItem(
+            drawableRes = R.drawable.ic_phone,
+            stringRes = R.string.home_detail_phone
+        )
+
+        Spacer(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .background(Color.Gray)
+        )
+
+        HomeDetailTabItem(
+            drawableRes = R.drawable.ic_bookmark,
+            stringRes = R.string.home_detail_bookmark
+        )
+
+        Spacer(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .background(Color.Gray)
+        )
+
+        HomeDetailTabItem(
+            drawableRes = R.drawable.ic_navigation,
+            stringRes = R.string.home_detail_navigation
+        )
+
+        Spacer(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .background(Color.Gray)
+        )
+
+        HomeDetailTabItem(
+            drawableRes = R.drawable.ic_share,
+            stringRes = R.string.home_detail_share
+        )
+    }
+}
+
+@Composable
+fun RowScope.HomeDetailTabItem(
+    @DrawableRes drawableRes: Int,
+    @StringRes stringRes: Int,
+) {
+    Column(
+        modifier = Modifier.weight(1f),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(drawableRes),
+            contentDescription = null,
+            modifier = Modifier.padding(top = 9.dp)
+        )
+
+        Text(
+            text = stringResource(stringRes),
+            modifier = Modifier.padding(top = 11.dp),
+            color = Raisin_Black.copy(alpha = 0.8f),
+            fontSize = 14.dp.toSp(),
+            fontFamily = pretendard,
+            letterSpacing = (-0.03).em
+        )
     }
 }
 
@@ -103,6 +187,14 @@ fun HomeDetailAppbar(
 private fun HomeDetailAppbarPreview() {
     HomeDetailAppbar(
         title = stringResource(R.string.home_detail_app_bar)
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeDetailTabPreview() {
+    HomeDetailTab(
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
