@@ -5,4 +5,5 @@
     <string name="home_detail_bookmark">북마크</string>
     <string name="home_detail_navigation">길 안내</string>
     <string name="home_detail_share">공유하기</string>
+    <string name="home_detail_keyword">키워드</string>
 </resources>
