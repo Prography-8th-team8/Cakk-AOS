@@ -6,6 +6,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,15 +17,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.prography.designsystem.R
-import org.prography.designsystem.ui.theme.Black
-import org.prography.designsystem.ui.theme.Raisin_Black
-import org.prography.designsystem.ui.theme.pretendard
+import org.prography.designsystem.ui.theme.*
 import org.prography.utility.extensions.toSp
 
 @Composable
@@ -31,7 +33,7 @@ fun HomeDetailScreen(
     modifier: Modifier = Modifier,
     cake_shop_brand: String,
     cake_shop_location: String,
-    cake_shop_keywords: List<String>,
+    cake_shop_keywords: List<StoreType>,
 ) {
     Column(modifier) {
         HomeDetailAppbar(
@@ -75,11 +77,64 @@ fun HomeDetailScreen(
                 .padding(top = 32.dp)
                 .fillMaxWidth()
         )
+
+        Spacer(
+            modifier = Modifier
+                .padding(top = 32.dp)
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(Color.Gray)
+        )
+
+        HomeDetailKeywordRow(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            cake_shop_keywords = cake_shop_keywords
+        )
     }
 }
 
 @Composable
-fun HomeDetailTab(
+private fun HomeDetailKeywordRow(
+    modifier: Modifier = Modifier,
+    cake_shop_keywords: List<StoreType>,
+) {
+    Column(modifier) {
+        Text(
+            text = stringResource(R.string.home_detail_keyword),
+            modifier = Modifier.padding(top = 40.dp),
+            color = Raisin_Black,
+            fontSize = 18.dp.toSp(),
+            fontFamily = pretendard,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.03).em
+        )
+
+        LazyRow(
+            modifier = Modifier.padding(top = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items(cake_shop_keywords, key = { it.tag }) {
+                Text(
+                    text = it.tag,
+                    modifier = Modifier
+                        .background(it.color.copy(alpha = 0.2f), RoundedCornerShape(14.dp))
+                        .padding(vertical = 8.dp, horizontal = 12.dp),
+                    color = it.color,
+                    fontSize = 12.dp.toSp(),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = pretendard,
+                    letterSpacing = (-0.03).em,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomeDetailTab(
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier.height(intrinsicSize = IntrinsicSize.Max)) {
@@ -127,7 +182,7 @@ fun HomeDetailTab(
 }
 
 @Composable
-fun RowScope.HomeDetailTabItem(
+private fun RowScope.HomeDetailTabItem(
     @DrawableRes drawableRes: Int,
     @StringRes stringRes: Int,
 ) {
@@ -153,7 +208,7 @@ fun RowScope.HomeDetailTabItem(
 }
 
 @Composable
-fun HomeDetailAppbar(
+private fun HomeDetailAppbar(
     title: String,
     onBack: () -> Unit = {},
 ) {
@@ -184,6 +239,25 @@ fun HomeDetailAppbar(
 
 @Preview(showBackground = true)
 @Composable
+private fun HomeDetailKeywordPreview() {
+    HomeDetailKeywordRow(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        cake_shop_keywords = listOf(
+            StoreType("캐릭터", Light_Deep_Pink),
+            StoreType("레터링", Palatinate_Blue),
+            StoreType("떡케이크", Medium_Slate_Blue),
+            StoreType("도시락", Mustard_Yellow),
+            StoreType("플라워", Metallic_Sunburst),
+            StoreType("포토", Congo_Pink),
+            StoreType("피규어", Yankees_Blue),
+            StoreType("업체 케이크", Light_Deep_Pink),
+            StoreType("티아라", Cerise)
+        )
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun HomeDetailAppbarPreview() {
     HomeDetailAppbar(
         title = stringResource(R.string.home_detail_app_bar)
@@ -205,6 +279,16 @@ private fun HomeDetailScreenPreview() {
         modifier = Modifier.fillMaxSize(),
         cake_shop_brand = "케이크를 부탁해 연신내역점",
         cake_shop_location = "서울 은평구 연서로29길 8",
-        cake_shop_keywords = listOf()
+        cake_shop_keywords = listOf(
+            StoreType("캐릭터", Light_Deep_Pink),
+            StoreType("레터링", Palatinate_Blue),
+            StoreType("떡케이크", Medium_Slate_Blue),
+            StoreType("도시락", Mustard_Yellow),
+            StoreType("플라워", Metallic_Sunburst),
+            StoreType("포토", Congo_Pink),
+            StoreType("피규어", Yankees_Blue),
+            StoreType("업체 케이크", Light_Deep_Pink),
+            StoreType("티아라", Cerise)
+        )
     )
 }
