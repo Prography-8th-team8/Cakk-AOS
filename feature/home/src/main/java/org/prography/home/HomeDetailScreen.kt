@@ -251,15 +251,14 @@ private fun HomeDetailKeywordPreview() {
     HomeDetailKeywordRow(
         modifier = Modifier.padding(horizontal = 16.dp),
         cake_shop_keywords = listOf(
-            StoreType("캐릭터", Light_Deep_Pink),
-            StoreType("레터링", Palatinate_Blue),
-            StoreType("떡케이크", Medium_Slate_Blue),
-            StoreType("도시락", Mustard_Yellow),
-            StoreType("플라워", Metallic_Sunburst),
-            StoreType("포토", Congo_Pink),
-            StoreType("피규어", Yankees_Blue),
-            StoreType("업체 케이크", Light_Deep_Pink),
-            StoreType("티아라", Cerise)
+            StoreType.CHARACTER,
+            StoreType.LETTERING,
+            StoreType.RICE,
+            StoreType.MEALBOX,
+            StoreType.FLOWER,
+            StoreType.PHOTO,
+            StoreType.FIGURE,
+            StoreType.TIARA
         )
     )
 }
@@ -288,15 +287,14 @@ private fun HomeDetailScreenPreview() {
         cake_shop_brand = "케이크를 부탁해 연신내역점",
         cake_shop_location = "서울 은평구 연서로29길 8",
         cake_shop_keywords = listOf(
-            StoreType("캐릭터", Light_Deep_Pink),
-            StoreType("레터링", Palatinate_Blue),
-            StoreType("떡케이크", Medium_Slate_Blue),
-            StoreType("도시락", Mustard_Yellow),
-            StoreType("플라워", Metallic_Sunburst),
-            StoreType("포토", Congo_Pink),
-            StoreType("피규어", Yankees_Blue),
-            StoreType("업체 케이크", Light_Deep_Pink),
-            StoreType("티아라", Cerise)
+            StoreType.CHARACTER,
+            StoreType.LETTERING,
+            StoreType.RICE,
+            StoreType.MEALBOX,
+            StoreType.FLOWER,
+            StoreType.PHOTO,
+            StoreType.FIGURE,
+            StoreType.TIARA
         )
     )
 }
