@@ -83,14 +83,23 @@ fun HomeDetailScreen(
                 .padding(top = 32.dp)
                 .height(1.dp)
                 .fillMaxWidth()
-                .background(Color.Gray)
+                .background(Platinum)
         )
 
         HomeDetailKeywordRow(
             modifier = Modifier
+                .padding(top = 40.dp)
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             cake_shop_keywords = cake_shop_keywords
+        )
+
+        Spacer(
+            modifier = Modifier
+                .padding(top = 22.dp)
+                .height(10.dp)
+                .fillMaxWidth()
+                .background(Platinum)
         )
     }
 }
@@ -103,7 +112,6 @@ private fun HomeDetailKeywordRow(
     Column(modifier) {
         Text(
             text = stringResource(R.string.home_detail_keyword),
-            modifier = Modifier.padding(top = 40.dp),
             color = Raisin_Black,
             fontSize = 18.dp.toSp(),
             fontFamily = pretendard,
