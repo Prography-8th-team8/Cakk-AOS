@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -31,9 +32,7 @@ import org.prography.utility.extensions.toSp
 fun HomeDetailScreen(
     navHostController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier,
-    cake_shop_brand: String,
-    cake_shop_location: String,
-    cake_shop_keywords: List<StoreType>,
+    storeModel: StoreModel,
 ) {
     Column(modifier) {
         HomeDetailAppbar(
@@ -50,7 +49,7 @@ fun HomeDetailScreen(
         )
 
         Text(
-            text = cake_shop_brand,
+            text = storeModel.name,
             modifier = Modifier
                 .padding(top = 40.dp)
                 .align(Alignment.CenterHorizontally),
@@ -62,7 +61,7 @@ fun HomeDetailScreen(
         )
 
         Text(
-            text = cake_shop_location,
+            text = storeModel.location.split(",").first(),
             modifier = Modifier
                 .padding(top = 12.dp)
                 .align(Alignment.CenterHorizontally),
@@ -91,7 +90,7 @@ fun HomeDetailScreen(
                 .padding(top = 40.dp)
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
-            cake_shop_keywords = cake_shop_keywords
+            storeTypes = storeModel.storeType
         )
 
         Spacer(
@@ -101,13 +100,173 @@ fun HomeDetailScreen(
                 .fillMaxWidth()
                 .background(Platinum)
         )
+
+        HomeDetailInfoRow(
+            modifier = Modifier
+                .padding(top = 40.dp)
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            location = storeModel.location
+        )
     }
+}
+
+@Composable
+private fun HomeDetailInfoRow(
+    modifier: Modifier = Modifier,
+    location: String,
+) {
+    val locations = location.split(",")
+    Column(modifier) {
+        Text(
+            text = stringResource(R.string.home_detail_info),
+            color = Raisin_Black,
+            fontSize = 18.dp.toSp(),
+            fontFamily = pretendard,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-0.03).em
+        )
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .padding(top = 24.dp)
+                .background(Platinum)
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 15.dp)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_location),
+                contentDescription = null,
+            )
+
+            Column(modifier = Modifier.padding(start = 13.25.dp)) {
+                Row {
+                    Text(
+                        text = locations[0],
+                        modifier = Modifier.weight(1f, false),
+                        color = Raisin_Black,
+                        fontSize = 14.dp.toSp(),
+                        fontFamily = pretendard,
+                        letterSpacing = (-0.03).em,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Text(
+                        text = "∙",
+                        modifier = Modifier.padding(start = 4.dp),
+                        color = Raisin_Black.copy(alpha = 0.2f),
+                        fontSize = 14.dp.toSp(),
+                        fontFamily = pretendard
+                    )
+
+                    Text(
+                        text = "주소 복사",
+                        modifier = Modifier.padding(start = 4.dp),
+                        color = Raisin_Black,
+                        fontSize = 14.dp.toSp(),
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.03).em
+                    )
+                }
+
+                Text(
+                    text = locations[1],
+                    modifier = Modifier.padding(top = 10.dp),
+                    color = Raisin_Black.copy(alpha = 0.4f),
+                    fontSize = 14.dp.toSp(),
+                    fontFamily = pretendard,
+                    letterSpacing = (-0.03).em
+                )
+
+                Text(
+                    text = locations[2],
+                    modifier = Modifier.padding(top = 12.dp),
+                    color = Raisin_Black,
+                    fontSize = 14.dp.toSp(),
+                    fontFamily = pretendard,
+                    letterSpacing = (-0.03).em
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .padding(top = 16.dp)
+                .background(Platinum)
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 17.5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_clock),
+                contentDescription = null
+            )
+
+            Text(
+                text = stringResource(R.string.home_detail_opening),
+                modifier = Modifier.padding(start = 10.dp),
+                color = Raisin_Black,
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.03).em
+            )
+
+            Text(
+                text = "∙",
+                modifier = Modifier.padding(start = 4.dp),
+                color = Raisin_Black.copy(alpha = 0.2f),
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard
+            )
+
+            // 추후 변경
+            Text(
+                text = "22:30에 영업 종료",
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .weight(1f, false),
+                color = Raisin_Black,
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard
+            )
+
+            Image(
+                painter = painterResource(R.drawable.ic_down_arrow),
+                contentDescription = null,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeDetailInfoRowPreview() {
+    HomeDetailInfoRow(
+        modifier = Modifier.fillMaxWidth(),
+        location = "서울 은평구 연서로29길 8,지번: 갈현동 399-7,연신내역 7번 출구에서 219m"
+    )
 }
 
 @Composable
 private fun HomeDetailKeywordRow(
     modifier: Modifier = Modifier,
-    cake_shop_keywords: List<StoreType>,
+    storeTypes: List<StoreType>,
 ) {
     Column(modifier) {
         Text(
@@ -123,7 +282,7 @@ private fun HomeDetailKeywordRow(
             modifier = Modifier.padding(top = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(cake_shop_keywords, key = { it.tag }) {
+            items(storeTypes, key = { it.tag }) {
                 Text(
                     text = it.tag,
                     modifier = Modifier
@@ -250,7 +409,7 @@ private fun HomeDetailAppbar(
 private fun HomeDetailKeywordPreview() {
     HomeDetailKeywordRow(
         modifier = Modifier.padding(horizontal = 16.dp),
-        cake_shop_keywords = listOf(
+        storeTypes = listOf(
             StoreType.CHARACTER,
             StoreType.LETTERING,
             StoreType.RICE,
@@ -284,17 +443,20 @@ private fun HomeDetailTabPreview() {
 private fun HomeDetailScreenPreview() {
     HomeDetailScreen(
         modifier = Modifier.fillMaxSize(),
-        cake_shop_brand = "케이크를 부탁해 연신내역점",
-        cake_shop_location = "서울 은평구 연서로29길 8",
-        cake_shop_keywords = listOf(
-            StoreType.CHARACTER,
-            StoreType.LETTERING,
-            StoreType.RICE,
-            StoreType.MEALBOX,
-            StoreType.FLOWER,
-            StoreType.PHOTO,
-            StoreType.FIGURE,
-            StoreType.TIARA
+        storeModel = StoreModel(
+            id = 0L,
+            name = "케이크를 부탁해 연신내역점",
+            location = "서울 은평구 연서로29길 8,지번: 갈현동 399-7,연신내역 7번 출구에서 219m",
+            storeType = listOf(
+                StoreType.CHARACTER,
+                StoreType.LETTERING,
+                StoreType.RICE,
+                StoreType.MEALBOX,
+                StoreType.FLOWER,
+                StoreType.PHOTO,
+                StoreType.FIGURE,
+                StoreType.TIARA
+            )
         )
     )
 }
