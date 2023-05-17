@@ -2,13 +2,13 @@ package org.prography.home
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,82 +31,235 @@ import org.prography.utility.extensions.toSp
 @Composable
 fun HomeDetailScreen(
     navHostController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier,
     storeModel: StoreModel,
+    blogReviews: List<BlogReviewModel>,
 ) {
-    Column(modifier) {
+    val state = rememberScrollState()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(White)
+    ) {
         HomeDetailAppbar(
             title = stringResource(R.string.home_detail_app_bar),
             onBack = {}
         )
 
-        Image(
-            painter = painterResource(R.drawable.img_default_cakeshop),
-            contentDescription = null,
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(360 / 176f)
-        )
+                .fillMaxSize()
+                .verticalScroll(state)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.img_default_cakeshop),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(360 / 176f)
+            )
 
+            Text(
+                text = storeModel.name,
+                modifier = Modifier
+                    .padding(top = 40.dp)
+                    .align(Alignment.CenterHorizontally),
+                color = Raisin_Black,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.dp.toSp(),
+                fontFamily = pretendard,
+                letterSpacing = (-0.03).em
+            )
+
+            Text(
+                text = storeModel.location.split(",").first(),
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .align(Alignment.CenterHorizontally),
+                color = Raisin_Black.copy(alpha = 0.8f),
+                fontSize = 16.dp.toSp(),
+                fontFamily = pretendard,
+                letterSpacing = (-0.03).em
+            )
+
+            HomeDetailTab(
+                modifier = Modifier
+                    .padding(top = 32.dp)
+                    .fillMaxWidth()
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .padding(top = 32.dp)
+                    .height(1.dp)
+                    .fillMaxWidth()
+                    .background(Platinum)
+            )
+
+            HomeDetailKeywordRow(
+                modifier = Modifier
+                    .padding(top = 40.dp)
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                storeTypes = storeModel.storeType
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .padding(top = 22.dp)
+                    .height(10.dp)
+                    .fillMaxWidth()
+                    .background(Platinum)
+            )
+
+            HomeDetailInfoRow(
+                modifier = Modifier
+                    .padding(top = 40.dp)
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                location = storeModel.location
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .padding(top = 26.5.dp)
+                    .height(10.dp)
+                    .fillMaxWidth()
+                    .background(Platinum)
+            )
+
+            HomeDetailBlogRow(
+                modifier = Modifier
+                    .padding(top = 40.dp, bottom = 60.dp)
+                    .padding(horizontal = 16.dp),
+                blogReviews = blogReviews
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeDetailBlogRow(
+    modifier: Modifier = Modifier,
+    blogReviews: List<BlogReviewModel>,
+) {
+    Column(modifier) {
         Text(
-            text = storeModel.name,
-            modifier = Modifier
-                .padding(top = 40.dp)
-                .align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.home_detail_blog_review),
             color = Raisin_Black,
+            fontSize = 18.dp.toSp(),
+            fontFamily = pretendard,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.dp.toSp(),
-            fontFamily = pretendard,
             letterSpacing = (-0.03).em
-        )
-
-        Text(
-            text = storeModel.location.split(",").first(),
-            modifier = Modifier
-                .padding(top = 12.dp)
-                .align(Alignment.CenterHorizontally),
-            color = Raisin_Black.copy(alpha = 0.8f),
-            fontSize = 16.dp.toSp(),
-            fontFamily = pretendard,
-            letterSpacing = (-0.03).em
-        )
-
-        HomeDetailTab(
-            modifier = Modifier
-                .padding(top = 32.dp)
-                .fillMaxWidth()
         )
 
         Spacer(
             modifier = Modifier
-                .padding(top = 32.dp)
+                .padding(top = 24.dp)
                 .height(1.dp)
                 .fillMaxWidth()
                 .background(Platinum)
         )
 
-        HomeDetailKeywordRow(
-            modifier = Modifier
-                .padding(top = 40.dp)
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            storeTypes = storeModel.storeType
-        )
+        blogReviews.take(3).forEach { review ->
+            HomeDetailBlogItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 23.dp),
+                blogReview = review
+            )
 
-        Spacer(
+            Spacer(
+                modifier = Modifier
+                    .padding(top = 24.dp)
+                    .height(1.dp)
+                    .fillMaxWidth()
+                    .background(Platinum)
+            )
+        }
+
+        Button(
+            onClick = { /*TODO*/ },
             modifier = Modifier
-                .padding(top = 22.dp)
-                .height(10.dp)
                 .fillMaxWidth()
-                .background(Platinum)
+                .padding(top = 24.dp),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
+            elevation = ButtonDefaults.elevation(0.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = White
+            )
+        ) {
+            Text(
+                text = "블로그 리뷰 더 보기",
+                color = Raisin_Black,
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.03).em
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeDetailBlogItem(
+    modifier: Modifier = Modifier,
+    blogReview: BlogReviewModel,
+) {
+    Column(modifier) {
+        Row {
+            Text(
+                text = blogReview.name,
+                modifier = Modifier.weight(1f, false),
+                color = Raisin_Black,
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                letterSpacing = (-0.03).em
+            )
+
+            Text(
+                text = "∙",
+                modifier = Modifier.padding(start = 4.dp),
+                color = Raisin_Black.copy(alpha = 0.2f),
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard
+            )
+
+            Text(
+                text = blogReview.date,
+                modifier = Modifier.padding(start = 4.dp),
+                color = Raisin_Black.copy(alpha = 0.6f),
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard,
+                letterSpacing = (-0.03).em
+            )
+        }
+
+        Text(
+            text = blogReview.title,
+            modifier = Modifier.padding(top = 16.dp),
+            color = Raisin_Black,
+            fontSize = 16.dp.toSp(),
+            fontFamily = pretendard,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            letterSpacing = (-0.03).em
         )
 
-        HomeDetailInfoRow(
-            modifier = Modifier
-                .padding(top = 40.dp)
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            location = storeModel.location
+        Text(
+            text = blogReview.description,
+            modifier = Modifier.padding(top = 12.dp),
+            color = Raisin_Black.copy(alpha = 0.8f),
+            fontSize = 14.dp.toSp(),
+            fontFamily = pretendard,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            letterSpacing = (-0.03).em,
+            lineHeight = (22.4).dp.toSp()
         )
     }
 }
@@ -254,15 +407,6 @@ private fun HomeDetailInfoRow(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun HomeDetailInfoRowPreview() {
-    HomeDetailInfoRow(
-        modifier = Modifier.fillMaxWidth(),
-        location = "서울 은평구 연서로29길 8,지번: 갈현동 399-7,연신내역 7번 출구에서 219m"
-    )
-}
-
 @Composable
 private fun HomeDetailKeywordRow(
     modifier: Modifier = Modifier,
@@ -406,6 +550,43 @@ private fun HomeDetailAppbar(
 
 @Preview(showBackground = true)
 @Composable
+private fun HomeDetailBlogRowPreview() {
+    HomeDetailBlogRow(
+        modifier = Modifier.fillMaxWidth(),
+        blogReviews = listOf(
+            BlogReviewModel(
+                name = "블로거 이름",
+                date = "2023.05.01",
+                title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
+                description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각..."
+            ),
+            BlogReviewModel(
+                name = "블로거 이름",
+                date = "2023.05.01",
+                title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
+                description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각..."
+            ),
+            BlogReviewModel(
+                name = "블로거 이름",
+                date = "2023.05.01",
+                title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
+                description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각..."
+            )
+        )
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeDetailInfoRowPreview() {
+    HomeDetailInfoRow(
+        modifier = Modifier.fillMaxWidth(),
+        location = "서울 은평구 연서로29길 8,지번: 갈현동 399-7,연신내역 7번 출구에서 219m"
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun HomeDetailKeywordPreview() {
     HomeDetailKeywordRow(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -442,7 +623,6 @@ private fun HomeDetailTabPreview() {
 @Composable
 private fun HomeDetailScreenPreview() {
     HomeDetailScreen(
-        modifier = Modifier.fillMaxSize(),
         storeModel = StoreModel(
             id = 0L,
             name = "케이크를 부탁해 연신내역점",
@@ -456,6 +636,26 @@ private fun HomeDetailScreenPreview() {
                 StoreType.PHOTO,
                 StoreType.FIGURE,
                 StoreType.TIARA
+            )
+        ),
+        blogReviews = listOf(
+            BlogReviewModel(
+                name = "블로거 이름",
+                date = "2023.05.01",
+                title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
+                description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각..."
+            ),
+            BlogReviewModel(
+                name = "블로거 이름",
+                date = "2023.05.01",
+                title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
+                description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각..."
+            ),
+            BlogReviewModel(
+                name = "블로거 이름",
+                date = "2023.05.01",
+                title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
+                description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각..."
             )
         )
     )
