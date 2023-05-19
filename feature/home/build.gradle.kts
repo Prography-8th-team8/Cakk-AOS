@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":core:utility"))
     implementation(project(":core:base"))
+    implementation(project(":core:designsystem"))
 
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
