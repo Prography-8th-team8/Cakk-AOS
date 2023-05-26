@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.ktlint)
-    id("dagger.hilt.android.plugin")
+    alias(libs.plugins.dagger.hilt)
 }
 
 android {

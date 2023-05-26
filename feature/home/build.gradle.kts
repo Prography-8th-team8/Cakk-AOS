@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.secrets.gradle)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.dagger.hilt)
 }
 
 android {
@@ -34,14 +36,19 @@ android {
 
 dependencies {
     implementation(project(":data"))
+    implementation(project(":core:designsystem"))
     implementation(project(":core:utility"))
     implementation(project(":core:base"))
-    implementation(project(":core:designsystem"))
+    implementation(project(":core:network"))
 
+    implementation(libs.androidx.compose.hilt.navigation)
+    implementation(libs.androidx.compose.navigation)
     implementation(libs.material)
+    implementation(libs.bundles.dagger)
     implementation(libs.bundles.androidx.compose)
     implementation(libs.naver.map)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
+    kapt(libs.bundles.compiler)
 }

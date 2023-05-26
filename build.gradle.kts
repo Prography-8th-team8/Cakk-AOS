@@ -20,6 +20,8 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.secrets.gradle) apply false
+    alias(libs.plugins.serialization) apply false
+    alias(libs.plugins.dagger.hilt) apply false
 }
 
 tasks {
