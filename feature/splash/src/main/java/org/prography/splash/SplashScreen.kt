@@ -38,45 +38,15 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
         val logoAnimationState = animateLottieCompositionAsState(lottieComposition)
 
         Column {
-            LottieAnimation(
-                composition = lottieComposition,
-                progress = { logoAnimationState.progress },
-                modifier = Modifier.weight(1f),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter
-            )
-
-            LottieAnimation(
-                composition = lottieComposition,
-                progress = { logoAnimationState.progress },
-                modifier = Modifier.weight(1f),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter
-            )
-
-            LottieAnimation(
-                composition = lottieComposition,
-                progress = { logoAnimationState.progress },
-                modifier = Modifier.weight(1f),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter
-            )
-
-            LottieAnimation(
-                composition = lottieComposition,
-                progress = { logoAnimationState.progress },
-                modifier = Modifier.weight(1f),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter
-            )
-
-            LottieAnimation(
-                composition = lottieComposition,
-                progress = { logoAnimationState.progress },
-                modifier = Modifier.weight(1f),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter
-            )
+            (0..4).forEach {
+                LottieAnimation(
+                    composition = lottieComposition,
+                    progress = { logoAnimationState.progress },
+                    modifier = Modifier.weight(1f),
+                    contentScale = ContentScale.FillWidth,
+                    alignment = Alignment.TopCenter
+                )
+            }
         }
 
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
