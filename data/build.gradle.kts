@@ -1,9 +1,10 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.konan.properties.Properties
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
-val properties = Properties()
-properties.load(project.rootProject.file("local.properties").inputStream())
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+}
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -19,7 +20,7 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "CAKK_BASE_URL", properties.getProperty("CAKK_BASE_URL"))
+        buildConfigField("String", "CAKK_BASE_URL", getApiKey("CAKK_BASE_URL"))
     }
 }
 dependencies {
@@ -37,5 +38,3 @@ dependencies {
     implementation(libs.androidx.test.espresso)
     kapt(libs.bundles.compiler)
 }
-
-
