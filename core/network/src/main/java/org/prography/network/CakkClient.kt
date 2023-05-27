@@ -1,6 +1,9 @@
-package org.prography.cakk.data
+package org.prography.network
 
-import android.util.Log
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.features.*
@@ -10,10 +13,16 @@ import io.ktor.client.features.logging.*
 import io.ktor.client.features.observer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@InstallIn(SingletonComponent::class)
+@Module
 class CakkHttpClient @Inject constructor() {
 
+    @Provides
+    @Singleton
     fun getHttpClient() = HttpClient(Android) {
         install(JsonFeature) {
             serializer = KotlinxSerializer(
@@ -27,27 +36,21 @@ class CakkHttpClient @Inject constructor() {
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
-                    Log.i(TAG_KTOR_LOGGER, message)
+                    Timber.i(message)
                 }
             }
         }
         install(ResponseObserver) {
             onResponse { response ->
-                Log.i(TAG_HTTP_STATUS_LOGGER, "${response.status.value}")
+                Timber.i(response.status.value.toString())
             }
         }
         install(DefaultRequest) {
             header(HttpHeaders.ContentType, ContentType.Application.Json)
         }
         engine {
-            connectTimeout = TIME_OUT
-            socketTimeout = TIME_OUT
+            connectTimeout = 10_000
+            socketTimeout = 10_000
         }
-    }
-
-    companion object {
-        private const val TIME_OUT = 10_000
-        private const val TAG_KTOR_LOGGER = "ktor_logger:"
-        private const val TAG_HTTP_STATUS_LOGGER = "http_status:"
     }
 }
