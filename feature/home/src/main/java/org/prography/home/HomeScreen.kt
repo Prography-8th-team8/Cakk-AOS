@@ -25,7 +25,7 @@ fun HomeScreen(
 ) {
     val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
 
-    Box {
+    Box(modifier = Modifier.fillMaxSize()) {
         NaverMap(
             modifier = Modifier.fillMaxSize()
         ) {
