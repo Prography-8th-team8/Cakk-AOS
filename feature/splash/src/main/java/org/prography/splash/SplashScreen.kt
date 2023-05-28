@@ -37,11 +37,17 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
         val lottieComposition by rememberLottieComposition(spec = LottieCompositionSpec.Asset("grid_animation.json"))
         val logoAnimationState = animateLottieCompositionAsState(lottieComposition)
 
-        LottieAnimation(
-            composition = lottieComposition,
-            progress = { logoAnimationState.progress },
-            contentScale = ContentScale.FillHeight,
-        )
+        Column {
+            (0..4).forEach {
+                LottieAnimation(
+                    composition = lottieComposition,
+                    progress = { logoAnimationState.progress },
+                    modifier = Modifier.weight(1f),
+                    contentScale = ContentScale.FillWidth,
+                    alignment = Alignment.TopCenter
+                )
+            }
+        }
 
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
             navHostController.navigate(CakkDestination.OnBoarding.route) {
