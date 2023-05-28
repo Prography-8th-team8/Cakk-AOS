@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.bundles.dagger)
+    implementation(libs.dagger.hilt.android)
     implementation(libs.timber)
     implementation(libs.bundles.androidx.compose)
     testImplementation(libs.junit)

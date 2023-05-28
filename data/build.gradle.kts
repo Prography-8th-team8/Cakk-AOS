@@ -2,10 +2,6 @@
 
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
-fun getApiKey(propertyKey: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyKey)
-}
-
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.android)
@@ -20,7 +16,7 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "CAKK_BASE_URL", getApiKey("CAKK_BASE_URL"))
+        buildConfigField("String", "CAKK_BASE_URL", gradleLocalProperties(rootDir).getProperty("CAKK_BASE_URL"))
     }
 }
 dependencies {
@@ -28,7 +24,7 @@ dependencies {
     implementation(project(":core:utility"))
 
     implementation(libs.gson)
-    implementation(libs.bundles.dagger)
+    implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.bundles.ktor)
