@@ -14,12 +14,11 @@ import io.ktor.client.features.observer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import timber.log.Timber
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-class CakkHttpClient @Inject constructor() {
+object CakkHttpClient {
 
     @Provides
     @Singleton
