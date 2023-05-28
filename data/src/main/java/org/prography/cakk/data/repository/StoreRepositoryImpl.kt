@@ -15,11 +15,13 @@ class StoreRepositoryImpl @Inject constructor(
 
     override fun fetchStoreList(storeListRequest: StoreListRequest): Flow<List<StoreListResponse>> {
         return flow {
-            httpClient.get {
-                url("${BuildConfig.CAKK_BASE_URL}api/store/list")
-                parameter("district", storeListRequest.district)
-                parameter("page", storeListRequest.page)
-            }
+            emit(
+                httpClient.get {
+                    url("${BuildConfig.CAKK_BASE_URL}api/store/list")
+                    parameter("district", storeListRequest.district)
+                    parameter("page", storeListRequest.page)
+                }
+            )
         }
     }
 }
