@@ -1,9 +1,14 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.dagger.hilt)
 }
 
 android {
@@ -11,16 +16,21 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "CAKK_BASE_URL", gradleLocalProperties(rootDir).getProperty("CAKK_BASE_URL"))
     }
 }
 dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:utility"))
 
+    implementation(libs.gson)
+    implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.bundles.ktor)
     implementation(libs.material)
     implementation(libs.junit)
     implementation(libs.androidx.test.junit)
     implementation(libs.androidx.test.espresso)
+    kapt(libs.bundles.compiler)
 }

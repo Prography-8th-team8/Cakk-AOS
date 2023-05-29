@@ -8,7 +8,7 @@ import org.prography.base.BaseSideEffect
 import org.prography.base.BaseState
 
 abstract class BaseViewModel<ACTION : BaseAction, STATE : BaseState, SE : BaseSideEffect>(
-    initialState: STATE
+    initialState: STATE,
 ) : ViewModel() {
     private val actionChannel: Channel<ACTION> = Channel()
     val state: StateFlow<STATE> = actionChannel.receiveAsFlow()
@@ -19,13 +19,14 @@ abstract class BaseViewModel<ACTION : BaseAction, STATE : BaseState, SE : BaseSi
     val sideEffect: Flow<SE> = sideEffectChannel.receiveAsFlow()
 
     fun sendAction(action: ACTION) {
-        viewModelScope.launch{
+        viewModelScope.launch {
             actionChannel.send(action)
         }
     }
-    abstract fun reduceState(currentState: STATE, action: ACTION) : STATE
 
-    protected fun sendSideEffect(sideEffect: SE){
+    abstract fun reduceState(currentState: STATE, action: ACTION): STATE
+
+    protected fun sendSideEffect(sideEffect: SE) {
         viewModelScope.launch {
             sideEffectChannel.send(sideEffect)
         }

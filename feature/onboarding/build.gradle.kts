@@ -39,7 +39,7 @@ dependencies {
     implementation(libs.bundles.androidx.lifeycle)
     implementation(libs.androidx.compose.hilt.navigation)
     testImplementation(libs.junit)
-    implementation(libs.bundles.dagger)
+    implementation(libs.dagger.hilt.android)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
     kapt(libs.bundles.compiler)

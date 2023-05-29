@@ -34,10 +34,15 @@ jobs:
 
       - name: Change gradlew permissions
         run: chmod +x ./gradlew
-        
+
       - name: Touch local properties
         run: touch local.properties
-        
+
+      - name: Access CAKK_BASE_URL
+        env:
+            CAKK_BASE_URL: ${{ secrets.CAKK_BASE_URL }}
+        run: echo "CAKK_BASE_URL=\"CAKK_BASE_URL\"" >> local.properties
+
       - name: Access NAVER_API_MAP_KEY
         env:
             NAVER_API_MAP_KEY: ${{ secrets.NAVER_API_MAP_KEY }}
