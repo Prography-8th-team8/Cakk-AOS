@@ -41,7 +41,7 @@ jobs:
       - name: Access CAKK_BASE_URL
         env:
             CAKK_BASE_URL: ${{ secrets.CAKK_BASE_URL }}
-        run: echo "CAKK_BASE_URL=\"CAKK_BASE_URL\"" >> local.properties
+        run: echo "CAKK_BASE_URL=\"$CAKK_BASE_URL\"" >> local.properties
 
       - name: Access NAVER_API_MAP_KEY
         env:
