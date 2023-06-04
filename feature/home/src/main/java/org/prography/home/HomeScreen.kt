@@ -17,6 +17,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,9 +49,9 @@ fun HomeScreen(
     val screenHeight = configuration.screenHeightDp
     val statusBarHeight = LocalContext.current.resources.getDimensionPixelSize(
         LocalContext.current.resources.getIdentifier(
-            "status_bar_height",
-            "dimen",
-            "android",
+            stringResource(id = R.string.home_status_bar_height),
+            stringResource(id = R.string.home_dimen),
+            stringResource(id = R.string.home_android),
         ),
     )
     BottomSheet(storeList, screenHeight, statusBarHeight)
