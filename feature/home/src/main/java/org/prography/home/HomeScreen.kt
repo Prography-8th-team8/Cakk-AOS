@@ -34,8 +34,25 @@ import org.prography.designsystem.ui.theme.*
 import org.prography.enums.DistrictType
 import org.prography.utility.extensions.toSp
 
-enum class ExpandedType(var height: Int) {
-    HALF(0), FULL(0), COLLAPSED(53), MOVING(0)
+enum class ExpandedType {
+    HALF, FULL, COLLAPSED, MOVING;
+
+    fun getByScreenHeight(type: ExpandedType, screenHeight: Int, statusBarHeight: Int, offsetY: Float): Int {
+        return when (type) {
+            FULL -> {
+                (screenHeight - statusBarHeight)
+            }
+            HALF -> {
+                ((screenHeight / 2.5).toInt())
+            }
+            COLLAPSED -> {
+                53
+            }
+            MOVING -> {
+                offsetY.toInt()
+            }
+        }
+    }
 }
 
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
@@ -64,10 +81,9 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
     var offsetY by remember { mutableStateOf((screenHeight / 20).toFloat()) }
-    var expandedType by remember {
-        mutableStateOf(ExpandedType.COLLAPSED)
-    }
-    val height by animateIntAsState(expandedType.height)
+    var expandedType by remember { mutableStateOf(ExpandedType.COLLAPSED) }
+    val height by animateIntAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
+
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetElevation = 0.dp,
@@ -88,23 +104,22 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                             onDrag = { change, dragAmount ->
                                 change.consume()
                                 offsetY -= dragAmount.y
-                                ExpandedType.MOVING.height = offsetY.toInt()
                             },
                             onDragEnd = {
                                 expandedType = when {
                                     offsetY >= (screenHeight / 1.5).toFloat() -> {
-                                        offsetY = screenHeight.toFloat()
-                                        ExpandedType.FULL.also { it.height = screenHeight - statusBarHeight }
+                                        ExpandedType.FULL
                                     }
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
-                                        offsetY = (screenHeight / 2.5).toFloat()
-                                        ExpandedType.HALF.also { it.height = (screenHeight / 2.5).toInt() }
+                                        ExpandedType.HALF
                                     }
                                     else -> {
-                                        offsetY = 53f
-                                        ExpandedType.COLLAPSED.also { it.height = 53 }
+                                        ExpandedType.COLLAPSED
                                     }
                                 }
+                                offsetY = expandedType
+                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                    .toFloat()
                             },
                         )
                     }
