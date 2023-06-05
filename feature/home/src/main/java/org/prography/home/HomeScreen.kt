@@ -34,8 +34,8 @@ import org.prography.designsystem.ui.theme.*
 import org.prography.enums.DistrictType
 import org.prography.utility.extensions.toSp
 
-enum class ExpandedType {
-    HALF, FULL, COLLAPSED, MOVING
+enum class ExpandedType(var height: Int) {
+    HALF(0), FULL(0), COLLAPSED(53), MOVING(0)
 }
 
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
@@ -45,8 +45,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
     val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp
+    val screenHeight = LocalConfiguration.current.screenHeightDp
     val statusBarHeight = LocalContext.current.resources.getDimensionPixelSize(
         LocalContext.current.resources.getIdentifier(
             stringResource(id = R.string.home_status_bar_height),
@@ -68,20 +67,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
     var expandedType by remember {
         mutableStateOf(ExpandedType.COLLAPSED)
     }
-    val height by animateIntAsState(
-        when (expandedType) {
-            ExpandedType.HALF -> {
-                offsetY = (screenHeight / 2.5).toFloat()
-                (screenHeight / 2.5).toInt()
-            }
-            ExpandedType.FULL -> {
-                offsetY = screenHeight.toFloat()
-                screenHeight - statusBarHeight
-            }
-            ExpandedType.COLLAPSED -> 53
-            ExpandedType.MOVING -> offsetY.toInt()
-        },
-    )
+    val height by animateIntAsState(expandedType.height)
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetElevation = 0.dp,
@@ -96,22 +82,27 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                     .height(height.dp)
                     .pointerInput(Unit) {
                         detectDragGestures(
+                            onDragStart = {
+                                expandedType = ExpandedType.MOVING
+                            },
                             onDrag = { change, dragAmount ->
                                 change.consume()
-                                expandedType = ExpandedType.MOVING
                                 offsetY -= dragAmount.y
+                                ExpandedType.MOVING.height = offsetY.toInt()
                             },
                             onDragEnd = {
                                 expandedType = when {
                                     offsetY >= (screenHeight / 1.5).toFloat() -> {
-                                        ExpandedType.FULL
+                                        offsetY = screenHeight.toFloat()
+                                        ExpandedType.FULL.also { it.height = screenHeight - statusBarHeight }
                                     }
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
-                                        ExpandedType.HALF
+                                        offsetY = (screenHeight / 2.5).toFloat()
+                                        ExpandedType.HALF.also { it.height = (screenHeight / 2.5).toInt() }
                                     }
                                     else -> {
                                         offsetY = 53f
-                                        ExpandedType.COLLAPSED
+                                        ExpandedType.COLLAPSED.also { it.height = 53 }
                                     }
                                 }
                             },
