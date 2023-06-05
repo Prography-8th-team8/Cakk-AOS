@@ -4,13 +4,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class StoreListResponse(
-    val city: String,
-    val createdAt: String,
-    val district: String,
     val id: Int,
-    val latitude: Double,
-    val longitude: Double,
+    val createdAt: String,
     val modifiedAt: String,
     val name: String,
+    val city: String,
+    val district: String,
+    val location: String,
+    val latitude: Double,
+    val longitude: Double,
     val storeTypes: List<String>,
 )
