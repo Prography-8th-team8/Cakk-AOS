@@ -1,7 +1,7 @@
 package org.prography.home
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,19 +38,19 @@ import org.prography.utility.extensions.toSp
 enum class ExpandedType {
     HALF, FULL, COLLAPSED, MOVING;
 
-    fun getByScreenHeight(type: ExpandedType, screenHeight: Int, statusBarHeight: Int, offsetY: Float): Int {
+    fun getByScreenHeight(type: ExpandedType, screenHeight: Int, statusBarHeight: Int, offsetY: Float): Dp {
         return when (type) {
             FULL -> {
-                (screenHeight - statusBarHeight)
+                (screenHeight - statusBarHeight).dp
             }
             HALF -> {
-                ((screenHeight / 2.5).toInt())
+                ((screenHeight / 2.5).toInt()).dp
             }
             COLLAPSED -> {
-                53
+                53.dp
             }
             MOVING -> {
-                offsetY.toInt()
+                offsetY.dp
             }
         }
     }
@@ -82,7 +83,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
     )
     var offsetY by remember { mutableStateOf((screenHeight / 20).toFloat()) }
     var expandedType by remember { mutableStateOf(ExpandedType.COLLAPSED) }
-    val height by animateIntAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
+    val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
@@ -95,7 +96,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .height(height.dp)
+                    .height(height)
                     .pointerInput(Unit) {
                         detectDragGestures(
                             onDragStart = {
@@ -119,7 +120,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                                 }
                                 offsetY = expandedType
                                     .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                    .toFloat()
+                                    .value
                             },
                         )
                     }
@@ -128,7 +129,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                 BottomSheetContent(storeList)
             }
         },
-        sheetPeekHeight = height.dp,
+        sheetPeekHeight = height,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             CakkMap(storeList)
