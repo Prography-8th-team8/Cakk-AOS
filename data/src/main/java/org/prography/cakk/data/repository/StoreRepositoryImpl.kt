@@ -4,9 +4,12 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.prography.cakk.data.BuildConfig
 import org.prography.cakk.data.api.model.request.StoreListRequest
 import org.prography.cakk.data.api.model.response.StoreListResponse
+import org.prography.network.CakkService.BASE_URL
+import org.prography.network.CakkService.Endpoint.STORE_LIST
+import org.prography.network.CakkService.Parameter.DISTRICT
+import org.prography.network.CakkService.Parameter.PAGE
 import javax.inject.Inject
 
 class StoreRepositoryImpl @Inject constructor(
@@ -17,9 +20,9 @@ class StoreRepositoryImpl @Inject constructor(
         return flow {
             emit(
                 httpClient.get {
-                    url("${BuildConfig.CAKK_BASE_URL}api/store/list")
-                    parameter("district", storeListRequest.district)
-                    parameter("page", storeListRequest.page)
+                    url("$BASE_URL$STORE_LIST")
+                    parameter(DISTRICT, storeListRequest.district)
+                    parameter(PAGE, storeListRequest.page)
                 }
             )
         }
