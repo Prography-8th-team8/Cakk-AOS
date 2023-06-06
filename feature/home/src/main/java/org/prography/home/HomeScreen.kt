@@ -32,7 +32,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import org.prography.cakk.data.api.model.response.StoreListResponse
 import org.prography.designsystem.R
 import org.prography.designsystem.ui.theme.*
-import org.prography.enums.DistrictType
+import org.prography.cakk.data.api.model.enums.DistrictType
 import org.prography.utility.extensions.toSp
 
 enum class ExpandedType {

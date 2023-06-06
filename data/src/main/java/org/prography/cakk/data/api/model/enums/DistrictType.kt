@@ -1,4 +1,4 @@
-package org.prography.enums
+package org.prography.cakk.data.api.model.enums
 
 enum class DistrictType(val districtKr: String) {
     DOBONG("도봉"),
