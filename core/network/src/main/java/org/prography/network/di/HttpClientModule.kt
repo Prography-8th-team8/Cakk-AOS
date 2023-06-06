@@ -1,4 +1,4 @@
-package org.prography.network
+package org.prography.network.di
 
 import dagger.Module
 import dagger.Provides
@@ -18,7 +18,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object CakkHttpClient {
+object HttpClientModule {
 
     @Provides
     @Singleton
