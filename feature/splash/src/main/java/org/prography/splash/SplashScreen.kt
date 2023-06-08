@@ -50,7 +50,11 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
         }
 
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
-            navHostController.navigate(CakkDestination.OnBoarding.route) {
+            navHostController.navigate(
+                CakkDestination.Home.withArgs(
+                    true
+                )
+            ) {
                 popUpTo(CakkDestination.Splash.route) {
                     inclusive = true
                 }
