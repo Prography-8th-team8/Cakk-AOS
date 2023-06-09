@@ -109,7 +109,7 @@ private fun LocationPermission(
     }
 
     LaunchedEffect(true) {
-        val formOnBoarding = navHostController.previousBackStackEntry?.destination?.route != "onBoarding"
+        val formOnBoarding = navHostController.previousBackStackEntry?.destination?.route != CakkDestination.OnBoarding.route
 
         if (formOnBoarding) {
             checkAndRequestPermissions(
