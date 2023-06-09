@@ -70,9 +70,8 @@ enum class ExpandedType {
 fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-    fromSplash: Boolean,
 ) {
-    LocationPermission(navHostController, fromSplash)
+    LocationPermission(navHostController)
 
     val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
     val screenHeight = LocalConfiguration.current.screenHeightDp
@@ -89,7 +88,6 @@ fun HomeScreen(
 @Composable
 private fun LocationPermission(
     navHostController: NavHostController,
-    fromSplash: Boolean,
 ) {
     val context = LocalContext.current
     val permissions = arrayOf(
@@ -100,22 +98,20 @@ private fun LocationPermission(
     val launcherMultiplePermissions = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { permissionsMap ->
-        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+        val areGranted = permissionsMap.values.reduceOrNull { acc, next -> acc && next }
 
-        if (areGranted) {
+        if (areGranted == true) {
             Timber.i("권한이 동의되었습니다.")
         } else {
             Timber.i("권한이 거부되었습니다.")
-            navHostController.navigate(CakkDestination.OnBoarding.route) {
-                popUpTo(CakkDestination.Home.route) {
-                    inclusive = true
-                }
-            }
+            navHostController.navigate(CakkDestination.OnBoarding.route)
         }
     }
 
-    LaunchedEffect(fromSplash) {
-        if (fromSplash) {
+    LaunchedEffect(true) {
+        val formOnBoarding = navHostController.previousBackStackEntry?.destination?.route != "onBoarding"
+
+        if (formOnBoarding) {
             checkAndRequestPermissions(
                 context,
                 permissions,

@@ -32,7 +32,7 @@ import org.prography.utility.navigation.destination.CakkDestination
 @Composable
 fun OnBoardingScreen(
     navHostController: NavHostController = rememberNavController(),
-    viewModel: OnBoardingViewModel = hiltViewModel()
+    viewModel: OnBoardingViewModel = hiltViewModel(),
 ) {
     val state = viewModel.regions.collectAsStateWithLifecycle()
 
@@ -80,13 +80,9 @@ fun OnBoardingScreen(
                 color = it.color,
                 onClick = {
                     // Home으로 이동, 추후 데이터까지 전달
-                    navHostController.navigate(
-                        CakkDestination.Home.withArgs(
-                            false
-                        )
-                    ) {
+                    navHostController.navigate(CakkDestination.Home.route) {
                         popUpTo(CakkDestination.OnBoarding.route) {
-                            inclusive = true
+                            inclusive = false
                         }
                     }
                 }
@@ -136,7 +132,7 @@ private fun OnBoardingRegionItem(
     region: String,
     count: Int,
     color: Color,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier

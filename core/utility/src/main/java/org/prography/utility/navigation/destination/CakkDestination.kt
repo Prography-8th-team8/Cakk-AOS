@@ -12,13 +12,4 @@ sealed class CakkDestination(
         private const val HOME = "home"
         private const val ON_BOARDING = "onBoarding"
     }
-
-    fun withArgs(vararg args: Boolean): String {
-        return buildString {
-            append(route)
-            args.forEach { arg ->
-                append("/$arg")
-            }
-        }
-    }
 }
