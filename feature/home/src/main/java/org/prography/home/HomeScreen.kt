@@ -83,7 +83,13 @@ fun HomeScreen(
             stringResource(id = R.string.home_android),
         ),
     )
-    BottomSheet(storeList, screenHeight, statusBarHeight, navHostController)
+    BottomSheet(storeList, screenHeight, statusBarHeight) {
+        navHostController.navigate(CakkDestination.OnBoarding.route) {
+            popUpTo(CakkDestination.Home.route) {
+                inclusive = true
+            }
+        }
+    }
 }
 
 @Composable
@@ -129,7 +135,7 @@ private fun LocationPermission(
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int, navHostController: NavHostController) {
+private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int, navigateToOnBoarding: () -> Unit) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
@@ -178,7 +184,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList, navHostController)
+                BottomSheetContent(storeList, navigateToOnBoarding)
             }
         },
         sheetPeekHeight = height,
@@ -190,12 +196,12 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
 }
 
 @Composable
-private fun BottomSheetContent(storeList: List<StoreListResponse>, navHostController: NavHostController) {
+private fun BottomSheetContent(storeList: List<StoreListResponse>, navigateToOnBoarding: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BottomSheetTop(modifier = Modifier.align(Alignment.Start), navHostController)
+        BottomSheetTop(modifier = Modifier.align(Alignment.Start), navigateToOnBoarding)
 
         LazyColumn(
             modifier = Modifier.padding(top = 22.dp),
@@ -292,7 +298,7 @@ private fun StoreTags(store: StoreListResponse) {
 }
 
 @Composable
-private fun BottomSheetTop(modifier: Modifier, navHostController: NavHostController) {
+private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
         contentDescription = null,
@@ -331,11 +337,7 @@ private fun BottomSheetTop(modifier: Modifier, navHostController: NavHostControl
             Text(
                 text = stringResource(id = R.string.home_change_location),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).clickable {
-                    navHostController.navigate(CakkDestination.OnBoarding.route) {
-                        popUpTo(CakkDestination.Home.route) {
-                            inclusive = true
-                        }
-                    }
+                    navigateToOnBoarding()
                 },
                 fontFamily = pretendard,
                 fontSize = 12.sp,
