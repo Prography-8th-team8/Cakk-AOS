@@ -26,6 +26,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":data"))
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
 }
