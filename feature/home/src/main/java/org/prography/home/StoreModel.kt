@@ -1,5 +1,7 @@
 package org.prography.home
 
+import org.prography.cakk.data.api.model.enums.StoreType
+
 data class StoreModel(
     val id: Long = 0L,
     val createdAt: String = "",

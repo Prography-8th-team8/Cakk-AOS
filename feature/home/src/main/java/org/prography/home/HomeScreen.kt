@@ -33,6 +33,8 @@ import org.prography.cakk.data.api.model.response.StoreListResponse
 import org.prography.designsystem.R
 import org.prography.designsystem.ui.theme.*
 import org.prography.cakk.data.api.model.enums.DistrictType
+import org.prography.cakk.data.api.model.enums.StoreType
+import org.prography.designsystem.extensions.toColor
 import org.prography.utility.extensions.toSp
 
 enum class ExpandedType {
@@ -210,12 +212,12 @@ private fun StoreTags(store: StoreListResponse) {
         store.storeTypes.forEach { storeType ->
             Surface(
                 shape = RoundedCornerShape(14.dp),
-                color = StoreType.valueOf(storeType).color.copy(alpha = 0.2f)
+                color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
             ) {
                 Text(
                     text = StoreType.valueOf(storeType).tag,
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = StoreType.valueOf(storeType).color,
+                    color = StoreType.valueOf(storeType).toColor(),
                     fontSize = 12.sp,
                     fontFamily = pretendard
                 )

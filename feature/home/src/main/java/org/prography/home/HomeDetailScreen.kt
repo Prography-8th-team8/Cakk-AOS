@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import org.prography.cakk.data.api.model.enums.StoreType
 import org.prography.designsystem.R
+import org.prography.designsystem.extensions.toColor
 import org.prography.designsystem.ui.theme.*
 import org.prography.utility.extensions.toSp
 
@@ -430,9 +432,9 @@ private fun HomeDetailKeywordRow(
                 Text(
                     text = it.tag,
                     modifier = Modifier
-                        .background(it.color.copy(alpha = 0.2f), RoundedCornerShape(14.dp))
+                        .background(it.toColor().copy(alpha = 0.2f), RoundedCornerShape(14.dp))
                         .padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = it.color,
+                    color = it.toColor(),
                     fontSize = 12.dp.toSp(),
                     fontWeight = FontWeight.Bold,
                     fontFamily = pretendard,
