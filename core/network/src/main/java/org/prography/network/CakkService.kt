@@ -5,6 +5,7 @@ object CakkService {
 
     object Endpoint {
         const val STORE_LIST = "api/store/list"
+        const val STORE_DETAIL = "api/store"
     }
 
     object Parameter {
