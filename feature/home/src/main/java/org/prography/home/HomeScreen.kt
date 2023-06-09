@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -82,7 +83,13 @@ fun HomeScreen(
             stringResource(id = R.string.home_android),
         ),
     )
-    BottomSheet(storeList, screenHeight, statusBarHeight)
+    BottomSheet(storeList, screenHeight, statusBarHeight) {
+        navHostController.navigate(CakkDestination.OnBoarding.route) {
+            popUpTo(CakkDestination.Home.route) {
+                inclusive = true
+            }
+        }
+    }
 }
 
 @Composable
@@ -104,7 +111,11 @@ private fun LocationPermission(
             Timber.i("권한이 동의되었습니다.")
         } else {
             Timber.i("권한이 거부되었습니다.")
-            navHostController.navigate(CakkDestination.OnBoarding.route)
+            navHostController.navigate(CakkDestination.OnBoarding.route) {
+                popUpTo(CakkDestination.Home.route) {
+                    inclusive = true
+                }
+            }
         }
     }
 
@@ -124,7 +135,7 @@ private fun LocationPermission(
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int) {
+private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int, navigateToOnBoarding: () -> Unit) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
@@ -173,7 +184,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList)
+                BottomSheetContent(storeList, navigateToOnBoarding)
             }
         },
         sheetPeekHeight = height,
@@ -185,12 +196,12 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
 }
 
 @Composable
-private fun BottomSheetContent(storeList: List<StoreListResponse>) {
+private fun BottomSheetContent(storeList: List<StoreListResponse>, navigateToOnBoarding: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BottomSheetTop(modifier = Modifier.align(Alignment.Start))
+        BottomSheetTop(modifier = Modifier.align(Alignment.Start), navigateToOnBoarding)
 
         LazyColumn(
             modifier = Modifier.padding(top = 22.dp),
@@ -287,30 +298,54 @@ private fun StoreTags(store: StoreListResponse) {
 }
 
 @Composable
-private fun BottomSheetTop(modifier: Modifier) {
+private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
         contentDescription = null,
         modifier = Modifier.padding(top = 20.dp)
     )
-    Text(
-        text = "은평, 마포, 서대문",
-        fontFamily = pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.dp.toSp(),
-        color = Raisin_Black,
-        modifier = modifier
-            .padding(start = 20.dp, top = 30.dp)
-    )
-    Text(
-        text = "24개의 케이크샵",
-        fontFamily = pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.dp.toSp(),
-        color = Raisin_Black.copy(alpha = 0.8f),
-        modifier = modifier
-            .padding(start = 20.dp, top = 12.dp)
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = "은평, 마포, 서대문",
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.dp.toSp(),
+                color = Raisin_Black,
+                modifier = modifier
+                    .padding(top = 30.dp)
+            )
+            Text(
+                text = "24개의 케이크샵",
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.dp.toSp(),
+                color = Raisin_Black.copy(alpha = 0.8f),
+                modifier = modifier
+                    .padding(top = 12.dp)
+            )
+        }
+        Surface(
+            modifier = Modifier.padding(top = 34.dp),
+            shape = RoundedCornerShape(12.dp),
+            color = Light_Deep_Pink.copy(alpha = 0.15f)
+        ) {
+            Text(
+                text = stringResource(id = R.string.home_change_location),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).clickable {
+                    navigateToOnBoarding()
+                },
+                fontFamily = pretendard,
+                fontSize = 12.sp,
+                color = Magenta,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
 }
 
 @Composable
