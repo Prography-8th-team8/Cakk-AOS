@@ -1,6 +1,12 @@
 package org.prography.home
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -34,6 +41,8 @@ import org.prography.designsystem.R
 import org.prography.designsystem.ui.theme.*
 import org.prography.enums.DistrictType
 import org.prography.utility.extensions.toSp
+import org.prography.utility.navigation.destination.CakkDestination
+import timber.log.Timber
 
 enum class ExpandedType {
     HALF, FULL, COLLAPSED, MOVING;
@@ -62,6 +71,8 @@ fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
+    LocationPermission(navHostController)
+
     val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val statusBarHeight = LocalContext.current.resources.getDimensionPixelSize(
@@ -72,6 +83,42 @@ fun HomeScreen(
         ),
     )
     BottomSheet(storeList, screenHeight, statusBarHeight)
+}
+
+@Composable
+private fun LocationPermission(
+    navHostController: NavHostController,
+) {
+    val context = LocalContext.current
+    val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+
+    val launcherMultiplePermissions = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissionsMap ->
+        val areGranted = permissionsMap.values.reduceOrNull { acc, next -> acc && next }
+
+        if (areGranted == true) {
+            Timber.i("권한이 동의되었습니다.")
+        } else {
+            Timber.i("권한이 거부되었습니다.")
+            navHostController.navigate(CakkDestination.OnBoarding.route)
+        }
+    }
+
+    LaunchedEffect(true) {
+        val formOnBoarding = navHostController.previousBackStackEntry?.destination?.route != CakkDestination.OnBoarding.route
+
+        if (formOnBoarding) {
+            checkAndRequestPermissions(
+                context,
+                permissions,
+                launcherMultiplePermissions,
+            )
+        }
+    }
 }
 
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
@@ -290,5 +337,27 @@ private fun CakkMap(storeList: List<StoreListResponse>) {
                 icon = OverlayImage.fromResource(R.drawable.ic_marker),
             )
         }
+    }
+}
+
+fun checkAndRequestPermissions(
+    context: Context,
+    permissions: Array<String>,
+    launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
+) {
+    // 권한이 이미 있는 경우
+    if (permissions.all {
+            ContextCompat.checkSelfPermission(
+                context,
+                it,
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+    ) {
+        Timber.d("권한이 이미 존재합니다.")
+    }
+    // 권한이 없는 경우
+    else {
+        launcher.launch(permissions)
+        Timber.d("권한을 요청하였습니다.")
     }
 }
