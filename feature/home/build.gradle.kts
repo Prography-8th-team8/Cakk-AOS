@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.androidx.compose.hilt.navigation)
     implementation(libs.androidx.compose.navigation)
     implementation(libs.material)
+    implementation(libs.timber)
     implementation(libs.dagger.hilt.android)
     implementation(libs.bundles.androidx.compose)
     implementation(libs.naver.map)

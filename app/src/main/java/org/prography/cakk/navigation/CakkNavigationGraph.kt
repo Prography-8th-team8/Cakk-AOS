@@ -22,7 +22,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
         }
 
         composable(route = CakkDestination.Home.route) {
-            HomeScreen()
+            HomeScreen(navHostController = navController)
         }
 
         composable(route = CakkDestination.OnBoarding.route) {

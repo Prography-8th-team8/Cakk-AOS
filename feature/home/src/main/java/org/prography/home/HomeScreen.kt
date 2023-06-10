@@ -1,9 +1,16 @@
 package org.prography.home
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -36,6 +44,8 @@ import org.prography.cakk.data.api.model.enums.DistrictType
 import org.prography.cakk.data.api.model.enums.StoreType
 import org.prography.designsystem.extensions.toColor
 import org.prography.utility.extensions.toSp
+import org.prography.utility.navigation.destination.CakkDestination
+import timber.log.Timber
 
 enum class ExpandedType {
     HALF, FULL, COLLAPSED, MOVING;
@@ -64,6 +74,8 @@ fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
+    LocationPermission(navHostController)
+
     val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val statusBarHeight = LocalContext.current.resources.getDimensionPixelSize(
@@ -73,13 +85,59 @@ fun HomeScreen(
             stringResource(id = R.string.home_android),
         ),
     )
-    BottomSheet(storeList, screenHeight, statusBarHeight)
+    BottomSheet(storeList, screenHeight, statusBarHeight) {
+        navHostController.navigate(CakkDestination.OnBoarding.route) {
+            popUpTo(CakkDestination.Home.route) {
+                inclusive = true
+            }
+        }
+    }
+}
+
+@Composable
+private fun LocationPermission(
+    navHostController: NavHostController,
+) {
+    val context = LocalContext.current
+    val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+
+    val launcherMultiplePermissions = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissionsMap ->
+        val areGranted = permissionsMap.values.reduceOrNull { acc, next -> acc && next }
+
+        if (areGranted == true) {
+            Timber.i("권한이 동의되었습니다.")
+        } else {
+            Timber.i("권한이 거부되었습니다.")
+            navHostController.navigate(CakkDestination.OnBoarding.route) {
+                popUpTo(CakkDestination.Home.route) {
+                    inclusive = true
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(true) {
+        val formOnBoarding = navHostController.previousBackStackEntry?.destination?.route != CakkDestination.OnBoarding.route
+
+        if (formOnBoarding) {
+            checkAndRequestPermissions(
+                context,
+                permissions,
+                launcherMultiplePermissions,
+            )
+        }
+    }
 }
 
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int) {
+private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int, navigateToOnBoarding: () -> Unit) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
@@ -128,7 +186,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList)
+                BottomSheetContent(storeList, navigateToOnBoarding)
             }
         },
         sheetPeekHeight = height,
@@ -140,12 +198,12 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
 }
 
 @Composable
-private fun BottomSheetContent(storeList: List<StoreListResponse>) {
+private fun BottomSheetContent(storeList: List<StoreListResponse>, navigateToOnBoarding: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BottomSheetTop(modifier = Modifier.align(Alignment.Start))
+        BottomSheetTop(modifier = Modifier.align(Alignment.Start), navigateToOnBoarding)
 
         LazyColumn(
             modifier = Modifier.padding(top = 22.dp),
@@ -242,30 +300,54 @@ private fun StoreTags(store: StoreListResponse) {
 }
 
 @Composable
-private fun BottomSheetTop(modifier: Modifier) {
+private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
         contentDescription = null,
         modifier = Modifier.padding(top = 20.dp)
     )
-    Text(
-        text = "은평, 마포, 서대문",
-        fontFamily = pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.dp.toSp(),
-        color = Raisin_Black,
-        modifier = modifier
-            .padding(start = 20.dp, top = 30.dp)
-    )
-    Text(
-        text = "24개의 케이크샵",
-        fontFamily = pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.dp.toSp(),
-        color = Raisin_Black.copy(alpha = 0.8f),
-        modifier = modifier
-            .padding(start = 20.dp, top = 12.dp)
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = "은평, 마포, 서대문",
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.dp.toSp(),
+                color = Raisin_Black,
+                modifier = modifier
+                    .padding(top = 30.dp)
+            )
+            Text(
+                text = "24개의 케이크샵",
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.dp.toSp(),
+                color = Raisin_Black.copy(alpha = 0.8f),
+                modifier = modifier
+                    .padding(top = 12.dp)
+            )
+        }
+        Surface(
+            modifier = Modifier.padding(top = 34.dp),
+            shape = RoundedCornerShape(12.dp),
+            color = Light_Deep_Pink.copy(alpha = 0.15f)
+        ) {
+            Text(
+                text = stringResource(id = R.string.home_change_location),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).clickable {
+                    navigateToOnBoarding()
+                },
+                fontFamily = pretendard,
+                fontSize = 12.sp,
+                color = Magenta,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
 }
 
 @Composable
@@ -292,5 +374,27 @@ private fun CakkMap(storeList: List<StoreListResponse>) {
                 icon = OverlayImage.fromResource(R.drawable.ic_marker),
             )
         }
+    }
+}
+
+fun checkAndRequestPermissions(
+    context: Context,
+    permissions: Array<String>,
+    launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
+) {
+    // 권한이 이미 있는 경우
+    if (permissions.all {
+            ContextCompat.checkSelfPermission(
+                context,
+                it,
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+    ) {
+        Timber.d("권한이 이미 존재합니다.")
+    }
+    // 권한이 없는 경우
+    else {
+        launcher.launch(permissions)
+        Timber.d("권한을 요청하였습니다.")
     }
 }
