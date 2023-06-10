@@ -32,8 +32,8 @@ class StoreRepositoryImpl @Inject constructor(
 
     override fun fetchDetailStore(storeId: Int): Flow<StoreDetailResponse> = flow {
         emit(
-            httpClient.get(path = "$storeId") {
-                url("$BASE_URL$STORE_DETAIL")
+            httpClient.get {
+                url("$BASE_URL$STORE_DETAIL/정$storeId")
             }
         )
     }
