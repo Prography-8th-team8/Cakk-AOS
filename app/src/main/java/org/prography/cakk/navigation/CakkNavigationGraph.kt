@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import org.prography.home.HomeDetailScreen
 import org.prography.home.HomeScreen
 import org.prography.onboarding.OnBoardingScreen
 import org.prography.splash.SplashScreen
@@ -23,6 +24,16 @@ fun CakkNavigationGraph(navController: NavHostController) {
 
         composable(route = CakkDestination.Home.route) {
             HomeScreen(navHostController = navController)
+        }
+
+        composable(
+            route = CakkDestination.HomeDetail.routeWithArgs,
+            arguments = CakkDestination.HomeDetail.arguments
+        ) { navBackStackEntry ->
+            val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.HomeDetail.storeIdArg)
+            if (storeId != null) {
+                HomeDetailScreen(navHostController = navController, storeId = storeId)
+            }
         }
 
         composable(route = CakkDestination.OnBoarding.route) {
