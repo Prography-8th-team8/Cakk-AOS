@@ -85,13 +85,21 @@ fun HomeScreen(
             stringResource(id = R.string.home_android),
         ),
     )
-    BottomSheet(storeList, screenHeight, statusBarHeight) {
-        navHostController.navigate(CakkDestination.OnBoarding.route) {
-            popUpTo(CakkDestination.Home.route) {
-                inclusive = true
+    BottomSheet(
+        storeList = storeList,
+        screenHeight = screenHeight,
+        statusBarHeight = statusBarHeight,
+        navigateToOnBoarding = {
+            navHostController.navigate(CakkDestination.OnBoarding.route) {
+                popUpTo(CakkDestination.Home.route) {
+                    inclusive = true
+                }
             }
+        },
+        navigateToDetail = { storeId ->
+            navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
         }
-    }
+    )
 }
 
 @Composable
@@ -137,7 +145,13 @@ private fun LocationPermission(
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int, navigateToOnBoarding: () -> Unit) {
+private fun BottomSheet(
+    storeList: List<StoreListResponse>,
+    screenHeight: Int,
+    statusBarHeight: Int,
+    navigateToOnBoarding: () -> Unit,
+    navigateToDetail: (Int) -> Unit,
+) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
@@ -186,7 +200,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList, navigateToOnBoarding)
+                BottomSheetContent(storeList, navigateToOnBoarding, navigateToDetail)
             }
         },
         sheetPeekHeight = height,
@@ -198,7 +212,11 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
 }
 
 @Composable
-private fun BottomSheetContent(storeList: List<StoreListResponse>, navigateToOnBoarding: () -> Unit) {
+private fun BottomSheetContent(
+    storeList: List<StoreListResponse>,
+    navigateToOnBoarding: () -> Unit,
+    navigateToDetail: (Int) -> Unit,
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -212,7 +230,8 @@ private fun BottomSheetContent(storeList: List<StoreListResponse>, navigateToOnB
                 Surface(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .clickable { navigateToDetail(store.id) },
                     shape = RoundedCornerShape(24.dp),
                     color = OldLace
                 ) {
