@@ -1,11 +1,10 @@
+package org.prography.base
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.prography.base.BaseAction
-import org.prography.base.BaseSideEffect
-import org.prography.base.BaseState
 
 abstract class BaseViewModel<ACTION : BaseAction, STATE : BaseState, SE : BaseSideEffect>(
     initialState: STATE,
