@@ -12,7 +12,7 @@ androidxNavigation = "2.5.3"
 
 # 3rd-party
 kotlin = "1.8.10"
-dagger = "2.45"
+dagger = "2.44"
 coil = "2.3.0"
 timber = "5.0.1"
 lottie = "6.0.0"
@@ -37,7 +37,6 @@ secrets-gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradl
 [libraries]
 plugin-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-androidGradle = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
-plugin-hilt = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "dagger" }
 plugin-secrets-gradle = { group = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", name = "secrets-gradle-plugin", version.ref = "secrets-gradle" }
 
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanistSystemUiController" }
@@ -95,4 +94,4 @@ androidx-lifeycle = ["androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewm
 androidx-compose = ["androidx-compose-ui", "androidx-compose-material", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-tooling", "androidx-compose-navigation"]
 kotlin = ["kotlin-serialization", "kotlin-coroutine-core", "kotlin-coroutine-android", "kotlin-coroutine-test"]
 ktor = ["ktor-android", "ktor-serialization", "ktor-logging"]
-compiler = ["dagger-compiler", "dagger-hilt-compiler"]
+compiler = ["dagger-hilt-compiler"]
