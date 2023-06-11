@@ -18,16 +18,14 @@ class StoreRepositoryImpl @Inject constructor(
     private val httpClient: HttpClient,
 ) : StoreRepository {
 
-    override fun fetchStoreList(storeListRequest: StoreListRequest): Flow<List<StoreListResponse>> {
-        return flow {
-            emit(
-                httpClient.get {
-                    url("$BASE_URL$STORE_LIST")
-                    parameter(DISTRICT, storeListRequest.district)
-                    parameter(PAGE, storeListRequest.page)
-                }
-            )
-        }
+    override fun fetchStoreList(storeListRequest: StoreListRequest): Flow<List<StoreListResponse>> = flow {
+        emit(
+            httpClient.get {
+                url("$BASE_URL$STORE_LIST")
+                parameter(DISTRICT, storeListRequest.district)
+                parameter(PAGE, storeListRequest.page)
+            }
+        )
     }
 
     override fun fetchDetailStore(storeId: Int): Flow<StoreDetailResponse> = flow {
