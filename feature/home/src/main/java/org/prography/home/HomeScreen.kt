@@ -155,8 +155,9 @@ private fun BottomSheet(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
-    var offsetY by remember { mutableStateOf((screenHeight / 20).toFloat()) }
-    var expandedType by remember { mutableStateOf(ExpandedType.COLLAPSED) }
+
+    var offsetY by remember { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
+    var expandedType by remember { mutableStateOf(ExpandedType.HALF) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
