@@ -12,7 +12,7 @@ import javax.inject.Inject
 class DistrictRepositoryImpl @Inject constructor(
     private val httpClient: HttpClient,
 ) : DistrictRepository {
-    override fun fetchDistrictList(): Flow<DistrictResponse> = flow {
+    override fun fetchDistrictList(): Flow<List<DistrictResponse>> = flow {
         emit(
             httpClient.get {
                 url("$BASE_URL$DISTRICT_LIST")
