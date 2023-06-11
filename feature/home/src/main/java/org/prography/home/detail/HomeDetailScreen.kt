@@ -56,7 +56,7 @@ fun HomeDetailScreen(
     ) {
         HomeDetailAppbar(
             title = stringResource(R.string.home_detail_app_bar),
-            onBack = {}
+            onBack = { navHostController.popBackStack() }
         )
 
         Column(
