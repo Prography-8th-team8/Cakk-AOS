@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import org.prography.base.BaseViewModel
-import org.prography.cakk.data.repository.StoreRepository
+import org.prography.cakk.data.repository.store.StoreRepository
 import javax.inject.Inject
 
 @HiltViewModel

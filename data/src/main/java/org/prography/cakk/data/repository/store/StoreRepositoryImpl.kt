@@ -1,4 +1,4 @@
-package org.prography.cakk.data.repository
+package org.prography.cakk.data.repository.store
 
 import io.ktor.client.*
 import io.ktor.client.request.*
