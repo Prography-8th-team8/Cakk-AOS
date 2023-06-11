@@ -7,6 +7,6 @@ sealed class OnBoardingAction : BaseAction {
     object LoadDistrictList : OnBoardingAction()
 
     data class LoadedDistrictList(
-        val districts: List<DistrictModel>,
+        val districts: List<DistrictModel>
     ) : OnBoardingAction()
 }

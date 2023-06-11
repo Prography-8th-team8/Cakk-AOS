@@ -5,7 +5,7 @@ import org.prography.cakk.data.api.model.response.DistrictResponse
 
 data class DistrictModel(
     val district: DistrictType,
-    val count: Int,
+    val count: Int
 )
 
 fun DistrictResponse.toModel() = DistrictModel(

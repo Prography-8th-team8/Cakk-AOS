@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnBoardingViewModel @Inject constructor(
-    private val districtRepository: DistrictRepository,
+    private val districtRepository: DistrictRepository
 ) : BaseViewModel<OnBoardingAction, OnBoardingState, OnBoardingSideEffect>(
     initialState = OnBoardingState()
 ) {
