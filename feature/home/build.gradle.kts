@@ -33,7 +33,6 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:utility"))
     implementation(project(":core:base"))
-    implementation(project(":core:network"))
 
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.hilt.navigation)

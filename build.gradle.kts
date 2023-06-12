@@ -6,7 +6,6 @@ allprojects {
 
 buildscript {
     dependencies {
-        classpath(libs.plugin.hilt)
         classpath(libs.plugin.androidGradle)
         classpath(libs.plugin.kotlin)
         classpath(libs.plugin.secrets.gradle)

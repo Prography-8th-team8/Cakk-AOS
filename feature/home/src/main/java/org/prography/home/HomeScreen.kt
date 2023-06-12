@@ -40,7 +40,9 @@ import com.naver.maps.map.overlay.OverlayImage
 import org.prography.cakk.data.api.model.response.StoreListResponse
 import org.prography.designsystem.R
 import org.prography.designsystem.ui.theme.*
-import org.prography.enums.DistrictType
+import org.prography.cakk.data.api.model.enums.DistrictType
+import org.prography.cakk.data.api.model.enums.StoreType
+import org.prography.designsystem.extensions.toColor
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
 import timber.log.Timber
@@ -83,13 +85,21 @@ fun HomeScreen(
             stringResource(id = R.string.home_android),
         ),
     )
-    BottomSheet(storeList, screenHeight, statusBarHeight) {
-        navHostController.navigate(CakkDestination.OnBoarding.route) {
-            popUpTo(CakkDestination.Home.route) {
-                inclusive = true
+    BottomSheet(
+        storeList = storeList,
+        screenHeight = screenHeight,
+        statusBarHeight = statusBarHeight,
+        navigateToOnBoarding = {
+            navHostController.navigate(CakkDestination.OnBoarding.route) {
+                popUpTo(CakkDestination.Home.route) {
+                    inclusive = true
+                }
             }
+        },
+        navigateToDetail = { storeId ->
+            navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
         }
-    }
+    )
 }
 
 @Composable
@@ -135,12 +145,19 @@ private fun LocationPermission(
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, statusBarHeight: Int, navigateToOnBoarding: () -> Unit) {
+private fun BottomSheet(
+    storeList: List<StoreListResponse>,
+    screenHeight: Int,
+    statusBarHeight: Int,
+    navigateToOnBoarding: () -> Unit,
+    navigateToDetail: (Int) -> Unit,
+) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
-    var offsetY by remember { mutableStateOf((screenHeight / 20).toFloat()) }
-    var expandedType by remember { mutableStateOf(ExpandedType.COLLAPSED) }
+
+    var offsetY by remember { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
+    var expandedType by remember { mutableStateOf(ExpandedType.HALF) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
@@ -184,7 +201,7 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList, navigateToOnBoarding)
+                BottomSheetContent(storeList, navigateToOnBoarding, navigateToDetail)
             }
         },
         sheetPeekHeight = height,
@@ -196,7 +213,11 @@ private fun BottomSheet(storeList: List<StoreListResponse>, screenHeight: Int, s
 }
 
 @Composable
-private fun BottomSheetContent(storeList: List<StoreListResponse>, navigateToOnBoarding: () -> Unit) {
+private fun BottomSheetContent(
+    storeList: List<StoreListResponse>,
+    navigateToOnBoarding: () -> Unit,
+    navigateToDetail: (Int) -> Unit,
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -210,7 +231,8 @@ private fun BottomSheetContent(storeList: List<StoreListResponse>, navigateToOnB
                 Surface(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .clickable { navigateToDetail(store.id) },
                     shape = RoundedCornerShape(24.dp),
                     color = OldLace
                 ) {
@@ -268,12 +290,12 @@ private fun StoreTags(store: StoreListResponse) {
         store.storeTypes.forEach { storeType ->
             Surface(
                 shape = RoundedCornerShape(14.dp),
-                color = StoreType.valueOf(storeType).color.copy(alpha = 0.2f)
+                color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
             ) {
                 Text(
                     text = StoreType.valueOf(storeType).tag,
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = StoreType.valueOf(storeType).color,
+                    color = StoreType.valueOf(storeType).toColor(),
                     fontSize = 12.sp,
                     fontFamily = pretendard
                 )
