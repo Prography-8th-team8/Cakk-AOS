@@ -1,4 +1,4 @@
-package org.prography.cakk.data.repository
+package org.prography.cakk.data.repository.store
 
 import kotlinx.coroutines.flow.Flow
 import org.prography.cakk.data.api.model.request.StoreListRequest

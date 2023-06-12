@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import org.prography.cakk.data.api.model.request.StoreListRequest
-import org.prography.cakk.data.repository.StoreRepository
+import org.prography.cakk.data.repository.store.StoreRepository
 import javax.inject.Inject
 
 @HiltViewModel

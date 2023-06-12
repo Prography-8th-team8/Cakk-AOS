@@ -10,19 +10,20 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import org.prography.designsystem.extensions.toColor
 import org.prography.designsystem.ui.theme.Black
 import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
@@ -32,10 +33,14 @@ import org.prography.utility.navigation.destination.CakkDestination
 @Composable
 fun OnBoardingScreen(
     navHostController: NavHostController = rememberNavController(),
-    viewModel: OnBoardingViewModel = hiltViewModel()
+    onBoardingViewModel: OnBoardingViewModel = hiltViewModel()
 ) {
-    val state = viewModel.regions.collectAsStateWithLifecycle()
+    LaunchedEffect(true) {
+        onBoardingViewModel.sendAction(OnBoardingAction.LoadDistrictList)
+    }
 
+    val districtListState = onBoardingViewModel.state.collectAsStateWithLifecycle()
+    val districtList = districtListState.value.districtGroups
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier
@@ -70,16 +75,15 @@ fun OnBoardingScreen(
             }
         }
 
-        items(state.value) {
+        items(districtList) {
             OnBoardingRegionItem(
                 modifier = Modifier
                     .padding(2.dp)
                     .aspectRatio(17 / 12f),
-                region = it.region,
+                region = it.districts.joinToString(separator = " ") { it.district.districtKr },
                 count = it.count,
-                color = it.color,
+                color = it.districts.first().district.toColor(),
                 onClick = {
-                    // Home으로 이동, 추후 데이터까지 전달
                     navHostController.navigate(CakkDestination.Home.route) {
                         popUpTo(CakkDestination.OnBoarding.route) {
                             inclusive = false
@@ -87,41 +91,6 @@ fun OnBoardingScreen(
                     }
                 }
             )
-        }
-
-        item(span = { GridItemSpan(2) }) {
-            Spacer(modifier = Modifier.size(122.dp))
-//            Column {
-//                Text(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(top = 40.dp),
-//                    text = stringResource(R.string.onboarding_not_find_region),
-//                    color = Black,
-//                    fontSize = 14.dp.toSp(),
-//                    letterSpacing = (-0.03).em,
-//                    fontFamily = pretendard,
-//                    fontWeight = FontWeight.Bold,
-//                    textAlign = TextAlign.Center
-//                )
-//
-//                Text(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(top = 8.dp, bottom = 46.dp)
-//                        .clickable {
-//                            // 지역 요청 API 호출 ,
-//                        },
-//                    text = stringResource(R.string.onboarding_request_region),
-//                    color = Black,
-//                    fontSize = 14.dp.toSp(),
-//                    letterSpacing = (-0.03).em,
-//                    fontFamily = pretendard,
-//                    fontWeight = FontWeight.Normal,
-//                    textDecoration = TextDecoration.Underline,
-//                    textAlign = TextAlign.Center
-//                )
-//            }
         }
     }
 }
@@ -172,22 +141,4 @@ private fun OnBoardingRegionItem(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OnBoardingScreenPreview() {
-    OnBoardingScreen()
-}
-
-@Preview
-@Composable
-private fun OnBoardingRegionItemPreview() {
-    OnBoardingRegionItem(
-        modifier = Modifier.size(170.dp, 120.dp),
-        region = "도봉 강북 성북 노원",
-        count = 43,
-        color = Color(0x1A2448FF),
-        onClick = {}
-    )
 }
