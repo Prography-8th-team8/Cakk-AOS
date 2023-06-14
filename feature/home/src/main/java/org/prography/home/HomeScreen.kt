@@ -73,6 +73,7 @@ enum class ExpandedType {
 fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
+    districts: String?,
 ) {
     LocationPermission(navHostController)
 

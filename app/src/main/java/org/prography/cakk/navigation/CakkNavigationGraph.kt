@@ -22,8 +22,12 @@ fun CakkNavigationGraph(navController: NavHostController) {
             SplashScreen(navHostController = navController)
         }
 
-        composable(route = CakkDestination.Home.route) {
-            HomeScreen(navHostController = navController)
+        composable(
+            route = CakkDestination.Home.routeWithArgs,
+            arguments = CakkDestination.Home.arguments
+        ) { navBackStackEntry ->
+            val districts = navBackStackEntry.arguments?.getString(CakkDestination.Home.districtsArgs)
+            HomeScreen(navHostController = navController, districts = districts)
         }
 
         composable(
