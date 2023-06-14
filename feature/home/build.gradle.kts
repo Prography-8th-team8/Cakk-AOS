@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     implementation(libs.bundles.androidx.compose)
     implementation(libs.naver.map)
+    implementation(libs.gms)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso)
