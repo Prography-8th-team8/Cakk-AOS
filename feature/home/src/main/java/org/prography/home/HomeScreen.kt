@@ -76,7 +76,7 @@ enum class ExpandedType {
     }
 }
 
-private var locationCallback: LocationCallback? = null
+var locationCallback: LocationCallback? = null
 var fusedLocationClient: FusedLocationProviderClient? = null
 
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
@@ -86,6 +86,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -119,12 +120,12 @@ fun HomeScreen(
         }
     }
 
-    LocationPermission(navHostController, context, permissions, settingResultRequest, launcherMultiplePermissions)
+    LocationPermission(navHostController, permissions, settingResultRequest, launcherMultiplePermissions)
 
     val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
     val screenHeight = LocalConfiguration.current.screenHeightDp
-    val statusBarHeight = LocalContext.current.resources.getDimensionPixelSize(
-        LocalContext.current.resources.getIdentifier(
+    val statusBarHeight = context.resources.getDimensionPixelSize(
+        context.resources.getIdentifier(
             stringResource(id = R.string.home_status_bar_height),
             stringResource(id = R.string.home_dimen),
             stringResource(id = R.string.home_android),
@@ -133,7 +134,6 @@ fun HomeScreen(
     BottomSheet(
         navHostController,
         settingResultRequest,
-        context,
         storeList = storeList,
         screenHeight = screenHeight,
         statusBarHeight = statusBarHeight,
@@ -155,7 +155,6 @@ fun HomeScreen(
 private fun BottomSheet(
     navHostController: NavHostController,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
-    context: Context,
     storeList: List<StoreListResponse>,
     screenHeight: Int,
     statusBarHeight: Int,
@@ -216,8 +215,8 @@ private fun BottomSheet(
         sheetPeekHeight = height,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            CakkMap(storeList, navHostController, context)
-            SearchArea(modifier = Modifier.align(Alignment.TopCenter), context, settingResultRequest)
+            CakkMap(storeList, navHostController)
+            SearchArea(modifier = Modifier.align(Alignment.TopCenter), settingResultRequest)
         }
     }
 }
@@ -225,9 +224,10 @@ private fun BottomSheet(
 @Composable
 private fun SearchArea(
     modifier: Modifier,
-    context: Context,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
 ) {
+    val context = LocalContext.current
+
     Button(
         modifier = modifier.padding(top = 24.dp),
         onClick = {
@@ -421,7 +421,8 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
 
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
-private fun CakkMap(storeList: List<StoreListResponse>, navHostController: NavHostController, context: Context) {
+private fun CakkMap(storeList: List<StoreListResponse>, navHostController: NavHostController) {
+    val context = LocalContext.current
     val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
 
     val cameraPositionState: CameraPositionState = rememberCameraPositionState { position = CameraPosition(LatLng(0.0, 0.0), 16.0) }
@@ -469,11 +470,12 @@ private fun CakkMap(storeList: List<StoreListResponse>, navHostController: NavHo
 @Composable
 private fun LocationPermission(
     navHostController: NavHostController,
-    context: Context,
     permissions: Array<String>,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(true) {
         val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
 
