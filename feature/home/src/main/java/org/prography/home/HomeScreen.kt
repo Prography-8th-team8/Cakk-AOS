@@ -246,7 +246,7 @@ private fun SearchArea(
             Image(painter = painterResource(id = R.drawable.ic_swap), contentDescription = null)
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "이 지역 재검색",
+                text = stringResource(id = R.string.home_current_location_research),
                 fontSize = 12.dp.toSp(),
                 fontWeight = FontWeight.Bold,
                 fontFamily = pretendard
