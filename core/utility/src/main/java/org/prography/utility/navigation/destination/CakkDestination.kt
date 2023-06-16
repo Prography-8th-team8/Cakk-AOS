@@ -9,11 +9,12 @@ sealed class CakkDestination(
     object Splash : CakkDestination(route = SPLASH)
     object Home : CakkDestination(route = HOME) {
         const val districtsArgs = "districts"
+        const val defaultValue = ""
         val routeWithArgs = "$route?$districtsArgs={$districtsArgs}"
         val arguments = listOf(
             navArgument(districtsArgs) {
                 type = NavType.StringType
-                defaultValue = ""
+                defaultValue = Home.defaultValue
             }
         )
     }
