@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.*
 import org.prography.base.BaseViewModel
 import org.prography.cakk.data.api.model.request.StoreListRequest
 import org.prography.cakk.data.repository.store.StoreRepository
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,7 +28,6 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class)
     private fun fetchStoreList(districts: List<String>) {
-        Timber.i("fetchStoreList ${districts.first()}")
         districts.asFlow()
             .flatMapMerge { storeRepository.fetchStoreList(StoreListRequest(it, 1)) }
             .onStart { sendAction(HomeUiAction.Loading) }
