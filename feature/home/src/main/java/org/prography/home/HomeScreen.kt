@@ -147,6 +147,7 @@ fun HomeScreen(
         navHostController,
         settingResultRequest,
         storeList = storeList,
+        districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.valueOf(it) } else listOf(),
         screenHeight = screenHeight,
         statusBarHeight = statusBarHeight,
         navigateToOnBoarding = {
@@ -168,6 +169,7 @@ private fun BottomSheet(
     navHostController: NavHostController,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     storeList: List<StoreModel>,
+    districts: List<DistrictType>,
     screenHeight: Int,
     statusBarHeight: Int,
     navigateToOnBoarding: () -> Unit,
@@ -221,7 +223,7 @@ private fun BottomSheet(
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList, navigateToOnBoarding, navigateToDetail)
+                BottomSheetContent(storeList, districts, navigateToOnBoarding, navigateToDetail)
             }
         },
         sheetPeekHeight = height,
@@ -270,6 +272,7 @@ private fun SearchArea(
 @Composable
 private fun BottomSheetContent(
     storeList: List<StoreModel>,
+    districts: List<DistrictType>,
     navigateToOnBoarding: () -> Unit,
     navigateToDetail: (Int) -> Unit,
 ) {
@@ -277,7 +280,12 @@ private fun BottomSheetContent(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BottomSheetTop(modifier = Modifier.align(Alignment.Start), navigateToOnBoarding)
+        BottomSheetTop(
+            modifier = Modifier.align(Alignment.Start),
+            title = if (districts.isNotEmpty()) districts.joinToString { it.districtKr } else "현재 위치",
+            store_count = storeList.size,
+            navigateToOnBoarding
+        )
 
         LazyColumn(
             modifier = Modifier.padding(top = 22.dp),
@@ -377,7 +385,12 @@ private fun StoreTags(store: StoreModel) {
 }
 
 @Composable
-private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit) {
+private fun BottomSheetTop(
+    modifier: Modifier,
+    title: String,
+    store_count: Int,
+    navigateToOnBoarding: () -> Unit,
+) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
         contentDescription = null,
@@ -392,7 +405,7 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
     ) {
         Column {
             Text(
-                text = "은평, 마포, 서대문",
+                text = title,
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.dp.toSp(),
@@ -401,7 +414,7 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
                     .padding(top = 30.dp)
             )
             Text(
-                text = "24개의 케이크샵",
+                text = "${store_count}개의 케이크샵",
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.dp.toSp(),
