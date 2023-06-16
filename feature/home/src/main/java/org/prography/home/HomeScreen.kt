@@ -25,7 +25,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.google.android.gms.location.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -40,17 +39,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
-import org.prography.cakk.data.api.model.response.StoreListResponse
-import org.prography.designsystem.R
-import org.prography.designsystem.ui.theme.*
 import org.prography.cakk.data.api.model.enums.DistrictType
 import org.prography.cakk.data.api.model.enums.StoreType
+import org.prography.designsystem.R
 import org.prography.designsystem.extensions.toColor
+import org.prography.designsystem.ui.theme.*
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
 import timber.log.Timber
@@ -84,7 +83,7 @@ var fusedLocationClient: FusedLocationProviderClient? = null
 fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-    districts: String?,
+    districts: String,
 ) {
     val context = LocalContext.current
 
@@ -123,7 +122,19 @@ fun HomeScreen(
 
     LocationPermission(navHostController, permissions, settingResultRequest, launcherMultiplePermissions)
 
-    val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
+    LaunchedEffect(homeViewModel) {
+        homeViewModel.sendAction(
+            if (districts.isEmpty()) {
+                // TODO 현재 지역 검
+                HomeUiAction.LoadStoreList(listOf("JONGNO"))
+            } else {
+                HomeUiAction.LoadStoreList(districts.split(" "))
+            }
+        )
+    }
+
+    val homeState = homeViewModel.state.collectAsStateWithLifecycle()
+    val storeList = homeState.value.storeModels
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val statusBarHeight = context.resources.getDimensionPixelSize(
         context.resources.getIdentifier(
@@ -156,7 +167,7 @@ fun HomeScreen(
 private fun BottomSheet(
     navHostController: NavHostController,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
-    storeList: List<StoreListResponse>,
+    storeList: List<StoreModel>,
     screenHeight: Int,
     statusBarHeight: Int,
     navigateToOnBoarding: () -> Unit,
@@ -258,7 +269,7 @@ private fun SearchArea(
 
 @Composable
 private fun BottomSheetContent(
-    storeList: List<StoreListResponse>,
+    storeList: List<StoreModel>,
     navigateToOnBoarding: () -> Unit,
     navigateToDetail: (Int) -> Unit,
 ) {
@@ -293,7 +304,7 @@ private fun BottomSheetContent(
 }
 
 @Composable
-private fun StoreInfo(store: StoreListResponse) {
+private fun StoreInfo(store: StoreModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(start = 20.dp, top = 20.dp)
@@ -329,7 +340,7 @@ private fun StoreInfo(store: StoreListResponse) {
 }
 
 @Composable
-private fun StoreTags(store: StoreListResponse) {
+private fun StoreTags(store: StoreModel) {
     Row(modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)) {
         store.storeTypes.forEach { storeType ->
             Surface(
@@ -422,7 +433,7 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
 
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
-private fun CakkMap(storeList: List<StoreListResponse>, navHostController: NavHostController) {
+private fun CakkMap(storeList: List<StoreModel>, navHostController: NavHostController) {
     val context = LocalContext.current
     val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
 
