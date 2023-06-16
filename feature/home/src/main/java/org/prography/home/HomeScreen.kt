@@ -2,10 +2,15 @@ package org.prography.home
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.os.Looper
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
@@ -20,6 +25,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.google.android.gms.location.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -28,13 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.tasks.Task
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
 import org.prography.cakk.data.api.model.response.StoreListResponse
@@ -68,49 +76,32 @@ enum class ExpandedType {
     }
 }
 
+var locationCallback: LocationCallback? = null
+var fusedLocationClient: FusedLocationProviderClient? = null
+
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
 @Composable
 fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
-    LocationPermission(navHostController)
-
-    val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
-    val screenHeight = LocalConfiguration.current.screenHeightDp
-    val statusBarHeight = LocalContext.current.resources.getDimensionPixelSize(
-        LocalContext.current.resources.getIdentifier(
-            stringResource(id = R.string.home_status_bar_height),
-            stringResource(id = R.string.home_dimen),
-            stringResource(id = R.string.home_android),
-        ),
-    )
-    BottomSheet(
-        storeList = storeList,
-        screenHeight = screenHeight,
-        statusBarHeight = statusBarHeight,
-        navigateToOnBoarding = {
-            navHostController.navigate(CakkDestination.OnBoarding.route) {
-                popUpTo(CakkDestination.Home.route) {
-                    inclusive = true
-                }
-            }
-        },
-        navigateToDetail = { storeId ->
-            navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
-        }
-    )
-}
-
-@Composable
-private fun LocationPermission(
-    navHostController: NavHostController,
-) {
     val context = LocalContext.current
+
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
     )
+
+    val settingResultRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { activityResult ->
+        if (activityResult.resultCode == RESULT_OK) {
+            Timber.d("위치 설정이 동의되었습니다.")
+            startLocationUpdates()
+        } else {
+            Timber.d("위치 설정이 거부되었습니다.")
+        }
+    }
 
     val launcherMultiplePermissions = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
@@ -129,16 +120,32 @@ private fun LocationPermission(
         }
     }
 
-    LaunchedEffect(true) {
-        val formOnBoarding = navHostController.previousBackStackEntry?.destination?.route != CakkDestination.OnBoarding.route
+    LocationPermission(navHostController, permissions, settingResultRequest, launcherMultiplePermissions)
 
-        if (formOnBoarding) {
-            checkAndRequestPermissions(
-                context,
-                permissions,
-                launcherMultiplePermissions,
-            )
+    val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val statusBarHeight = context.resources.getDimensionPixelSize(
+        context.resources.getIdentifier(
+            stringResource(id = R.string.home_status_bar_height),
+            stringResource(id = R.string.home_dimen),
+            stringResource(id = R.string.home_android),
+        ),
+    )
+    BottomSheet(
+        navHostController,
+        settingResultRequest,
+        storeList = storeList,
+        screenHeight = screenHeight,
+        statusBarHeight = statusBarHeight,
+        navigateToOnBoarding = {
+            navHostController.navigate(CakkDestination.OnBoarding.route) {
+                popUpTo(CakkDestination.Home.route) {
+                    inclusive = true
+                }
+            }
         }
+    ) { storeId ->
+        navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
     }
 }
 
@@ -146,6 +153,8 @@ private fun LocationPermission(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BottomSheet(
+    navHostController: NavHostController,
+    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     storeList: List<StoreListResponse>,
     screenHeight: Int,
     statusBarHeight: Int,
@@ -155,7 +164,6 @@ private fun BottomSheet(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
-
     var offsetY by remember { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
     var expandedType by remember { mutableStateOf(ExpandedType.HALF) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
@@ -207,7 +215,42 @@ private fun BottomSheet(
         sheetPeekHeight = height,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            CakkMap(storeList)
+            CakkMap(storeList, navHostController)
+            SearchArea(modifier = Modifier.align(Alignment.TopCenter), settingResultRequest)
+        }
+    }
+}
+
+@Composable
+private fun SearchArea(
+    modifier: Modifier,
+    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
+) {
+    val context = LocalContext.current
+
+    Button(
+        modifier = modifier.padding(top = 24.dp),
+        onClick = {
+            checkAndRequestMyLocationPermission(
+                context = context,
+                onDisabled = { intentSenderRequest ->
+                    settingResultRequest.launch(intentSenderRequest)
+                },
+                onEnabled = { startLocationUpdates() }
+            )
+        },
+        shape = RoundedCornerShape(40.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = White, contentColor = Black.copy(alpha = .2f))
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(painter = painterResource(id = R.drawable.ic_swap), contentDescription = null)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = stringResource(id = R.string.home_current_location_research),
+                fontSize = 12.dp.toSp(),
+                fontWeight = FontWeight.Bold,
+                fontFamily = pretendard
+            )
         }
     }
 }
@@ -296,8 +339,9 @@ private fun StoreTags(store: StoreListResponse) {
                     text = StoreType.valueOf(storeType).tag,
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
                     color = StoreType.valueOf(storeType).toColor(),
-                    fontSize = 12.sp,
-                    fontFamily = pretendard
+                    fontSize = 12.dp.toSp(),
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Bold
                 )
             }
             Spacer(modifier = Modifier.width(4.dp))
@@ -311,8 +355,9 @@ private fun StoreTags(store: StoreListResponse) {
                     text = "+${store.storeTypes.size - 3}",
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
                     color = White,
-                    fontSize = 12.sp,
-                    fontFamily = pretendard
+                    fontSize = 12.dp.toSp(),
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -327,7 +372,9 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
         modifier = Modifier.padding(top = 20.dp)
     )
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -358,11 +405,13 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
         ) {
             Text(
                 text = stringResource(id = R.string.home_change_location),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).clickable {
-                    navigateToOnBoarding()
-                },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .clickable {
+                        navigateToOnBoarding()
+                    },
                 fontFamily = pretendard,
-                fontSize = 12.sp,
+                fontSize = 12.dp.toSp(),
                 color = Magenta,
                 fontWeight = FontWeight.Bold
             )
@@ -372,7 +421,27 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
 
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
-private fun CakkMap(storeList: List<StoreListResponse>) {
+private fun CakkMap(storeList: List<StoreListResponse>, navHostController: NavHostController) {
+    val context = LocalContext.current
+    val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
+
+    val cameraPositionState: CameraPositionState = rememberCameraPositionState { position = CameraPosition(LatLng(0.0, 0.0), 16.0) }
+
+    if (fromOnBoarding) {
+        if (storeList.isNotEmpty()) {
+            cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
+        }
+    } else {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    cameraPositionState.position = CameraPosition(LatLng(location.latitude, location.longitude), 16.0)
+                }
+            }
+        }
+    }
+
     val mapUiSettings by remember {
         mutableStateOf(
             MapUiSettings(
@@ -386,7 +455,8 @@ private fun CakkMap(storeList: List<StoreListResponse>) {
 
     NaverMap(
         modifier = Modifier.fillMaxSize(),
-        uiSettings = mapUiSettings
+        uiSettings = mapUiSettings,
+        cameraPositionState = cameraPositionState,
     ) {
         storeList.forEach { store ->
             Marker(
@@ -397,12 +467,40 @@ private fun CakkMap(storeList: List<StoreListResponse>) {
     }
 }
 
+@Composable
+private fun LocationPermission(
+    navHostController: NavHostController,
+    permissions: Array<String>,
+    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
+    launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(true) {
+        val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
+
+        if (!fromOnBoarding) {
+            checkAndRequestPermissions(
+                context,
+                permissions,
+                launcherMultiplePermissions,
+            )
+            checkAndRequestMyLocationPermission(
+                context = context,
+                onDisabled = { intentSenderRequest ->
+                    settingResultRequest.launch(intentSenderRequest)
+                },
+                onEnabled = { startLocationUpdates() }
+            )
+        }
+    }
+}
+
 fun checkAndRequestPermissions(
     context: Context,
     permissions: Array<String>,
     launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
 ) {
-    // 권한이 이미 있는 경우
     if (permissions.all {
             ContextCompat.checkSelfPermission(
                 context,
@@ -411,10 +509,56 @@ fun checkAndRequestPermissions(
         }
     ) {
         Timber.d("권한이 이미 존재합니다.")
-    }
-    // 권한이 없는 경우
-    else {
+    } else {
         launcher.launch(permissions)
         Timber.d("권한을 요청하였습니다.")
+    }
+}
+
+@SuppressLint("MissingPermission")
+fun checkAndRequestMyLocationPermission(
+    context: Context,
+    onDisabled: (IntentSenderRequest) -> Unit,
+    onEnabled: () -> Unit,
+) {
+    val locationRequest = LocationRequest.Builder(1000L)
+        .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+        .build()
+
+    val client: SettingsClient = LocationServices.getSettingsClient(context)
+    val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+    val gpsSettingTask: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+
+    gpsSettingTask.addOnSuccessListener {
+        onEnabled()
+    }
+
+    gpsSettingTask.addOnFailureListener { exception ->
+        if (exception is ResolvableApiException) {
+            try {
+                val intentSenderRequest = IntentSenderRequest
+                    .Builder(exception.resolution)
+                    .build()
+                onDisabled(intentSenderRequest)
+            } catch (sendEx: IntentSender.SendIntentException) {
+                Timber.i(sendEx.message)
+            }
+        }
+    }
+}
+
+@SuppressLint("MissingPermission")
+private fun startLocationUpdates() {
+    locationCallback?.let {
+        val locationRequest = LocationRequest.Builder(1000L)
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            .setDurationMillis(3000L)
+            .build()
+
+        fusedLocationClient?.requestLocationUpdates(
+            locationRequest,
+            it,
+            Looper.getMainLooper(),
+        )
     }
 }
