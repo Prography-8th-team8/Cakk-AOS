@@ -29,6 +29,8 @@ import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
+import org.prography.utility.navigation.destination.CakkDestination.Home.districtsArgs
+import org.prography.utility.navigation.destination.CakkDestination.Home.storeCountArgs
 
 @Composable
 fun OnBoardingScreen(
@@ -85,8 +87,9 @@ fun OnBoardingScreen(
                 color = districtGroup.districts.first().district.toColor(),
                 onClick = {
                     val districtJoinString = districtGroup.districts.joinToString(" ") { it.district.name }
-
-                    navHostController.navigate("${CakkDestination.Home.route}?${CakkDestination.Home.districtsArgs}=$districtJoinString") {
+                    navHostController.navigate(
+                        "${CakkDestination.Home.route}?$districtsArgs=$districtJoinString&$storeCountArgs=${districtGroup.count}"
+                    ) {
                         popUpTo(CakkDestination.OnBoarding.route) {
                             inclusive = false
                         }
