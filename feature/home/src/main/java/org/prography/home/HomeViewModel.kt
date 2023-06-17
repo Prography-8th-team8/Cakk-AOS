@@ -16,6 +16,9 @@ class HomeViewModel @Inject constructor(
     initialState = HomeUiState()
 ) {
     override fun reduceState(currentState: HomeUiState, action: HomeUiAction): HomeUiState = when (action) {
+        HomeUiAction.BottomSheetExpandFull -> currentState.copy(lastExpandedType = ExpandedType.FULL)
+        HomeUiAction.BottomSheetExpandHalf -> currentState.copy(lastExpandedType = ExpandedType.HALF)
+        HomeUiAction.BottomSheetExpandCollapsed -> currentState.copy(lastExpandedType = ExpandedType.COLLAPSED)
         HomeUiAction.Loading -> currentState
         is HomeUiAction.LoadStoreList -> {
             fetchStoreList(action.districts)
@@ -28,7 +31,7 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class)
     private fun fetchStoreList(districts: List<String>) {
-        districts.asFlow()
+        districts.sorted().asFlow()
             .flatMapMerge { storeRepository.fetchStoreList(StoreListRequest(it, 1)) }
             .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.LoadedStoreList(it.toModel())) }
