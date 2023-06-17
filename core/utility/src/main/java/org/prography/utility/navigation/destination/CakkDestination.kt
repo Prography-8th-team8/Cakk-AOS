@@ -9,12 +9,16 @@ sealed class CakkDestination(
     object Splash : CakkDestination(route = SPLASH)
     object Home : CakkDestination(route = HOME) {
         const val districtsArgs = "districts"
-        const val defaultValue = ""
-        val routeWithArgs = "$route?$districtsArgs={$districtsArgs}"
+        const val storeCountArgs = "storeCount"
+        val routeWithArgs = "$route?$districtsArgs={$districtsArgs}&$storeCountArgs={$storeCountArgs}"
         val arguments = listOf(
             navArgument(districtsArgs) {
                 type = NavType.StringType
-                defaultValue = Home.defaultValue
+                defaultValue = ""
+            },
+            navArgument(storeCountArgs) {
+                type = NavType.IntType
+                defaultValue = -1
             }
         )
     }
