@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,27 +53,6 @@ import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
 import timber.log.Timber
 
-enum class ExpandedType {
-    HALF, FULL, COLLAPSED, MOVING;
-
-    fun getByScreenHeight(type: ExpandedType, screenHeight: Int, statusBarHeight: Int, offsetY: Float): Dp {
-        return when (type) {
-            FULL -> {
-                (screenHeight - statusBarHeight).dp
-            }
-            HALF -> {
-                ((screenHeight / 2.5).toInt()).dp
-            }
-            COLLAPSED -> {
-                53.dp
-            }
-            MOVING -> {
-                offsetY.dp
-            }
-        }
-    }
-}
-
 var locationCallback: LocationCallback? = null
 var fusedLocationClient: FusedLocationProviderClient? = null
 
@@ -86,8 +64,6 @@ fun HomeScreen(
     districts: String,
     storeCount: Int,
 ) {
-    val context = LocalContext.current
-
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -123,44 +99,35 @@ fun HomeScreen(
 
     LocationPermission(navHostController, permissions, settingResultRequest, launcherMultiplePermissions)
 
-    LaunchedEffect(homeViewModel) {
-        homeViewModel.sendAction(
-            if (districts.isEmpty()) {
-                // TODO 현재 지역 검
-                HomeUiAction.LoadStoreList(listOf("JONGNO"))
-            } else {
-                HomeUiAction.LoadStoreList(districts.split(" "))
-            }
-        )
-    }
-
     val homeState = homeViewModel.state.collectAsStateWithLifecycle()
-    val storeList = homeState.value.storeModels
-    val screenHeight = LocalConfiguration.current.screenHeightDp
-    val statusBarHeight = context.resources.getDimensionPixelSize(
-        context.resources.getIdentifier(
-            stringResource(id = R.string.home_status_bar_height),
-            stringResource(id = R.string.home_dimen),
-            stringResource(id = R.string.home_android),
-        ),
-    )
     BottomSheet(
         navHostController,
+        homeViewModel,
         settingResultRequest,
-        storeList = storeList,
+        storeList = homeState.value.storeModels,
         districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.valueOf(it) } else listOf(),
-        storeCount = if (storeCount >= 0) storeCount else storeList.size,
-        screenHeight = screenHeight,
-        statusBarHeight = statusBarHeight,
+        storeCount = if (storeCount >= 0) storeCount else homeState.value.storeModels.size,
+        bottomExpandedType = homeState.value.lastExpandedType,
         navigateToOnBoarding = {
             navHostController.navigate(CakkDestination.OnBoarding.route) {
                 popUpTo(CakkDestination.Home.route) {
                     inclusive = true
                 }
             }
+        },
+        navigateToDetail = { storeId ->
+            navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
         }
-    ) { storeId ->
-        navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
+    )
+
+    LaunchedEffect(homeViewModel) {
+        if (homeState.value.storeModels.isEmpty()) {
+            if (districts.isEmpty()) {
+                homeViewModel.sendAction(HomeUiAction.LoadStoreList(listOf("JONGNO")))
+            } else {
+                homeViewModel.sendAction(HomeUiAction.LoadStoreList(districts.split(" ")))
+            }
+        }
     }
 }
 
@@ -169,20 +136,29 @@ fun HomeScreen(
 @Composable
 private fun BottomSheet(
     navHostController: NavHostController,
+    homeViewModel: HomeViewModel = hiltViewModel(),
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
-    screenHeight: Int,
-    statusBarHeight: Int,
+    bottomExpandedType: ExpandedType,
     navigateToOnBoarding: () -> Unit,
     navigateToDetail: (Int) -> Unit,
 ) {
+    val context = LocalContext.current
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val statusBarHeight = context.resources.getDimensionPixelSize(
+        context.resources.getIdentifier(
+            stringResource(id = R.string.home_status_bar_height),
+            stringResource(id = R.string.home_dimen),
+            stringResource(id = R.string.home_android),
+        ),
+    )
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
     var offsetY by remember { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
-    var expandedType by remember { mutableStateOf(ExpandedType.HALF) }
+    var expandedType by remember { mutableStateOf(bottomExpandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
@@ -207,15 +183,18 @@ private fun BottomSheet(
                                 offsetY -= dragAmount.y
                             },
                             onDragEnd = {
-                                expandedType = when {
+                                when {
                                     offsetY >= (screenHeight / 1.5).toFloat() -> {
-                                        ExpandedType.FULL
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandFull)
+                                        expandedType = ExpandedType.FULL
                                     }
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
-                                        ExpandedType.HALF
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandHalf)
+                                        expandedType = ExpandedType.HALF
                                     }
                                     else -> {
-                                        ExpandedType.COLLAPSED
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandCollapsed)
+                                        expandedType = ExpandedType.COLLAPSED
                                     }
                                 }
                                 offsetY = expandedType
