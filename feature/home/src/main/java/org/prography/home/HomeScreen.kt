@@ -84,6 +84,7 @@ fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
     districts: String,
+    storeCount: Int,
 ) {
     val context = LocalContext.current
 
@@ -148,6 +149,7 @@ fun HomeScreen(
         settingResultRequest,
         storeList = storeList,
         districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.valueOf(it) } else listOf(),
+        storeCount = if (storeCount >= 0) storeCount else storeList.size,
         screenHeight = screenHeight,
         statusBarHeight = statusBarHeight,
         navigateToOnBoarding = {
@@ -170,6 +172,7 @@ private fun BottomSheet(
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
+    storeCount: Int,
     screenHeight: Int,
     statusBarHeight: Int,
     navigateToOnBoarding: () -> Unit,
@@ -223,7 +226,7 @@ private fun BottomSheet(
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList, districts, navigateToOnBoarding, navigateToDetail)
+                BottomSheetContent(storeList, districts, storeCount, navigateToOnBoarding, navigateToDetail)
             }
         },
         sheetPeekHeight = height,
@@ -273,6 +276,7 @@ private fun SearchArea(
 private fun BottomSheetContent(
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
+    storeCount: Int,
     navigateToOnBoarding: () -> Unit,
     navigateToDetail: (Int) -> Unit,
 ) {
@@ -283,7 +287,7 @@ private fun BottomSheetContent(
         BottomSheetTop(
             modifier = Modifier.align(Alignment.Start),
             title = if (districts.isNotEmpty()) districts.joinToString { it.districtKr } else "현재 위치",
-            store_count = storeList.size,
+            storeCount = storeCount,
             navigateToOnBoarding
         )
 
@@ -388,7 +392,7 @@ private fun StoreTags(store: StoreModel) {
 private fun BottomSheetTop(
     modifier: Modifier,
     title: String,
-    store_count: Int,
+    storeCount: Int,
     navigateToOnBoarding: () -> Unit,
 ) {
     Image(
@@ -414,7 +418,7 @@ private fun BottomSheetTop(
                     .padding(top = 30.dp)
             )
             Text(
-                text = "${store_count}개의 케이크샵",
+                text = "${storeCount}개의 케이크샵",
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.dp.toSp(),
