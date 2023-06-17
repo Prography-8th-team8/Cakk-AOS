@@ -8,4 +8,10 @@ sealed class HomeUiAction : BaseAction {
     data class LoadStoreList(val districts: List<String>) : HomeUiAction()
 
     data class LoadedStoreList(val storeModels: List<StoreModel>) : HomeUiAction()
+
+    object BottomSheetExpandFull : HomeUiAction()
+
+    object BottomSheetExpandHalf : HomeUiAction()
+
+    object BottomSheetExpandCollapsed : HomeUiAction()
 }
