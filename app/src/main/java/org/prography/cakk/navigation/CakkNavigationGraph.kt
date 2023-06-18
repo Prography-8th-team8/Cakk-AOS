@@ -28,9 +28,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
         ) { navBackStackEntry ->
             val districts = navBackStackEntry.arguments?.getString(CakkDestination.Home.DISTRICTS_INFO)
             val storeCount = navBackStackEntry.arguments?.getInt(CakkDestination.Home.STORE_COUNT)
-            if (districts != null && storeCount != null) {
-                HomeScreen(navHostController = navController, districts = districts, storeCount = storeCount)
-            }
+            HomeScreen(navHostController = navController, districtsArg = districts, storeCountArg = storeCount)
         }
 
         composable(

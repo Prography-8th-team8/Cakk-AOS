@@ -61,9 +61,12 @@ var fusedLocationClient: FusedLocationProviderClient? = null
 fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-    districts: String,
-    storeCount: Int,
+    districtsArg: String?,
+    storeCountArg: Int?,
 ) {
+    val districts = districtsArg ?: throw IllegalArgumentException()
+    val storeCount = storeCountArg ?: throw IllegalArgumentException()
+
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
