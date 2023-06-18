@@ -23,6 +23,7 @@ secrets-gradle = "2.0.1"
 ktor = "1.6.4"
 gson = "2.9.0"
 gms = "21.0.1"
+javax-inject = "1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -76,6 +77,7 @@ kotlin-coroutine-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-corou
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
 dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "dagger" }
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "dagger" }
+java-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javax-inject" }
 ## Network
 ktor-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
 ktor-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
