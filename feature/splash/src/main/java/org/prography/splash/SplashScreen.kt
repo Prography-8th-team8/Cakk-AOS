@@ -16,8 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -26,10 +24,9 @@ import org.prography.designsystem.ui.theme.Light_Cobalt_Blue
 import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
-import org.prography.utility.navigation.destination.CakkDestination
 
 @Composable
-fun SplashScreen(navHostController: NavHostController = rememberNavController()) {
+fun SplashScreen(onNavigateHome: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -49,13 +46,7 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
             }
         }
 
-        if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
-            navHostController.navigate(CakkDestination.Home.route) {
-                popUpTo(CakkDestination.Splash.route) {
-                    inclusive = true
-                }
-            }
-        }
+        if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) onNavigateHome()
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -81,5 +72,6 @@ fun SplashScreen(navHostController: NavHostController = rememberNavController())
 @Preview
 @Composable
 private fun SplashScreenPreview() {
-    SplashScreen()
+    SplashScreen {
+    }
 }

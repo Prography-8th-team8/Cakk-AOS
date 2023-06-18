@@ -19,7 +19,13 @@ fun CakkNavigationGraph(navController: NavHostController) {
         startDestination = CakkDestination.Splash.route,
     ) {
         composable(route = CakkDestination.Splash.route) {
-            SplashScreen(navHostController = navController)
+            SplashScreen {
+                navController.navigate(CakkDestination.Home.route) {
+                    popUpTo(CakkDestination.Splash.route) {
+                        inclusive = true
+                    }
+                }
+            }
         }
 
         composable(
