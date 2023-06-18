@@ -19,23 +19,59 @@ fun CakkNavigationGraph(navController: NavHostController) {
         startDestination = CakkDestination.Splash.route,
     ) {
         composable(route = CakkDestination.Splash.route) {
-            SplashScreen(navHostController = navController)
+            SplashScreen {
+                navController.navigate(CakkDestination.Home.route) {
+                    popUpTo(CakkDestination.Splash.route) {
+                        inclusive = true
+                    }
+                }
+            }
         }
 
-        composable(route = CakkDestination.Home.route) {
-            HomeScreen(navHostController = navController)
+        composable(
+            route = CakkDestination.Home.routeWithArgs,
+            arguments = CakkDestination.Home.arguments
+        ) { navBackStackEntry ->
+            val districts = navBackStackEntry.arguments?.getString(CakkDestination.Home.DISTRICTS_INFO)
+            val storeCount = navBackStackEntry.arguments?.getInt(CakkDestination.Home.STORE_COUNT)
+            HomeScreen(
+                navHostController = navController,
+                districtsArg = districts,
+                storeCountArg = storeCount,
+                onNavigateToOnBoarding = {
+                    navController.navigate(CakkDestination.OnBoarding.route) {
+                        popUpTo(CakkDestination.Home.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateToDetail = { storeId ->
+                    navController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
+                }
+            )
         }
 
         composable(
             route = CakkDestination.HomeDetail.routeWithArgs,
             arguments = CakkDestination.HomeDetail.arguments
         ) { navBackStackEntry ->
-            val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.HomeDetail.storeIdArg)
+            val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.HomeDetail.STORE_ID)
             storeId?.let { HomeDetailScreen(navHostController = navController, storeId = it) }
         }
 
         composable(route = CakkDestination.OnBoarding.route) {
-            OnBoardingScreen(navHostController = navController)
+            OnBoardingScreen { districts, storeCount ->
+                navController.navigate(
+                    CakkDestination.Home.route + "?" +
+                        "${CakkDestination.Home.DISTRICTS_INFO}=$districts" + "&" +
+                        "${CakkDestination.Home.STORE_COUNT}=$storeCount"
+                ) {
+                    popUpTo(CakkDestination.OnBoarding.route) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
         }
     }
 }

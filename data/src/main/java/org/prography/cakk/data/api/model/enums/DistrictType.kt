@@ -26,4 +26,9 @@ enum class DistrictType(val districtKr: String, val groupId: Int) {
     GANGNAM("강남", 7),
     GANGDONG("강동", 8),
     SONGPA("송파", 8),
+    ;
+
+    companion object {
+        fun getName(district: String) = valueOf(district)
+    }
 }

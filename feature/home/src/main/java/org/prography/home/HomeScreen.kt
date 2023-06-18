@@ -25,14 +25,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.google.android.gms.location.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,41 +38,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
-import org.prography.cakk.data.api.model.response.StoreListResponse
-import org.prography.designsystem.R
-import org.prography.designsystem.ui.theme.*
 import org.prography.cakk.data.api.model.enums.DistrictType
 import org.prography.cakk.data.api.model.enums.StoreType
+import org.prography.designsystem.R
 import org.prography.designsystem.extensions.toColor
+import org.prography.designsystem.ui.theme.*
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
 import timber.log.Timber
-
-enum class ExpandedType {
-    HALF, FULL, COLLAPSED, MOVING;
-
-    fun getByScreenHeight(type: ExpandedType, screenHeight: Int, statusBarHeight: Int, offsetY: Float): Dp {
-        return when (type) {
-            FULL -> {
-                (screenHeight - statusBarHeight).dp
-            }
-            HALF -> {
-                ((screenHeight / 2.5).toInt()).dp
-            }
-            COLLAPSED -> {
-                53.dp
-            }
-            MOVING -> {
-                offsetY.dp
-            }
-        }
-    }
-}
 
 var locationCallback: LocationCallback? = null
 var fusedLocationClient: FusedLocationProviderClient? = null
@@ -84,8 +61,14 @@ var fusedLocationClient: FusedLocationProviderClient? = null
 fun HomeScreen(
     navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
+    districtsArg: String?,
+    storeCountArg: Int?,
+    onNavigateToOnBoarding: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
 ) {
-    val context = LocalContext.current
+    val districts = districtsArg ?: throw IllegalArgumentException()
+    val storeCount = storeCountArg ?: throw IllegalArgumentException()
+    val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
 
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -112,17 +95,56 @@ fun HomeScreen(
             Timber.i("권한이 동의되었습니다.")
         } else {
             Timber.i("권한이 거부되었습니다.")
-            navHostController.navigate(CakkDestination.OnBoarding.route) {
-                popUpTo(CakkDestination.Home.route) {
-                    inclusive = true
-                }
-            }
+            onNavigateToOnBoarding()
         }
     }
 
-    LocationPermission(navHostController, permissions, settingResultRequest, launcherMultiplePermissions)
+    LocationPermission(
+        fromOnBoarding = fromOnBoarding,
+        permissions = permissions,
+        settingResultRequest = settingResultRequest,
+        launcherMultiplePermissions = launcherMultiplePermissions
+    )
 
-    val storeList by homeViewModel.stores.collectAsStateWithLifecycle()
+    val homeState = homeViewModel.state.collectAsStateWithLifecycle()
+    BottomSheet(
+        homeViewModel = homeViewModel,
+        fromOnBoarding = fromOnBoarding,
+        settingResultRequest = settingResultRequest,
+        storeList = homeState.value.storeModels,
+        districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.getName(it) } else listOf(),
+        storeCount = if (storeCount >= 0) storeCount else homeState.value.storeModels.size,
+        bottomExpandedType = homeState.value.lastExpandedType,
+        onNavigateToOnBoarding = onNavigateToOnBoarding,
+        onNavigateToDetail = onNavigateToDetail
+    )
+
+    LaunchedEffect(homeViewModel) {
+        if (homeState.value.storeModels.isEmpty()) {
+            if (districts.isEmpty()) {
+                homeViewModel.sendAction(HomeUiAction.LoadStoreList(listOf("JONGNO")))
+            } else {
+                homeViewModel.sendAction(HomeUiAction.LoadStoreList(districts.split(" ")))
+            }
+        }
+    }
+}
+
+@SuppressLint("InternalInsetResource", "DiscouragedApi")
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun BottomSheet(
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    fromOnBoarding: Boolean,
+    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
+    storeList: List<StoreModel>,
+    districts: List<DistrictType>,
+    storeCount: Int,
+    bottomExpandedType: ExpandedType,
+    onNavigateToOnBoarding: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
+) {
+    val context = LocalContext.current
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val statusBarHeight = context.resources.getDimensionPixelSize(
         context.resources.getIdentifier(
@@ -131,41 +153,11 @@ fun HomeScreen(
             stringResource(id = R.string.home_android),
         ),
     )
-    BottomSheet(
-        navHostController,
-        settingResultRequest,
-        storeList = storeList,
-        screenHeight = screenHeight,
-        statusBarHeight = statusBarHeight,
-        navigateToOnBoarding = {
-            navHostController.navigate(CakkDestination.OnBoarding.route) {
-                popUpTo(CakkDestination.Home.route) {
-                    inclusive = true
-                }
-            }
-        }
-    ) { storeId ->
-        navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
-    }
-}
-
-@SuppressLint("InternalInsetResource", "DiscouragedApi")
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun BottomSheet(
-    navHostController: NavHostController,
-    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
-    storeList: List<StoreListResponse>,
-    screenHeight: Int,
-    statusBarHeight: Int,
-    navigateToOnBoarding: () -> Unit,
-    navigateToDetail: (Int) -> Unit,
-) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
     var offsetY by remember { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
-    var expandedType by remember { mutableStateOf(ExpandedType.HALF) }
+    var expandedType by remember { mutableStateOf(bottomExpandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
@@ -190,15 +182,18 @@ private fun BottomSheet(
                                 offsetY -= dragAmount.y
                             },
                             onDragEnd = {
-                                expandedType = when {
+                                when {
                                     offsetY >= (screenHeight / 1.5).toFloat() -> {
-                                        ExpandedType.FULL
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandFull)
+                                        expandedType = ExpandedType.FULL
                                     }
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
-                                        ExpandedType.HALF
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandHalf)
+                                        expandedType = ExpandedType.HALF
                                     }
                                     else -> {
-                                        ExpandedType.COLLAPSED
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandCollapsed)
+                                        expandedType = ExpandedType.COLLAPSED
                                     }
                                 }
                                 offsetY = expandedType
@@ -209,14 +204,26 @@ private fun BottomSheet(
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList, navigateToOnBoarding, navigateToDetail)
+                BottomSheetContent(
+                    storeList = storeList,
+                    districts = districts,
+                    storeCount = storeCount,
+                    onNavigateToOnBoarding = onNavigateToOnBoarding,
+                    onNavigateToDetail = onNavigateToDetail
+                )
             }
         },
         sheetPeekHeight = height,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            CakkMap(storeList, navHostController)
-            SearchArea(modifier = Modifier.align(Alignment.TopCenter), settingResultRequest)
+            CakkMap(
+                fromOnBoarding = fromOnBoarding,
+                storeList = storeList
+            )
+            SearchArea(
+                modifier = Modifier.align(Alignment.TopCenter),
+                settingResultRequest = settingResultRequest
+            )
         }
     }
 }
@@ -257,15 +264,22 @@ private fun SearchArea(
 
 @Composable
 private fun BottomSheetContent(
-    storeList: List<StoreListResponse>,
-    navigateToOnBoarding: () -> Unit,
-    navigateToDetail: (Int) -> Unit,
+    storeList: List<StoreModel>,
+    districts: List<DistrictType>,
+    storeCount: Int,
+    onNavigateToOnBoarding: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BottomSheetTop(modifier = Modifier.align(Alignment.Start), navigateToOnBoarding)
+        BottomSheetTop(
+            modifier = Modifier.align(Alignment.Start),
+            title = if (districts.isNotEmpty()) districts.joinToString { it.districtKr } else "현재 위치",
+            storeCount = storeCount,
+            onNavigateToOnBoarding = onNavigateToOnBoarding
+        )
 
         LazyColumn(
             modifier = Modifier.padding(top = 22.dp),
@@ -275,7 +289,7 @@ private fun BottomSheetContent(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
-                        .clickable { navigateToDetail(store.id) },
+                        .clickable { onNavigateToDetail(store.id) },
                     shape = RoundedCornerShape(24.dp),
                     color = OldLace
                 ) {
@@ -292,7 +306,7 @@ private fun BottomSheetContent(
 }
 
 @Composable
-private fun StoreInfo(store: StoreListResponse) {
+private fun StoreInfo(store: StoreModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(start = 20.dp, top = 20.dp)
@@ -328,7 +342,7 @@ private fun StoreInfo(store: StoreListResponse) {
 }
 
 @Composable
-private fun StoreTags(store: StoreListResponse) {
+private fun StoreTags(store: StoreModel) {
     Row(modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)) {
         store.storeTypes.forEach { storeType ->
             Surface(
@@ -365,7 +379,12 @@ private fun StoreTags(store: StoreListResponse) {
 }
 
 @Composable
-private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit) {
+private fun BottomSheetTop(
+    modifier: Modifier,
+    title: String,
+    storeCount: Int,
+    onNavigateToOnBoarding: () -> Unit,
+) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
         contentDescription = null,
@@ -380,7 +399,7 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
     ) {
         Column {
             Text(
-                text = "은평, 마포, 서대문",
+                text = title,
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.dp.toSp(),
@@ -389,7 +408,7 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
                     .padding(top = 30.dp)
             )
             Text(
-                text = "24개의 케이크샵",
+                text = "${storeCount}개의 케이크샵",
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.dp.toSp(),
@@ -407,9 +426,7 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
                 text = stringResource(id = R.string.home_change_location),
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 12.dp)
-                    .clickable {
-                        navigateToOnBoarding()
-                    },
+                    .clickable { onNavigateToOnBoarding() },
                 fontFamily = pretendard,
                 fontSize = 12.dp.toSp(),
                 color = Magenta,
@@ -421,10 +438,11 @@ private fun BottomSheetTop(modifier: Modifier, navigateToOnBoarding: () -> Unit)
 
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
-private fun CakkMap(storeList: List<StoreListResponse>, navHostController: NavHostController) {
+private fun CakkMap(
+    fromOnBoarding: Boolean,
+    storeList: List<StoreModel>,
+) {
     val context = LocalContext.current
-    val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
-
     val cameraPositionState: CameraPositionState = rememberCameraPositionState { position = CameraPosition(LatLng(0.0, 0.0), 16.0) }
 
     if (fromOnBoarding) {
@@ -469,7 +487,7 @@ private fun CakkMap(storeList: List<StoreListResponse>, navHostController: NavHo
 
 @Composable
 private fun LocationPermission(
-    navHostController: NavHostController,
+    fromOnBoarding: Boolean,
     permissions: Array<String>,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
@@ -477,8 +495,6 @@ private fun LocationPermission(
     val context = LocalContext.current
 
     LaunchedEffect(true) {
-        val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
-
         if (!fromOnBoarding) {
             checkAndRequestPermissions(
                 context,

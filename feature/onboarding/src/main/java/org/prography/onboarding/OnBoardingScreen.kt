@@ -21,19 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import org.prography.designsystem.extensions.toColor
 import org.prography.designsystem.ui.theme.Black
 import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
-import org.prography.utility.navigation.destination.CakkDestination
 
 @Composable
 fun OnBoardingScreen(
-    navHostController: NavHostController = rememberNavController(),
-    onBoardingViewModel: OnBoardingViewModel = hiltViewModel()
+    onBoardingViewModel: OnBoardingViewModel = hiltViewModel(),
+    onNavigateHome: (String, Int) -> Unit
 ) {
     LaunchedEffect(true) {
         onBoardingViewModel.sendAction(OnBoardingAction.LoadDistrictList)
@@ -75,20 +72,17 @@ fun OnBoardingScreen(
             }
         }
 
-        items(districtList) {
+        items(districtList) { districtGroup ->
             OnBoardingRegionItem(
                 modifier = Modifier
                     .padding(2.dp)
                     .aspectRatio(17 / 12f),
-                region = it.districts.joinToString(separator = " ") { it.district.districtKr },
-                count = it.count,
-                color = it.districts.first().district.toColor(),
+                region = districtGroup.districts.joinToString(separator = " ") { it.district.districtKr },
+                count = districtGroup.count,
+                color = districtGroup.districts.first().district.toColor(),
                 onClick = {
-                    navHostController.navigate(CakkDestination.Home.route) {
-                        popUpTo(CakkDestination.OnBoarding.route) {
-                            inclusive = false
-                        }
-                    }
+                    val districtJoinString = districtGroup.districts.joinToString(" ") { it.district.name }
+                    onNavigateHome(districtJoinString, districtGroup.count)
                 }
             )
         }
