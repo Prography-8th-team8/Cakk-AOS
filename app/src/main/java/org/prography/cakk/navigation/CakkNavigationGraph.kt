@@ -69,6 +69,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
                     popUpTo(CakkDestination.OnBoarding.route) {
                         inclusive = true
                     }
+                    launchSingleTop = true
                 }
             }
         }

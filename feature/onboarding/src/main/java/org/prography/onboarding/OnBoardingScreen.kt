@@ -30,7 +30,7 @@ import org.prography.utility.extensions.toSp
 @Composable
 fun OnBoardingScreen(
     onBoardingViewModel: OnBoardingViewModel = hiltViewModel(),
-    onNavigateHome: (String, Int) -> Unit,
+    onNavigateHome: (String, Int) -> Unit
 ) {
     LaunchedEffect(true) {
         onBoardingViewModel.sendAction(OnBoardingAction.LoadDistrictList)
@@ -95,7 +95,7 @@ private fun OnBoardingRegionItem(
     region: String,
     count: Int,
     color: Color,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     Box(
         modifier = modifier
