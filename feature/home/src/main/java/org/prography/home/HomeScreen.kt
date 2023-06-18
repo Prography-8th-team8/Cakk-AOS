@@ -63,6 +63,8 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     districtsArg: String?,
     storeCountArg: Int?,
+    onNavigateToOnBoarding: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
 ) {
     val districts = districtsArg ?: throw IllegalArgumentException()
     val storeCount = storeCountArg ?: throw IllegalArgumentException()
@@ -92,11 +94,7 @@ fun HomeScreen(
             Timber.i("권한이 동의되었습니다.")
         } else {
             Timber.i("권한이 거부되었습니다.")
-            navHostController.navigate(CakkDestination.OnBoarding.route) {
-                popUpTo(CakkDestination.Home.route) {
-                    inclusive = true
-                }
-            }
+            onNavigateToOnBoarding()
         }
     }
 
@@ -111,16 +109,8 @@ fun HomeScreen(
         districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.getName(it) } else listOf(),
         storeCount = if (storeCount >= 0) storeCount else homeState.value.storeModels.size,
         bottomExpandedType = homeState.value.lastExpandedType,
-        navigateToOnBoarding = {
-            navHostController.navigate(CakkDestination.OnBoarding.route) {
-                popUpTo(CakkDestination.Home.route) {
-                    inclusive = true
-                }
-            }
-        },
-        navigateToDetail = { storeId ->
-            navHostController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
-        }
+        onNavigateToOnBoarding = onNavigateToOnBoarding,
+        onNavigateToDetail = onNavigateToDetail
     )
 
     LaunchedEffect(homeViewModel) {
@@ -145,8 +135,8 @@ private fun BottomSheet(
     districts: List<DistrictType>,
     storeCount: Int,
     bottomExpandedType: ExpandedType,
-    navigateToOnBoarding: () -> Unit,
-    navigateToDetail: (Int) -> Unit,
+    onNavigateToOnBoarding: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
 ) {
     val context = LocalContext.current
     val screenHeight = LocalConfiguration.current.screenHeightDp
@@ -208,7 +198,13 @@ private fun BottomSheet(
                     }
                     .background(White),
             ) {
-                BottomSheetContent(storeList, districts, storeCount, navigateToOnBoarding, navigateToDetail)
+                BottomSheetContent(
+                    storeList = storeList,
+                    districts = districts,
+                    storeCount = storeCount,
+                    onNavigateToOnBoarding = onNavigateToOnBoarding,
+                    onNavigateToDetail = onNavigateToDetail
+                )
             }
         },
         sheetPeekHeight = height,
@@ -259,8 +255,8 @@ private fun BottomSheetContent(
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
-    navigateToOnBoarding: () -> Unit,
-    navigateToDetail: (Int) -> Unit,
+    onNavigateToOnBoarding: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -270,7 +266,7 @@ private fun BottomSheetContent(
             modifier = Modifier.align(Alignment.Start),
             title = if (districts.isNotEmpty()) districts.joinToString { it.districtKr } else "현재 위치",
             storeCount = storeCount,
-            navigateToOnBoarding
+            onNavigateToOnBoarding = onNavigateToOnBoarding
         )
 
         LazyColumn(
@@ -281,7 +277,7 @@ private fun BottomSheetContent(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
-                        .clickable { navigateToDetail(store.id) },
+                        .clickable { onNavigateToDetail(store.id) },
                     shape = RoundedCornerShape(24.dp),
                     color = OldLace
                 ) {
@@ -375,7 +371,7 @@ private fun BottomSheetTop(
     modifier: Modifier,
     title: String,
     storeCount: Int,
-    navigateToOnBoarding: () -> Unit,
+    onNavigateToOnBoarding: () -> Unit,
 ) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
@@ -418,9 +414,7 @@ private fun BottomSheetTop(
                 text = stringResource(id = R.string.home_change_location),
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 12.dp)
-                    .clickable {
-                        navigateToOnBoarding()
-                    },
+                    .clickable { onNavigateToOnBoarding() },
                 fontFamily = pretendard,
                 fontSize = 12.dp.toSp(),
                 color = Magenta,

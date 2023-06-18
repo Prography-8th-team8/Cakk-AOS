@@ -28,7 +28,21 @@ fun CakkNavigationGraph(navController: NavHostController) {
         ) { navBackStackEntry ->
             val districts = navBackStackEntry.arguments?.getString(CakkDestination.Home.DISTRICTS_INFO)
             val storeCount = navBackStackEntry.arguments?.getInt(CakkDestination.Home.STORE_COUNT)
-            HomeScreen(navHostController = navController, districtsArg = districts, storeCountArg = storeCount)
+            HomeScreen(
+                navHostController = navController,
+                districtsArg = districts,
+                storeCountArg = storeCount,
+                onNavigateToOnBoarding = {
+                    navController.navigate(CakkDestination.OnBoarding.route) {
+                        popUpTo(CakkDestination.Home.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateToDetail = { storeId ->
+                    navController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
+                }
+            )
         }
 
         composable(
