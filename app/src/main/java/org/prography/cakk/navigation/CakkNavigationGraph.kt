@@ -60,7 +60,17 @@ fun CakkNavigationGraph(navController: NavHostController) {
         }
 
         composable(route = CakkDestination.OnBoarding.route) {
-            OnBoardingScreen(navHostController = navController)
+            OnBoardingScreen { districts, storeCount ->
+                navController.navigate(
+                    CakkDestination.Home.route + "?" +
+                        "${CakkDestination.Home.DISTRICTS_INFO}=$districts" + "&" +
+                        "${CakkDestination.Home.STORE_COUNT}=$storeCount"
+                ) {
+                    popUpTo(CakkDestination.OnBoarding.route) {
+                        inclusive = true
+                    }
+                }
+            }
         }
     }
 }

@@ -21,21 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import org.prography.designsystem.extensions.toColor
 import org.prography.designsystem.ui.theme.Black
 import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
-import org.prography.utility.navigation.destination.CakkDestination
-import org.prography.utility.navigation.destination.CakkDestination.Home.DISTRICTS_INFO
-import org.prography.utility.navigation.destination.CakkDestination.Home.STORE_COUNT
 
 @Composable
 fun OnBoardingScreen(
-    navHostController: NavHostController = rememberNavController(),
     onBoardingViewModel: OnBoardingViewModel = hiltViewModel(),
+    onNavigateHome: (String, Int) -> Unit,
 ) {
     LaunchedEffect(true) {
         onBoardingViewModel.sendAction(OnBoardingAction.LoadDistrictList)
@@ -87,13 +82,7 @@ fun OnBoardingScreen(
                 color = districtGroup.districts.first().district.toColor(),
                 onClick = {
                     val districtJoinString = districtGroup.districts.joinToString(" ") { it.district.name }
-                    navHostController.navigate(
-                        "${CakkDestination.Home.route}?$DISTRICTS_INFO=$districtJoinString&$STORE_COUNT=${districtGroup.count}"
-                    ) {
-                        popUpTo(CakkDestination.OnBoarding.route) {
-                            inclusive = false
-                        }
-                    }
+                    onNavigateHome(districtJoinString, districtGroup.count)
                 }
             )
         }
