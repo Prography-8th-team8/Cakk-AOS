@@ -68,6 +68,7 @@ fun HomeScreen(
 ) {
     val districts = districtsArg ?: throw IllegalArgumentException()
     val storeCount = storeCountArg ?: throw IllegalArgumentException()
+    val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
 
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -98,13 +99,18 @@ fun HomeScreen(
         }
     }
 
-    LocationPermission(navHostController, permissions, settingResultRequest, launcherMultiplePermissions)
+    LocationPermission(
+        fromOnBoarding = fromOnBoarding,
+        permissions = permissions,
+        settingResultRequest = settingResultRequest,
+        launcherMultiplePermissions = launcherMultiplePermissions
+    )
 
     val homeState = homeViewModel.state.collectAsStateWithLifecycle()
     BottomSheet(
-        navHostController,
-        homeViewModel,
-        settingResultRequest,
+        homeViewModel = homeViewModel,
+        fromOnBoarding = fromOnBoarding,
+        settingResultRequest = settingResultRequest,
         storeList = homeState.value.storeModels,
         districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.getName(it) } else listOf(),
         storeCount = if (storeCount >= 0) storeCount else homeState.value.storeModels.size,
@@ -128,8 +134,8 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BottomSheet(
-    navHostController: NavHostController,
     homeViewModel: HomeViewModel = hiltViewModel(),
+    fromOnBoarding: Boolean,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
@@ -210,8 +216,14 @@ private fun BottomSheet(
         sheetPeekHeight = height,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            CakkMap(storeList, navHostController)
-            SearchArea(modifier = Modifier.align(Alignment.TopCenter), settingResultRequest)
+            CakkMap(
+                fromOnBoarding = fromOnBoarding,
+                storeList = storeList
+            )
+            SearchArea(
+                modifier = Modifier.align(Alignment.TopCenter),
+                settingResultRequest = settingResultRequest
+            )
         }
     }
 }
@@ -426,10 +438,11 @@ private fun BottomSheetTop(
 
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
-private fun CakkMap(storeList: List<StoreModel>, navHostController: NavHostController) {
+private fun CakkMap(
+    fromOnBoarding: Boolean,
+    storeList: List<StoreModel>,
+) {
     val context = LocalContext.current
-    val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
-
     val cameraPositionState: CameraPositionState = rememberCameraPositionState { position = CameraPosition(LatLng(0.0, 0.0), 16.0) }
 
     if (fromOnBoarding) {
@@ -474,7 +487,7 @@ private fun CakkMap(storeList: List<StoreModel>, navHostController: NavHostContr
 
 @Composable
 private fun LocationPermission(
-    navHostController: NavHostController,
+    fromOnBoarding: Boolean,
     permissions: Array<String>,
     settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
     launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
@@ -482,8 +495,6 @@ private fun LocationPermission(
     val context = LocalContext.current
 
     LaunchedEffect(true) {
-        val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
-
         if (!fromOnBoarding) {
             checkAndRequestPermissions(
                 context,
