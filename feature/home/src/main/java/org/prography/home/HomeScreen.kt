@@ -108,7 +108,7 @@ fun HomeScreen(
         homeViewModel,
         settingResultRequest,
         storeList = homeState.value.storeModels,
-        districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.valueOf(it) } else listOf(),
+        districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.getName(it) } else listOf(),
         storeCount = if (storeCount >= 0) storeCount else homeState.value.storeModels.size,
         bottomExpandedType = homeState.value.lastExpandedType,
         navigateToOnBoarding = {
