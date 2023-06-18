@@ -29,13 +29,13 @@ import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
-import org.prography.utility.navigation.destination.CakkDestination.Home.districtsArgs
-import org.prography.utility.navigation.destination.CakkDestination.Home.storeCountArgs
+import org.prography.utility.navigation.destination.CakkDestination.Home.DISTRICTS_INFO
+import org.prography.utility.navigation.destination.CakkDestination.Home.STORE_COUNT
 
 @Composable
 fun OnBoardingScreen(
     navHostController: NavHostController = rememberNavController(),
-    onBoardingViewModel: OnBoardingViewModel = hiltViewModel()
+    onBoardingViewModel: OnBoardingViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(true) {
         onBoardingViewModel.sendAction(OnBoardingAction.LoadDistrictList)
@@ -88,7 +88,7 @@ fun OnBoardingScreen(
                 onClick = {
                     val districtJoinString = districtGroup.districts.joinToString(" ") { it.district.name }
                     navHostController.navigate(
-                        "${CakkDestination.Home.route}?$districtsArgs=$districtJoinString&$storeCountArgs=${districtGroup.count}"
+                        "${CakkDestination.Home.route}?$DISTRICTS_INFO=$districtJoinString&$STORE_COUNT=${districtGroup.count}"
                     ) {
                         popUpTo(CakkDestination.OnBoarding.route) {
                             inclusive = false
@@ -106,7 +106,7 @@ private fun OnBoardingRegionItem(
     region: String,
     count: Int,
     color: Color,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier

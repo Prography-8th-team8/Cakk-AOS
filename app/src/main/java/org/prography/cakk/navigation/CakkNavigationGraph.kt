@@ -26,8 +26,8 @@ fun CakkNavigationGraph(navController: NavHostController) {
             route = CakkDestination.Home.routeWithArgs,
             arguments = CakkDestination.Home.arguments
         ) { navBackStackEntry ->
-            val districts = navBackStackEntry.arguments?.getString(CakkDestination.Home.districtsArgs)
-            val storeCount = navBackStackEntry.arguments?.getInt(CakkDestination.Home.storeCountArgs)
+            val districts = navBackStackEntry.arguments?.getString(CakkDestination.Home.DISTRICTS_INFO)
+            val storeCount = navBackStackEntry.arguments?.getInt(CakkDestination.Home.STORE_COUNT)
             if (districts != null && storeCount != null) {
                 HomeScreen(navHostController = navController, districts = districts, storeCount = storeCount)
             }
@@ -37,7 +37,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
             route = CakkDestination.HomeDetail.routeWithArgs,
             arguments = CakkDestination.HomeDetail.arguments
         ) { navBackStackEntry ->
-            val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.HomeDetail.storeIdArg)
+            val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.HomeDetail.STORE_ID)
             storeId?.let { HomeDetailScreen(navHostController = navController, storeId = it) }
         }
 
