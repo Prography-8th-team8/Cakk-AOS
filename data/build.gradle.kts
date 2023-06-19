@@ -19,6 +19,7 @@ android {
 dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:utility"))
+    implementation(project(":domain"))
 
     implementation(libs.gson)
     implementation(libs.dagger.hilt.android)
