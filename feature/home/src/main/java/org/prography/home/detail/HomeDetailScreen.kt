@@ -28,7 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.prography.cakk.data.api.model.enums.StoreType
 import org.prography.designsystem.R
-import org.prography.designsystem.extensions.toColor
+import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
 import org.prography.home.detail.BlogReviewModel
 import org.prography.home.detail.HomeDetailAction

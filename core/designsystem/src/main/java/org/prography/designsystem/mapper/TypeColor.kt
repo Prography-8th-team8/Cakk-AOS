@@ -1,4 +1,4 @@
-package org.prography.designsystem.extensions
+package org.prography.designsystem.mapper
 
 import org.prography.cakk.data.api.model.enums.DistrictType
 import org.prography.cakk.data.api.model.enums.StoreType

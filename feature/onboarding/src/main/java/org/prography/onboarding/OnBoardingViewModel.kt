@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import org.prography.base.BaseViewModel
-import org.prography.domain.mapper.toGroup
+import org.prography.utility.mapper.toGroup
 import org.prography.domain.repository.DistrictRepository
 import javax.inject.Inject
 
