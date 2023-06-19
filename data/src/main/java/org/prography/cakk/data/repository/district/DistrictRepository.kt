@@ -1,4 +1,4 @@
-package org.prography.cakk.data.repository.district
+package org.prography.domain.repository.district
 
 import kotlinx.coroutines.flow.Flow
 import org.prography.cakk.data.api.model.response.DistrictResponse
