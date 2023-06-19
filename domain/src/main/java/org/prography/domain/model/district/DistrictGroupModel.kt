@@ -1,8 +1,8 @@
-package org.prography.onboarding
+package org.prography.domain.model.district
 
 data class DistrictGroupModel(
     val districts: List<DistrictModel> = listOf(),
-    val count: Int
+    val count: Int,
 )
 
 fun List<DistrictModel>.toGroup() =
