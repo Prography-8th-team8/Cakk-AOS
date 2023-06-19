@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import org.prography.base.BaseViewModel
-import org.prography.cakk.data.repository.store.StoreRepository
+import org.prography.domain.repository.StoreRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,7 +27,7 @@ class HomeDetailViewModel @Inject constructor(
     private fun fetchDetailStore(id: Int) {
         storeRepository.fetchDetailStore(id)
             .onStart { sendAction(HomeDetailAction.Loading) }
-            .onEach { sendAction(HomeDetailAction.LoadedDetailInfo(it.toModel())) }
+            .onEach { sendAction(HomeDetailAction.LoadedDetailInfo(it)) }
             .launchIn(viewModelScope)
     }
 }
