@@ -6,6 +6,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.serialization)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.dagger.hilt)
 }
@@ -20,7 +21,7 @@ android {
 }
 
 dependencies {
-
+    implementation(project(":domain"))
     implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

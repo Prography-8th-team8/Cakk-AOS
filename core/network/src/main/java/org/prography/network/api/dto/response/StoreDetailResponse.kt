@@ -1,4 +1,4 @@
-package org.prography.cakk.data.api.dto.response
+package org.prography.network.api.dto.response
 
 import kotlinx.serialization.Serializable
 import org.prography.domain.model.store.StoreDetailModel

@@ -1,4 +1,4 @@
-package org.prography.cakk.data.api.model.response
+package org.prography.network.api.dto.response
 
 import kotlinx.serialization.Serializable
 import org.prography.cakk.data.api.model.enums.DistrictType
