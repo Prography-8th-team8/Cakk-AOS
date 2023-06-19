@@ -5,8 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.prography.base.BaseViewModel
-import org.prography.cakk.data.api.model.request.StoreListRequest
-import org.prography.cakk.data.repository.store.StoreRepository
+import org.prography.domain.repository.StoreRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,9 +31,9 @@ class HomeViewModel @Inject constructor(
     @OptIn(FlowPreview::class)
     private fun fetchStoreList(districts: List<String>) {
         districts.sorted().asFlow()
-            .flatMapMerge { storeRepository.fetchStoreList(StoreListRequest(it, 1)) }
+            .flatMapMerge { storeRepository.fetchStoreList(it, 1) }
             .onStart { sendAction(HomeUiAction.Loading) }
-            .onEach { sendAction(HomeUiAction.LoadedStoreList(it.toModel())) }
+            .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
             .launchIn(viewModelScope)
     }
 }

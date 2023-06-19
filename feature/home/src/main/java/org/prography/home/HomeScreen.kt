@@ -49,6 +49,7 @@ import org.prography.cakk.data.api.model.enums.StoreType
 import org.prography.designsystem.R
 import org.prography.designsystem.extensions.toColor
 import org.prography.designsystem.ui.theme.*
+import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination
 import timber.log.Timber
