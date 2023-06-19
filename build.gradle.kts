@@ -29,3 +29,7 @@ tasks {
         delete(rootProject.buildDir)
     }
 }
+
+apply {
+    from("gradle/projectDependencyGraph.gradle")
+}

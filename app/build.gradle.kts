@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":data"))
     implementation(project(":feature:splash"))
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:home"))
