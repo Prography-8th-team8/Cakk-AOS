@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.prography.network.CakkService
 import org.prography.network.api.dto.response.StoreDetailResponse
-import org.prography.network.api.dto.response.StoreListResponse
+import org.prography.network.api.dto.response.StoreResponse
 import javax.inject.Inject
 
 class StoreRemoteSource @Inject constructor(
@@ -15,7 +15,7 @@ class StoreRemoteSource @Inject constructor(
     fun fetchStoreList(
         district: String,
         page: Int
-    ): Flow<List<StoreListResponse>> = flow {
+    ): Flow<List<StoreResponse>> = flow {
         emit(
             httpClient.get {
                 url("${CakkService.BASE_URL}${CakkService.Endpoint.STORE_LIST}")

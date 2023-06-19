@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import org.prography.domain.model.store.StoreModel
 
 @Serializable
-data class StoreListResponse(
+data class StoreResponse(
     val id: Int,
     val createdAt: String,
     val modifiedAt: String,
