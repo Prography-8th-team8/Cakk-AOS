@@ -1,6 +1,7 @@
 package org.prography.home
 
 import org.prography.base.BaseAction
+import org.prography.domain.model.store.StoreModel
 
 sealed class HomeUiAction : BaseAction {
     object Loading : HomeUiAction()

@@ -2,9 +2,12 @@ package org.prography.onboarding
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import org.prography.base.BaseViewModel
-import org.prography.cakk.data.repository.district.DistrictRepository
+import org.prography.utility.mapper.toGroup
+import org.prography.domain.repository.DistrictRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,7 +30,7 @@ class OnBoardingViewModel @Inject constructor(
     private fun fetchDistrictList() {
         districtRepository.fetchDistrictList()
             .onStart { sendAction(OnBoardingAction.Loading) }
-            .onEach { sendAction(OnBoardingAction.LoadedDistrictList(it.map { it.toModel() })) }
+            .onEach { sendAction(OnBoardingAction.LoadedDistrictList(it)) }
             .launchIn(viewModelScope)
     }
 }

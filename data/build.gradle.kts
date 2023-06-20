@@ -4,7 +4,6 @@
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.serialization)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.dagger.hilt)
 }
@@ -19,6 +18,7 @@ android {
 dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:utility"))
+    implementation(project(":domain"))
 
     implementation(libs.gson)
     implementation(libs.dagger.hilt.android)
