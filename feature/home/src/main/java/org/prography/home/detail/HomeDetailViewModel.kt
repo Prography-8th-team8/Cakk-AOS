@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeDetailViewModel @Inject constructor(
     private val storeRepository: StoreRepository,
-) : BaseViewModel<HomeDetailAction, HomeDetailState, HomeDetailSideEffect>(
+) : BaseViewModel<HomeDetailAction, HomeDetailState, Nothing>(
     initialState = HomeDetailState()
 ) {
     override fun reduceState(currentState: HomeDetailState, action: HomeDetailAction): HomeDetailState = when (action) {
