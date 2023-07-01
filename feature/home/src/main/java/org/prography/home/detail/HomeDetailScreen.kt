@@ -1,5 +1,7 @@
 package org.prography.home
 
+import android.text.Html
+import android.text.Html.FROM_HTML_OPTION_USE_CSS_COLORS
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.*
@@ -214,10 +216,13 @@ private fun HomeDetailBlogItem(
     modifier: Modifier = Modifier,
     blogPost: BlogPostModel,
 ) {
+    val year = blogPost.postdate.substring(0, 4)
+    val month = blogPost.postdate.substring(4, 6)
+    val day = blogPost.postdate.substring(6)
     Column(modifier) {
         Row {
             Text(
-                text = blogPost.bloggername,
+                text = Html.fromHtml(blogPost.bloggername, FROM_HTML_OPTION_USE_CSS_COLORS).toString(),
                 modifier = Modifier.weight(1f, false),
                 color = Raisin_Black,
                 fontSize = 14.dp.toSp(),
@@ -237,7 +242,7 @@ private fun HomeDetailBlogItem(
             )
 
             Text(
-                text = blogPost.postdate,
+                text = "$year.$month.$day",
                 modifier = Modifier.padding(start = 4.dp),
                 color = Raisin_Black.copy(alpha = 0.6f),
                 fontSize = 14.dp.toSp(),
@@ -247,7 +252,7 @@ private fun HomeDetailBlogItem(
         }
 
         Text(
-            text = blogPost.title,
+            text = Html.fromHtml(blogPost.title, FROM_HTML_OPTION_USE_CSS_COLORS).toString(),
             modifier = Modifier.padding(top = 16.dp),
             color = Raisin_Black,
             fontSize = 16.dp.toSp(),
@@ -259,7 +264,7 @@ private fun HomeDetailBlogItem(
         )
 
         Text(
-            text = blogPost.description,
+            text = Html.fromHtml(blogPost.description, FROM_HTML_OPTION_USE_CSS_COLORS).toString(),
             modifier = Modifier.padding(top = 12.dp),
             color = Raisin_Black.copy(alpha = 0.8f),
             fontSize = 14.dp.toSp(),
