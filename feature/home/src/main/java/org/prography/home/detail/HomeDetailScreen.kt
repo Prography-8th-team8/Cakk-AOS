@@ -1,5 +1,7 @@
 package org.prography.home
 
+import android.content.Intent
+import android.net.Uri
 import android.text.Html
 import android.text.Html.FROM_HTML_OPTION_USE_CSS_COLORS
 import androidx.annotation.DrawableRes
@@ -17,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -219,7 +222,13 @@ private fun HomeDetailBlogItem(
     val year = blogPost.postdate.substring(0, 4)
     val month = blogPost.postdate.substring(4, 6)
     val day = blogPost.postdate.substring(6)
-    Column(modifier) {
+
+    val context = LocalContext.current
+    Column(
+        modifier = modifier.clickable {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogPost.link)))
+        }
+    ) {
         Row {
             Text(
                 text = Html.fromHtml(blogPost.bloggername, FROM_HTML_OPTION_USE_CSS_COLORS).toString(),
