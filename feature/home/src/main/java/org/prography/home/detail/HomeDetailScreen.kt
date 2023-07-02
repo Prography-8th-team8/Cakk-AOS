@@ -1,5 +1,9 @@
 package org.prography.home
 
+import android.content.Intent
+import android.net.Uri
+import android.text.Html
+import android.text.Html.FROM_HTML_OPTION_USE_CSS_COLORS
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.*
@@ -15,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +35,7 @@ import org.prography.cakk.data.api.model.enums.StoreType
 import org.prography.designsystem.R
 import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
-import org.prography.home.detail.BlogReviewModel
+import org.prography.domain.model.store.BlogPostModel
 import org.prography.home.detail.HomeDetailAction
 import org.prography.home.detail.HomeDetailViewModel
 import org.prography.utility.extensions.toSp
@@ -43,10 +48,12 @@ fun HomeDetailScreen(
 ) {
     LaunchedEffect(storeId) {
         homeDetailViewModel.sendAction(HomeDetailAction.LoadDetailInfo(storeId))
+        homeDetailViewModel.sendAction(HomeDetailAction.LoadBlogInfos(storeId))
     }
 
     val storeDetailState = homeDetailViewModel.state.collectAsStateWithLifecycle()
     val storeDetailModel = storeDetailState.value.storeDetailModel
+    val storeBlogPosts = storeDetailState.value.blogPosts
     val scrollState = rememberScrollState()
 
     Column(
@@ -54,10 +61,9 @@ fun HomeDetailScreen(
             .fillMaxSize()
             .background(White)
     ) {
-        HomeDetailAppbar(
-            title = stringResource(R.string.home_detail_app_bar),
-            onBack = { navHostController.popBackStack() }
-        )
+        HomeDetailAppbar(title = stringResource(R.string.home_detail_app_bar)) {
+            navHostController.popBackStack()
+        }
 
         Column(
             modifier = Modifier
@@ -138,26 +144,7 @@ fun HomeDetailScreen(
                 modifier = Modifier
                     .padding(top = 40.dp, bottom = 60.dp)
                     .padding(horizontal = 16.dp),
-                blogReviews = listOf(
-                    BlogReviewModel(
-                        name = "블로거 이름",
-                        date = "2023.05.01",
-                        title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
-                        description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각...",
-                    ),
-                    BlogReviewModel(
-                        name = "블로거 이름",
-                        date = "2023.05.01",
-                        title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
-                        description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각...",
-                    ),
-                    BlogReviewModel(
-                        name = "블로거 이름",
-                        date = "2023.05.01",
-                        title = "제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게 제목을 입력해 주세요. 제목은 한 줄까지만 노출 되게",
-                        description = "블로그 내용을 입력해 주세요. 내용은 최대 3줄까지만 쓰게 하려고 해요. 이 섹션 전체를 눌렀을 때 네이버로 이동할 수 있게 해당 블로그 글 링크 연결을 하면 괜찮지 않을까요? 어떻게 생각...",
-                    )
-                )
+                blogPosts = storeBlogPosts
             )
         }
     }
@@ -166,7 +153,7 @@ fun HomeDetailScreen(
 @Composable
 private fun HomeDetailBlogRow(
     modifier: Modifier = Modifier,
-    blogReviews: List<BlogReviewModel>,
+    blogPosts: List<BlogPostModel>,
 ) {
     Column(modifier) {
         Text(
@@ -186,12 +173,12 @@ private fun HomeDetailBlogRow(
                 .background(Platinum)
         )
 
-        blogReviews.take(3).forEach { review ->
+        blogPosts.take(3).forEach { blogPost ->
             HomeDetailBlogItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 23.dp),
-                blogReview = review
+                blogPost = blogPost
             )
 
             Spacer(
@@ -216,7 +203,7 @@ private fun HomeDetailBlogRow(
             )
         ) {
             Text(
-                text = "블로그 리뷰 더 보기",
+                text = stringResource(R.string.home_detail_blog_review_more),
                 color = Raisin_Black,
                 fontSize = 14.dp.toSp(),
                 fontFamily = pretendard,
@@ -230,12 +217,21 @@ private fun HomeDetailBlogRow(
 @Composable
 private fun HomeDetailBlogItem(
     modifier: Modifier = Modifier,
-    blogReview: BlogReviewModel,
+    blogPost: BlogPostModel,
 ) {
-    Column(modifier) {
+    val year = blogPost.postdate.substring(0, 4)
+    val month = blogPost.postdate.substring(4, 6)
+    val day = blogPost.postdate.substring(6)
+
+    val context = LocalContext.current
+    Column(
+        modifier = modifier.clickable {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogPost.link)))
+        }
+    ) {
         Row {
             Text(
-                text = blogReview.name,
+                text = Html.fromHtml(blogPost.bloggername, FROM_HTML_OPTION_USE_CSS_COLORS).toString(),
                 modifier = Modifier.weight(1f, false),
                 color = Raisin_Black,
                 fontSize = 14.dp.toSp(),
@@ -255,7 +251,7 @@ private fun HomeDetailBlogItem(
             )
 
             Text(
-                text = blogReview.date,
+                text = "$year.$month.$day",
                 modifier = Modifier.padding(start = 4.dp),
                 color = Raisin_Black.copy(alpha = 0.6f),
                 fontSize = 14.dp.toSp(),
@@ -265,7 +261,7 @@ private fun HomeDetailBlogItem(
         }
 
         Text(
-            text = blogReview.title,
+            text = Html.fromHtml(blogPost.title, FROM_HTML_OPTION_USE_CSS_COLORS).toString(),
             modifier = Modifier.padding(top = 16.dp),
             color = Raisin_Black,
             fontSize = 16.dp.toSp(),
@@ -277,7 +273,7 @@ private fun HomeDetailBlogItem(
         )
 
         Text(
-            text = blogReview.description,
+            text = Html.fromHtml(blogPost.description, FROM_HTML_OPTION_USE_CSS_COLORS).toString(),
             modifier = Modifier.padding(top = 12.dp),
             color = Raisin_Black.copy(alpha = 0.8f),
             fontSize = 14.dp.toSp(),
@@ -345,7 +341,7 @@ private fun HomeDetailInfoRow(
             )
 
             Text(
-                text = "주소 복사",
+                text = stringResource(R.string.home_detail_address_copy),
                 modifier = Modifier.padding(start = 4.dp),
                 color = Raisin_Black,
                 fontSize = 14.dp.toSp(),
@@ -465,9 +461,7 @@ private fun HomeDetailKeywordRow(
 private fun HomeDetailTab(
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.height(intrinsicSize = IntrinsicSize.Max)
-    ) {
+    Row(modifier = modifier.height(intrinsicSize = IntrinsicSize.Max)) {
         HomeDetailTabItem(
             drawableRes = R.drawable.ic_phone,
             stringRes = R.string.home_detail_phone

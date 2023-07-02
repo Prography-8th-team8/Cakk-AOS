@@ -5,6 +5,7 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.prography.network.CakkService
+import org.prography.network.api.dto.response.StoreBlogResponse
 import org.prography.network.api.dto.response.StoreDetailResponse
 import org.prography.network.api.dto.response.StoreResponse
 import javax.inject.Inject
@@ -12,10 +13,7 @@ import javax.inject.Inject
 class StoreRemoteSource @Inject constructor(
     private val httpClient: HttpClient
 ) {
-    fun fetchStoreList(
-        district: String,
-        page: Int
-    ): Flow<List<StoreResponse>> = flow {
+    fun fetchStoreList(district: String, page: Int): Flow<List<StoreResponse>> = flow {
         emit(
             httpClient.get {
                 url("${CakkService.BASE_URL}${CakkService.Endpoint.STORE_LIST}")
@@ -29,6 +27,14 @@ class StoreRemoteSource @Inject constructor(
         emit(
             httpClient.get {
                 url("${CakkService.BASE_URL}${CakkService.Endpoint.STORE_DETAIL}/$storeId")
+            }
+        )
+    }
+
+    fun fetchStoreBlog(storeId: Int): Flow<StoreBlogResponse> = flow {
+        emit(
+            httpClient.get {
+                url("${CakkService.BASE_URL}${CakkService.Endpoint.STORE_DETAIL}/$storeId/${CakkService.Endpoint.STORE_BLOG}")
             }
         )
     }

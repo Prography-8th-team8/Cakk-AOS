@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeDetailViewModel @Inject constructor(
     private val storeRepository: StoreRepository,
-) : BaseViewModel<HomeDetailAction, HomeDetailState, HomeDetailSideEffect>(
+) : BaseViewModel<HomeDetailAction, HomeDetailState, Nothing>(
     initialState = HomeDetailState()
 ) {
     override fun reduceState(currentState: HomeDetailState, action: HomeDetailAction): HomeDetailState = when (action) {
@@ -21,13 +21,29 @@ class HomeDetailViewModel @Inject constructor(
             fetchDetailStore(action.id)
             currentState
         }
-        is HomeDetailAction.LoadedDetailInfo -> currentState.copy(storeDetailModel = action.storeDetailModel)
+        is HomeDetailAction.LoadedDetailInfo -> {
+            currentState.copy(storeDetailModel = action.storeDetailModel)
+        }
+        is HomeDetailAction.LoadBlogInfos -> {
+            fetchStoreBlogInfos(action.id)
+            currentState
+        }
+        is HomeDetailAction.LoadedBlogInfos -> {
+            currentState.copy(blogPosts = action.blogPosts)
+        }
     }
 
     private fun fetchDetailStore(id: Int) {
         storeRepository.fetchDetailStore(id)
             .onStart { sendAction(HomeDetailAction.Loading) }
             .onEach { sendAction(HomeDetailAction.LoadedDetailInfo(it)) }
+            .launchIn(viewModelScope)
+    }
+
+    private fun fetchStoreBlogInfos(id: Int) {
+        storeRepository.fetchStoreBlog(id)
+            .onStart { sendAction(HomeDetailAction.Loading) }
+            .onEach { sendAction(HomeDetailAction.LoadedBlogInfos(it.blogPosts)) }
             .launchIn(viewModelScope)
     }
 }

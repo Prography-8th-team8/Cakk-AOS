@@ -18,4 +18,5 @@
     <string name="home_detail_address_copy">주소복사</string>
     <string name="home_detail_opening">영업중</string>
     <string name="home_detail_blog_review">블로그 리뷰</string>
+    <string name="home_detail_blog_review_more">블로그 리뷰 더 보기</string>
 </resources>
