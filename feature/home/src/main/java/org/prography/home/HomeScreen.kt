@@ -179,8 +179,10 @@ private fun BottomSheet(
                                 expandedType = ExpandedType.MOVING
                             },
                             onDrag = { change, dragAmount ->
-                                change.consume()
-                                offsetY -= dragAmount.y
+                                if (offsetY - (dragAmount.y * 0.5).toFloat() <= screenHeight) {
+                                    change.consume()
+                                    offsetY -= (dragAmount.y * 0.5).toFloat()
+                                }
                             },
                             onDragEnd = {
                                 when {
