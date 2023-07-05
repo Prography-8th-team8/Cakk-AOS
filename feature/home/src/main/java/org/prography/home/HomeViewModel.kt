@@ -24,7 +24,10 @@ class HomeViewModel @Inject constructor(
             currentState
         }
         is HomeUiAction.LoadedStoreList -> {
-            currentState.copy(storeModels = currentState.storeModels + action.storeModels)
+            currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
+        }
+        is HomeUiAction.ReloadStore -> {
+            currentState.copy(storeModels = action.storeModels, isReload = true)
         }
     }
 
@@ -57,7 +60,7 @@ class HomeViewModel @Inject constructor(
             storeTypes = storeTypes
         )
             .onStart { sendAction(HomeUiAction.Loading) }
-            .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
+            .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
             .launchIn(viewModelScope)
     }
 }

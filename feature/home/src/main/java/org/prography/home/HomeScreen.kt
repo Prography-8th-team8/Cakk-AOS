@@ -105,12 +105,15 @@ fun HomeScreen(
     )
 
     val homeState = homeViewModel.state.collectAsStateWithLifecycle()
+
+    Timber.d("HomeScreen ${homeState.value.storeModels.size}")
     BottomSheet(
         homeViewModel = homeViewModel,
         fromOnBoarding = fromOnBoarding,
+        isReload = homeState.value.isReload,
         storeList = homeState.value.storeModels,
         districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
-        storeCount = if (storeCountArg >= 0) storeCountArg else homeState.value.storeModels.size,
+        storeCount = if (storeCountArg >= 0 && homeState.value.isReload.not()) storeCountArg else homeState.value.storeModels.size,
         bottomExpandedType = homeState.value.lastExpandedType,
         onNavigateToOnBoarding = onNavigateToOnBoarding,
         onNavigateToDetail = onNavigateToDetail
@@ -133,6 +136,7 @@ fun HomeScreen(
 private fun BottomSheet(
     homeViewModel: HomeViewModel = hiltViewModel(),
     fromOnBoarding: Boolean,
+    isReload: Boolean,
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
@@ -203,6 +207,7 @@ private fun BottomSheet(
                     .background(White),
             ) {
                 BottomSheetContent(
+                    isReload = isReload,
                     storeList = storeList,
                     districts = districts,
                     storeCount = storeCount,
@@ -219,6 +224,7 @@ private fun BottomSheet(
             CakkMap(
                 cameraPositionState = cameraPositionState,
                 fromOnBoarding = fromOnBoarding,
+                isReload = isReload,
                 storeList = storeList
             )
             SearchArea(
@@ -282,6 +288,7 @@ private fun SearchArea(
 
 @Composable
 private fun BottomSheetContent(
+    isReload: Boolean,
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
@@ -294,7 +301,15 @@ private fun BottomSheetContent(
     ) {
         BottomSheetTop(
             modifier = Modifier.align(Alignment.Start),
-            title = if (districts.isNotEmpty()) districts.joinToString { it.districtKr } else "현재 위치",
+            title = if (isReload) {
+                "현재 지도 위치"
+            } else {
+                if (districts.isNotEmpty()) {
+                    districts.joinToString { it.districtKr }
+                } else {
+                    "현재 위치"
+                }
+            },
             storeCount = storeCount,
             onNavigateToOnBoarding = onNavigateToOnBoarding
         )
@@ -459,10 +474,11 @@ private fun BottomSheetTop(
 private fun CakkMap(
     cameraPositionState: CameraPositionState,
     fromOnBoarding: Boolean,
+    isReload: Boolean,
     storeList: List<StoreModel>,
 ) {
     val context = LocalContext.current
-    if (fromOnBoarding) {
+    if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
             cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
         }
