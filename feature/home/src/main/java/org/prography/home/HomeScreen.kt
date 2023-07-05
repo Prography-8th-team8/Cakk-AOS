@@ -43,7 +43,7 @@ import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
 import org.prography.cakk.data.api.model.enums.DistrictType
-import org.prography.cakk.data.api.model.enums.StoreType
+import org.prography.domain.model.enums.StoreType
 import org.prography.designsystem.R
 import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
@@ -415,20 +415,30 @@ private fun BottomSheetTop(
                     .padding(top = 12.dp)
             )
         }
-        Surface(
+        Row(
             modifier = Modifier.padding(top = 34.dp),
-            shape = RoundedCornerShape(12.dp),
-            color = Light_Deep_Pink.copy(alpha = 0.15f)
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(id = R.string.home_change_location),
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-                    .clickable { onNavigateToOnBoarding() },
-                fontFamily = pretendard,
-                fontSize = 12.dp.toSp(),
-                color = Magenta,
-                fontWeight = FontWeight.Bold
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = Light_Deep_Pink.copy(alpha = 0.15f)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.home_change_location),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .clickable { onNavigateToOnBoarding() },
+                    fontFamily = pretendard,
+                    fontSize = 12.dp.toSp(),
+                    color = Magenta,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                painter = painterResource(id = R.drawable.ic_filter),
+                contentDescription = null,
+                modifier = Modifier.clickable { }
             )
         }
     }
