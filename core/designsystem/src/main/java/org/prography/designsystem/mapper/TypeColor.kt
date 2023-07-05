@@ -1,7 +1,7 @@
 package org.prography.designsystem.mapper
 
 import org.prography.cakk.data.api.model.enums.DistrictType
-import org.prography.cakk.data.api.model.enums.StoreType
+import org.prography.domain.model.enums.StoreType
 import org.prography.designsystem.ui.theme.*
 
 fun StoreType.toColor() = when (this) {
@@ -13,6 +13,9 @@ fun StoreType.toColor() = when (this) {
     StoreType.PHOTO -> Congo_Pink
     StoreType.FIGURE -> Yankees_Blue
     StoreType.TIARA -> Cerise
+    StoreType.LUXURY -> Cerise // 추후 색상 변경
+    StoreType.SOLID -> Cerise // 추후 색상 변경
+    StoreType.ETC -> Cerise // 추후 색상 변경
 }
 
 fun DistrictType.toColor() = when (this.groupId) {
