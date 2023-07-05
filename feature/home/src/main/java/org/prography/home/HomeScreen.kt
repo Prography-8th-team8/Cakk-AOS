@@ -213,7 +213,8 @@ private fun BottomSheet(
         },
         sheetPeekHeight = height,
     ) {
-        val cameraPositionState: CameraPositionState = rememberCameraPositionState { position = CameraPosition(LatLng(0.0, 0.0), 16.0) }
+        val cameraPositionState: CameraPositionState =
+            rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
         Box(modifier = Modifier.fillMaxSize()) {
             CakkMap(
                 cameraPositionState = cameraPositionState,
