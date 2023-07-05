@@ -1,7 +1,9 @@
 package org.prography.network.api.dto.response
 
+import kotlinx.serialization.Serializable
 import org.prography.domain.model.store.StoreModel
 
+@Serializable
 data class StoreReloadResponse(
     val id: Int,
     val createdAt: String,
@@ -13,7 +15,7 @@ data class StoreReloadResponse(
     val location: String,
     val latitude: Double,
     val longitude: Double,
-    val thumbnail: String,
+    val thumbnail: String?,
     val imageUrls: List<String>,
     val storeTypes: List<String>
 ) {

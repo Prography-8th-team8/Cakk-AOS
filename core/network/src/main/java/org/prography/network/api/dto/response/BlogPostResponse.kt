@@ -1,8 +1,9 @@
 package org.prography.network.api.dto.response
 
+import kotlinx.serialization.Serializable
 import org.prography.domain.model.store.BlogPostModel
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class BlogPostResponse(
     val title: String,
     val link: String,
