@@ -36,4 +36,28 @@ class HomeViewModel @Inject constructor(
             .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
             .launchIn(viewModelScope)
     }
+
+    fun fetchStoreReload(
+        southwestLatitude: Double?,
+        southwestLongitude: Double?,
+        northeastLatitude: Double?,
+        northeastLongitude: Double?,
+        storeTypes: List<String> = listOf()
+    ) {
+        require(southwestLatitude != null)
+        require(southwestLongitude != null)
+        require(northeastLatitude != null)
+        require(northeastLongitude != null)
+
+        storeRepository.fetchStoreReload(
+            southwestLatitude,
+            southwestLongitude,
+            northeastLatitude,
+            northeastLongitude,
+            storeTypes = storeTypes
+        )
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
+            .launchIn(viewModelScope)
+    }
 }

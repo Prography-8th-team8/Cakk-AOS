@@ -222,6 +222,7 @@ private fun BottomSheet(
                 storeList = storeList
             )
             SearchArea(
+                homeViewModel = homeViewModel,
                 modifier = Modifier.align(Alignment.TopCenter),
                 cameraPositionState = cameraPositionState
             )
@@ -231,6 +232,7 @@ private fun BottomSheet(
 
 @Composable
 private fun SearchArea(
+    homeViewModel: HomeViewModel,
     modifier: Modifier,
     cameraPositionState: CameraPositionState
 ) {
@@ -244,7 +246,15 @@ private fun SearchArea(
 
     Button(
         modifier = modifier.padding(top = 24.dp),
-        onClick = { canReload = false },
+        onClick = {
+            homeViewModel.fetchStoreReload(
+                cameraPositionState.contentBounds?.southWest?.latitude,
+                cameraPositionState.contentBounds?.southWest?.longitude,
+                cameraPositionState.contentBounds?.northEast?.latitude,
+                cameraPositionState.contentBounds?.northEast?.longitude
+            )
+            canReload = false
+        },
         enabled = canReload,
         shape = RoundedCornerShape(40.dp),
         colors = ButtonDefaults.buttonColors(
