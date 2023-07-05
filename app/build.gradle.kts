@@ -12,7 +12,7 @@ plugins {
 android {
 
     defaultConfig {
-        applicationId = "org.prography.cakk"
+        applicationId = "com.prography.cakk"
         versionCode = 1
         versionName = "1.0"
         vectorDrawables {
