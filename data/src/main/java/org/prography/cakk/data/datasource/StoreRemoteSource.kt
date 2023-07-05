@@ -67,7 +67,9 @@ class StoreRemoteSource @Inject constructor(
                 parameter(NORTH_EAST_LATITUDE, northeastLatitude)
                 parameter(NORTH_EAST_LONGITUDE, northeastLongitude)
                 parameter(PAGE, page)
-                parameter(STORE_TYPES, storeTypes)
+                storeTypes.forEach { storeType ->
+                    parameter(STORE_TYPES, storeType)
+                }
             }
         )
     }
