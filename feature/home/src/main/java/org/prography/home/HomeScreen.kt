@@ -35,8 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
@@ -51,7 +49,8 @@ import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
-import org.prography.utility.navigation.destination.CakkDestination
+import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
+import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_STORE_COUNT
 import timber.log.Timber
 
 var locationCallback: LocationCallback? = null
@@ -60,17 +59,13 @@ var fusedLocationClient: FusedLocationProviderClient? = null
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
 @Composable
 fun HomeScreen(
-    navHostController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-    districtsArg: String?,
-    storeCountArg: Int?,
+    districtsArg: String,
+    storeCountArg: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
-    val districts = districtsArg ?: throw IllegalArgumentException()
-    val storeCount = storeCountArg ?: throw IllegalArgumentException()
-    val fromOnBoarding = navHostController.previousBackStackEntry?.destination?.route == CakkDestination.OnBoarding.route
-
+    val fromOnBoarding = districtsArg != DEFAULT_DISTRICTS_INFO && storeCountArg != DEFAULT_STORE_COUNT
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -113,8 +108,8 @@ fun HomeScreen(
         fromOnBoarding = fromOnBoarding,
         settingResultRequest = settingResultRequest,
         storeList = homeState.value.storeModels,
-        districts = if (districts.isNotEmpty()) districts.split(" ").map { DistrictType.getName(it) } else listOf(),
-        storeCount = if (storeCount >= 0) storeCount else homeState.value.storeModels.size,
+        districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
+        storeCount = if (storeCountArg >= 0) storeCountArg else homeState.value.storeModels.size,
         bottomExpandedType = homeState.value.lastExpandedType,
         onNavigateToOnBoarding = onNavigateToOnBoarding,
         onNavigateToDetail = onNavigateToDetail
@@ -122,10 +117,10 @@ fun HomeScreen(
 
     LaunchedEffect(homeViewModel) {
         if (homeState.value.storeModels.isEmpty()) {
-            if (districts.isEmpty()) {
+            if (districtsArg.isEmpty()) {
                 homeViewModel.sendAction(HomeUiAction.LoadStoreList(listOf("JONGNO")))
             } else {
-                homeViewModel.sendAction(HomeUiAction.LoadStoreList(districts.split(" ")))
+                homeViewModel.sendAction(HomeUiAction.LoadStoreList(districtsArg.split(" ")))
             }
         }
     }

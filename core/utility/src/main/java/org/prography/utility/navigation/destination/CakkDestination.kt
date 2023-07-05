@@ -10,15 +10,17 @@ sealed class CakkDestination(
     object Home : CakkDestination(route = HOME) {
         const val DISTRICTS_INFO = "DISTRICTS_INFO"
         const val STORE_COUNT = "STORE_COUNT"
+        const val DEFAULT_DISTRICTS_INFO = ""
+        const val DEFAULT_STORE_COUNT = -1
         val routeWithArgs = "$route?$DISTRICTS_INFO={$DISTRICTS_INFO}&$STORE_COUNT={$STORE_COUNT}"
         val arguments = listOf(
             navArgument(DISTRICTS_INFO) {
                 type = NavType.StringType
-                defaultValue = ""
+                defaultValue = DEFAULT_DISTRICTS_INFO
             },
             navArgument(STORE_COUNT) {
                 type = NavType.IntType
-                defaultValue = -1
+                defaultValue = DEFAULT_STORE_COUNT
             }
         )
     }

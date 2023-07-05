@@ -9,6 +9,10 @@ import org.prography.home.HomeScreen
 import org.prography.onboarding.OnBoardingScreen
 import org.prography.splash.SplashScreen
 import org.prography.utility.navigation.destination.CakkDestination
+import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
+import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_STORE_COUNT
+import org.prography.utility.navigation.destination.CakkDestination.Home.DISTRICTS_INFO
+import org.prography.utility.navigation.destination.CakkDestination.Home.STORE_COUNT
 import org.prography.utility.navigation.graph.GraphLabels
 
 @Composable
@@ -20,7 +24,7 @@ fun CakkNavigationGraph(navController: NavHostController) {
     ) {
         composable(route = CakkDestination.Splash.route) {
             SplashScreen {
-                navController.navigate(CakkDestination.Home.route) {
+                navController.navigate(CakkDestination.Home.routeWithArgs) {
                     popUpTo(CakkDestination.Splash.route) {
                         inclusive = true
                     }
@@ -32,15 +36,14 @@ fun CakkNavigationGraph(navController: NavHostController) {
             route = CakkDestination.Home.routeWithArgs,
             arguments = CakkDestination.Home.arguments
         ) { navBackStackEntry ->
-            val districts = navBackStackEntry.arguments?.getString(CakkDestination.Home.DISTRICTS_INFO)
-            val storeCount = navBackStackEntry.arguments?.getInt(CakkDestination.Home.STORE_COUNT)
+            val districts = navBackStackEntry.arguments?.getString(DISTRICTS_INFO) ?: DEFAULT_DISTRICTS_INFO
+            val storeCount = navBackStackEntry.arguments?.getInt(STORE_COUNT) ?: DEFAULT_STORE_COUNT
             HomeScreen(
-                navHostController = navController,
                 districtsArg = districts,
                 storeCountArg = storeCount,
                 onNavigateToOnBoarding = {
                     navController.navigate(CakkDestination.OnBoarding.route) {
-                        popUpTo(CakkDestination.Home.route) {
+                        popUpTo(CakkDestination.Home.routeWithArgs) {
                             inclusive = true
                         }
                     }
@@ -63,8 +66,8 @@ fun CakkNavigationGraph(navController: NavHostController) {
             OnBoardingScreen { districts, storeCount ->
                 navController.navigate(
                     CakkDestination.Home.route + "?" +
-                        "${CakkDestination.Home.DISTRICTS_INFO}=$districts" + "&" +
-                        "${CakkDestination.Home.STORE_COUNT}=$storeCount"
+                        "$DISTRICTS_INFO=$districts" + "&" +
+                        "$STORE_COUNT=$storeCount"
                 ) {
                     popUpTo(CakkDestination.OnBoarding.route) {
                         inclusive = true
