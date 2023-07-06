@@ -16,8 +16,9 @@ class HomeViewModel @Inject constructor(
 ) {
     override fun reduceState(currentState: HomeUiState, action: HomeUiAction): HomeUiState = when (action) {
         HomeUiAction.BottomSheetExpandFull -> currentState.copy(lastExpandedType = ExpandedType.FULL)
-        HomeUiAction.BottomSheetExpandHalf -> currentState.copy(lastExpandedType = ExpandedType.HALF)
+        HomeUiAction.BottomSheetExpandQuarter -> currentState.copy(lastExpandedType = ExpandedType.QUARTER)
         HomeUiAction.BottomSheetExpandCollapsed -> currentState.copy(lastExpandedType = ExpandedType.COLLAPSED)
+        HomeUiAction.BottomSheetExpandHalf -> currentState.copy(lastExpandedType = ExpandedType.HALF)
         HomeUiAction.Loading -> currentState
         is HomeUiAction.LoadStoreList -> {
             fetchStoreList(action.districts)

@@ -12,7 +12,9 @@ sealed class HomeUiAction : BaseAction {
 
     object BottomSheetExpandFull : HomeUiAction()
 
-    object BottomSheetExpandHalf : HomeUiAction()
+    object BottomSheetExpandQuarter : HomeUiAction()
 
     object BottomSheetExpandCollapsed : HomeUiAction()
+
+    object BottomSheetExpandHalf : HomeUiAction()
 }
