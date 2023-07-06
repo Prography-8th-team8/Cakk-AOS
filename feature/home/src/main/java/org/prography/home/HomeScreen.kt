@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,9 +21,11 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -31,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,10 +46,12 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
-import org.prography.cakk.data.api.model.enums.DistrictType
+import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
 import org.prography.designsystem.R
+import org.prography.designsystem.mapper.toBackgroundColor
 import org.prography.designsystem.mapper.toColor
+import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
@@ -103,6 +109,7 @@ fun HomeScreen(
     )
 
     val homeState = homeViewModel.state.collectAsStateWithLifecycle()
+
     BottomSheet(
         homeViewModel = homeViewModel,
         fromOnBoarding = fromOnBoarding,
@@ -111,6 +118,7 @@ fun HomeScreen(
         districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
         storeCount = if (storeCountArg >= 0) storeCountArg else homeState.value.storeModels.size,
         bottomExpandedType = homeState.value.lastExpandedType,
+        districtsArg = districtsArg,
         onNavigateToOnBoarding = onNavigateToOnBoarding,
         onNavigateToDetail = onNavigateToDetail
     )
@@ -118,16 +126,21 @@ fun HomeScreen(
     LaunchedEffect(homeViewModel) {
         if (homeState.value.storeModels.isEmpty()) {
             if (districtsArg.isEmpty()) {
-                homeViewModel.sendAction(HomeUiAction.LoadStoreList(listOf("JONGNO")))
+                homeViewModel.sendAction(HomeUiAction.LoadStoreList(listOf("JONGNO"), StoreType.values().joinToString(",") { it.name }))
             } else {
-                homeViewModel.sendAction(HomeUiAction.LoadStoreList(districtsArg.split(" ")))
+                homeViewModel.sendAction(
+                    HomeUiAction.LoadStoreList(
+                        districtsArg.split(" "),
+                        StoreType.values().joinToString(",") { it.name }
+                    )
+                )
             }
         }
     }
 }
 
 @SuppressLint("InternalInsetResource", "DiscouragedApi")
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun BottomSheet(
     homeViewModel: HomeViewModel = hiltViewModel(),
@@ -137,6 +150,7 @@ private fun BottomSheet(
     districts: List<DistrictType>,
     storeCount: Int,
     bottomExpandedType: ExpandedType,
+    districtsArg: String,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
@@ -152,8 +166,8 @@ private fun BottomSheet(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
-    var offsetY by remember { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
-    var expandedType by remember { mutableStateOf(bottomExpandedType) }
+    var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
+    var expandedType by rememberSaveable { mutableStateOf(bottomExpandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
@@ -168,6 +182,7 @@ private fun BottomSheet(
                 Modifier
                     .fillMaxWidth()
                     .height(height)
+                    .background(White)
                     .pointerInput(Unit) {
                         detectDragGestures(
                             onDragStart = {
@@ -180,18 +195,18 @@ private fun BottomSheet(
                                 }
                             },
                             onDragEnd = {
-                                when {
+                                expandedType = when {
                                     offsetY >= (screenHeight / 1.5).toFloat() -> {
                                         homeViewModel.sendAction(HomeUiAction.BottomSheetExpandFull)
-                                        expandedType = ExpandedType.FULL
+                                        ExpandedType.FULL
                                     }
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
-                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandHalf)
-                                        expandedType = ExpandedType.HALF
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                                        ExpandedType.QUARTER
                                     }
                                     else -> {
                                         homeViewModel.sendAction(HomeUiAction.BottomSheetExpandCollapsed)
-                                        expandedType = ExpandedType.COLLAPSED
+                                        ExpandedType.COLLAPSED
                                     }
                                 }
                                 offsetY = expandedType
@@ -200,15 +215,155 @@ private fun BottomSheet(
                             },
                         )
                     }
-                    .background(White),
             ) {
-                BottomSheetContent(
-                    storeList = storeList,
-                    districts = districts,
-                    storeCount = storeCount,
-                    onNavigateToOnBoarding = onNavigateToOnBoarding,
-                    onNavigateToDetail = onNavigateToDetail
-                )
+                if (expandedType != ExpandedType.HALF) {
+                    BottomSheetContent(
+                        storeList = storeList,
+                        districts = districts,
+                        storeCount = storeCount,
+                        onNavigateToOnBoarding = onNavigateToOnBoarding,
+                        onNavigateToDetail = onNavigateToDetail,
+                        openFilterSheet = {
+                            homeViewModel.sendAction(HomeUiAction.BottomSheetExpandHalf)
+                            expandedType = ExpandedType.HALF
+                            offsetY = expandedType
+                                .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                .value
+                        }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(horizontal = 20.dp),
+                    ) {
+                        val selectFilter = remember {
+                            mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
+                        }
+                        val filters = remember {
+                            mutableStateOf("")
+                        }
+
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Image(
+                                painterResource(R.drawable.ic_close),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(top = 22.dp)
+                                    .align(Alignment.End)
+                                    .clickable {
+                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                                        expandedType = ExpandedType.QUARTER
+                                        offsetY = expandedType
+                                            .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                            .value
+                                    },
+                            )
+                            Text(
+                                text = "Filter",
+                                fontFamily = pretendard,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.dp.toSp(),
+                                color = Black,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                            Row(
+                                modifier = Modifier.padding(top = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "원하는 디자인의 케이크 샵을 추천해 드려요!",
+                                    fontFamily = pretendard,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 16.dp.toSp(),
+                                    color = Black.copy(alpha = 0.6f),
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Image(
+                                    painterResource(id = R.drawable.ic_refresh),
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable {
+                                        selectFilter.indices.forEach { selectFilter[it] = false }
+                                    }
+                                )
+                            }
+
+                            FlowRow(
+                                modifier = Modifier.padding(top = 15.dp),
+                                content = {
+                                    StoreType.values().forEachIndexed { index, storeType ->
+                                        Surface(
+                                            shape = RoundedCornerShape(50.dp),
+                                            color = storeType.toBackgroundColor(isSelected = selectFilter[index]),
+                                            border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
+                                            modifier = Modifier
+                                                .padding(end = 4.dp, bottom = 6.dp)
+                                                .toggleable(
+                                                    value = selectFilter[index],
+                                                    onValueChange = {
+                                                        selectFilter[index] = !selectFilter[index]
+                                                    }
+                                                )
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                            ) {
+                                                storeType.toIcon()?.let { icon ->
+                                                    Image(painter = painterResource(id = icon), contentDescription = null)
+                                                }
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = storeType.tag,
+                                                    fontFamily = pretendard,
+                                                    fontWeight = FontWeight.Normal,
+                                                    fontSize = 14.dp.toSp(),
+                                                    color = Raisin_Black
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(15.dp),
+                            color = if (selectFilter.count { it } > 0) Light_Deep_Pink else Raisin_Black.copy(alpha = 0.2f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 4.dp)
+                                .clickable(enabled = selectFilter.count { it } > 0) {
+                                    StoreType.values()
+                                        .forEachIndexed { index, storeType ->
+                                            if (selectFilter[index]) filters.value += "${storeType.name},"
+                                        }
+                                    homeViewModel.sendAction(
+                                        HomeUiAction.LoadStoreList(
+                                            districtsArg.split(" "),
+                                            filters.value
+                                        )
+                                    )
+                                    homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                                    expandedType = ExpandedType.QUARTER
+                                    offsetY = expandedType
+                                        .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                        .value
+                                },
+                        ) {
+                            Text(
+                                text = "적용",
+                                fontFamily = pretendard,
+                                fontWeight = FontWeight.Normal,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = 10.dp),
+                                fontSize = 18.dp.toSp(),
+                                color = White
+                            )
+                        }
+                    }
+                }
             }
         },
         sheetPeekHeight = height,
@@ -267,6 +422,7 @@ private fun BottomSheetContent(
     storeCount: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
+    openFilterSheet: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -276,7 +432,8 @@ private fun BottomSheetContent(
             modifier = Modifier.align(Alignment.Start),
             title = if (districts.isNotEmpty()) districts.joinToString { it.districtKr } else "현재 위치",
             storeCount = storeCount,
-            onNavigateToOnBoarding = onNavigateToOnBoarding
+            onNavigateToOnBoarding = onNavigateToOnBoarding,
+            openFilterSheet = openFilterSheet
         )
 
         LazyColumn(
@@ -382,6 +539,7 @@ private fun BottomSheetTop(
     title: String,
     storeCount: Int,
     onNavigateToOnBoarding: () -> Unit,
+    openFilterSheet: () -> Unit,
 ) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
@@ -421,7 +579,7 @@ private fun BottomSheetTop(
         ) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = Light_Deep_Pink.copy(alpha = 0.15f)
+                color = Raisin_Black.copy(alpha = 0.05f)
             ) {
                 Text(
                     text = stringResource(id = R.string.home_change_location),
@@ -430,7 +588,7 @@ private fun BottomSheetTop(
                         .clickable { onNavigateToOnBoarding() },
                     fontFamily = pretendard,
                     fontSize = 12.dp.toSp(),
-                    color = Magenta,
+                    color = Raisin_Black.copy(alpha = 0.8f),
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -438,7 +596,7 @@ private fun BottomSheetTop(
             Image(
                 painter = painterResource(id = R.drawable.ic_filter),
                 contentDescription = null,
-                modifier = Modifier.clickable { }
+                modifier = Modifier.clickable { openFilterSheet() }
             )
         }
     }
