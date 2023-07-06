@@ -106,7 +106,6 @@ fun HomeScreen(
 
     val homeState = homeViewModel.state.collectAsStateWithLifecycle()
 
-    Timber.d("HomeScreen ${homeState.value.storeModels.size}")
     BottomSheet(
         homeViewModel = homeViewModel,
         fromOnBoarding = fromOnBoarding,

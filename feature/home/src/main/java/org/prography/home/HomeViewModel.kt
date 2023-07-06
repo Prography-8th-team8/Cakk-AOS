@@ -47,10 +47,10 @@ class HomeViewModel @Inject constructor(
         northeastLongitude: Double?,
         storeTypes: List<String> = listOf()
     ) {
-        require(southwestLatitude != null)
-        require(southwestLongitude != null)
-        require(northeastLatitude != null)
-        require(northeastLongitude != null)
+        requireNotNull(southwestLatitude)
+        requireNotNull(southwestLongitude)
+        requireNotNull(northeastLatitude)
+        requireNotNull(northeastLongitude)
 
         storeRepository.fetchStoreReload(
             southwestLatitude,
