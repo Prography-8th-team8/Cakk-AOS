@@ -12,6 +12,7 @@ object CakkService {
 
     object Parameter {
         const val DISTRICT = "district"
+        const val STORETYPE = "storeTypes"
         const val PAGE = "page"
     }
 }

@@ -13,11 +13,12 @@ import javax.inject.Inject
 class StoreRemoteSource @Inject constructor(
     private val httpClient: HttpClient
 ) {
-    fun fetchStoreList(district: String, page: Int): Flow<List<StoreResponse>> = flow {
+    fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreResponse>> = flow {
         emit(
             httpClient.get {
                 url("${CakkService.BASE_URL}${CakkService.Endpoint.STORE_LIST}")
                 parameter(CakkService.Parameter.DISTRICT, district)
+                parameter(CakkService.Parameter.STORETYPE, storeTypes)
                 parameter(CakkService.Parameter.PAGE, page)
             }
         )

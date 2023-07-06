@@ -21,7 +21,7 @@ class HomeViewModel @Inject constructor(
         HomeUiAction.BottomSheetExpandHalf -> currentState.copy(lastExpandedType = ExpandedType.HALF)
         HomeUiAction.Loading -> currentState
         is HomeUiAction.LoadStoreList -> {
-            fetchStoreList(action.districts)
+            fetchStoreList(action.districts, action.storeTypes)
             currentState
         }
         is HomeUiAction.LoadedStoreList -> {
@@ -30,9 +30,9 @@ class HomeViewModel @Inject constructor(
     }
 
     @OptIn(FlowPreview::class)
-    private fun fetchStoreList(districts: List<String>) {
+    private fun fetchStoreList(districts: List<String>, storeTypes: String) {
         districts.sorted().asFlow()
-            .flatMapMerge { storeRepository.fetchStoreList(it, 1) }
+            .flatMapMerge { storeRepository.fetchStoreList(it, storeTypes, 1) }
             .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
             .launchIn(viewModelScope)
