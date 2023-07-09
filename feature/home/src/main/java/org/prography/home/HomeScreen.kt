@@ -42,6 +42,8 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import org.prography.cakk.data.api.model.enums.DistrictType
 import org.prography.cakk.data.api.model.enums.StoreType
 import org.prography.designsystem.R
@@ -103,13 +105,14 @@ fun HomeScreen(
     )
 
     val homeState = homeViewModel.state.collectAsStateWithLifecycle()
+
     BottomSheet(
         homeViewModel = homeViewModel,
         fromOnBoarding = fromOnBoarding,
-        settingResultRequest = settingResultRequest,
+        isReload = homeState.value.isReload,
         storeList = homeState.value.storeModels,
         districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
-        storeCount = if (storeCountArg >= 0) storeCountArg else homeState.value.storeModels.size,
+        storeCount = if (storeCountArg >= 0 && homeState.value.isReload.not()) storeCountArg else homeState.value.storeModels.size,
         bottomExpandedType = homeState.value.lastExpandedType,
         onNavigateToOnBoarding = onNavigateToOnBoarding,
         onNavigateToDetail = onNavigateToDetail
@@ -132,7 +135,7 @@ fun HomeScreen(
 private fun BottomSheet(
     homeViewModel: HomeViewModel = hiltViewModel(),
     fromOnBoarding: Boolean,
-    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
+    isReload: Boolean,
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
@@ -203,6 +206,7 @@ private fun BottomSheet(
                     .background(White),
             ) {
                 BottomSheetContent(
+                    isReload = isReload,
                     storeList = storeList,
                     districts = districts,
                     storeCount = storeCount,
@@ -213,14 +217,19 @@ private fun BottomSheet(
         },
         sheetPeekHeight = height,
     ) {
+        val cameraPositionState: CameraPositionState =
+            rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
         Box(modifier = Modifier.fillMaxSize()) {
             CakkMap(
+                cameraPositionState = cameraPositionState,
                 fromOnBoarding = fromOnBoarding,
+                isReload = isReload,
                 storeList = storeList
             )
             SearchArea(
+                homeViewModel = homeViewModel,
                 modifier = Modifier.align(Alignment.TopCenter),
-                settingResultRequest = settingResultRequest
+                cameraPositionState = cameraPositionState
             )
         }
     }
@@ -228,27 +237,43 @@ private fun BottomSheet(
 
 @Composable
 private fun SearchArea(
+    homeViewModel: HomeViewModel,
     modifier: Modifier,
-    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
+    cameraPositionState: CameraPositionState
 ) {
-    val context = LocalContext.current
+    var canReload by remember { mutableStateOf(false) }
+    LaunchedEffect(cameraPositionState) {
+        snapshotFlow { cameraPositionState.isMoving }
+            .distinctUntilChanged()
+            .filter { it }
+            .collect { canReload = true }
+    }
 
     Button(
         modifier = modifier.padding(top = 24.dp),
         onClick = {
-            checkAndRequestMyLocationPermission(
-                context = context,
-                onDisabled = { intentSenderRequest ->
-                    settingResultRequest.launch(intentSenderRequest)
-                },
-                onEnabled = { startLocationUpdates() }
+            homeViewModel.fetchStoreReload(
+                cameraPositionState.contentBounds?.southWest?.latitude,
+                cameraPositionState.contentBounds?.southWest?.longitude,
+                cameraPositionState.contentBounds?.northEast?.latitude,
+                cameraPositionState.contentBounds?.northEast?.longitude
             )
+            canReload = false
         },
+        enabled = canReload,
         shape = RoundedCornerShape(40.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = White, contentColor = Black.copy(alpha = .2f))
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Royal_Blue,
+            contentColor = White,
+            disabledBackgroundColor = White,
+            disabledContentColor = Black.copy(alpha = .2f)
+        )
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(painter = painterResource(id = R.drawable.ic_swap), contentDescription = null)
+            Icon(
+                painter = painterResource(id = if (canReload) R.drawable.ic_swap_white else R.drawable.ic_swap),
+                contentDescription = null,
+            )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = stringResource(id = R.string.home_current_location_research),
@@ -262,6 +287,7 @@ private fun SearchArea(
 
 @Composable
 private fun BottomSheetContent(
+    isReload: Boolean,
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
@@ -274,7 +300,15 @@ private fun BottomSheetContent(
     ) {
         BottomSheetTop(
             modifier = Modifier.align(Alignment.Start),
-            title = if (districts.isNotEmpty()) districts.joinToString { it.districtKr } else "현재 위치",
+            title = if (isReload) {
+                "현재 지도 위치"
+            } else {
+                if (districts.isNotEmpty()) {
+                    districts.joinToString { it.districtKr }
+                } else {
+                    "현재 위치"
+                }
+            },
             storeCount = storeCount,
             onNavigateToOnBoarding = onNavigateToOnBoarding
         )
@@ -437,13 +471,13 @@ private fun BottomSheetTop(
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
 private fun CakkMap(
+    cameraPositionState: CameraPositionState,
     fromOnBoarding: Boolean,
+    isReload: Boolean,
     storeList: List<StoreModel>,
 ) {
     val context = LocalContext.current
-    val cameraPositionState: CameraPositionState = rememberCameraPositionState { position = CameraPosition(LatLng(0.0, 0.0), 16.0) }
-
-    if (fromOnBoarding) {
+    if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
             cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
         }

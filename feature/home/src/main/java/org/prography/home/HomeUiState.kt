@@ -8,6 +8,7 @@ import org.prography.domain.model.store.StoreModel
 data class HomeUiState(
     val storeModels: List<StoreModel> = listOf(),
     val lastExpandedType: ExpandedType = ExpandedType.HALF,
+    val isReload: Boolean = false
 ) : BaseState
 
 enum class ExpandedType {
