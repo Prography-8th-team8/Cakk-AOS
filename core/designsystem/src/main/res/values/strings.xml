@@ -6,6 +6,12 @@
     <string name="home_android">android</string>
     <string name="home_change_location">지역 변경</string>
     <string name="home_current_location_research">이 지역 재검색</string>
+    <string name="home_filter">Filter</string>
+    <string name="home_filter_recommend">원하는 디자인의 케이크 샵을 추천해 드려요!</string>
+    <string name="home_apply">적용</string>
+    <string name="home_current_location">현재 위치</string>
+    <string name="home_current_map_location">현재 지도 위치</string>
+    <string name="home_num_of_cake_shop">개의 케이크샵</string>
 
     <!-- home_detail -->
     <string name="home_detail_app_bar">상세정보</string>

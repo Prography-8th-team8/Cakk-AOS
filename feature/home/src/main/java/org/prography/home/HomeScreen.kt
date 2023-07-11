@@ -244,9 +244,7 @@ private fun BottomSheet(
                         val selectFilter = remember {
                             mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
                         }
-                        val filters = remember {
-                            mutableStateOf("")
-                        }
+                        val filters = remember { mutableStateOf("") }
 
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Image(
@@ -264,7 +262,7 @@ private fun BottomSheet(
                                     },
                             )
                             Text(
-                                text = "Filter",
+                                text = stringResource(id = R.string.home_filter),
                                 fontFamily = pretendard,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.dp.toSp(),
@@ -276,7 +274,7 @@ private fun BottomSheet(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "원하는 디자인의 케이크 샵을 추천해 드려요!",
+                                    text = stringResource(id = R.string.home_filter_recommend),
                                     fontFamily = pretendard,
                                     fontWeight = FontWeight.Normal,
                                     fontSize = 16.dp.toSp(),
@@ -356,7 +354,7 @@ private fun BottomSheet(
                                 },
                         ) {
                             Text(
-                                text = "적용",
+                                text = stringResource(id = R.string.home_apply),
                                 fontFamily = pretendard,
                                 fontWeight = FontWeight.Normal,
                                 textAlign = TextAlign.Center,
@@ -456,12 +454,12 @@ private fun BottomSheetContent(
         BottomSheetTop(
             modifier = Modifier.align(Alignment.Start),
             title = if (isReload) {
-                "현재 지도 위치"
+                stringResource(id = R.string.home_current_map_location)
             } else {
                 if (districts.isNotEmpty()) {
                     districts.joinToString { it.districtKr }
                 } else {
-                    "현재 위치"
+                    stringResource(id = R.string.home_current_location)
                 }
             },
             storeCount = storeCount,
@@ -597,7 +595,7 @@ private fun BottomSheetTop(
                     .padding(top = 30.dp)
             )
             Text(
-                text = "${storeCount}개의 케이크샵",
+                text = "$storeCount" + stringResource(id = R.string.home_num_of_cake_shop),
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.dp.toSp(),
