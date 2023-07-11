@@ -14,8 +14,8 @@ class StoreRepositoryImpl @Inject constructor(
     private val storeRemoteSource: StoreRemoteSource
 ) : StoreRepository {
 
-    override fun fetchStoreList(district: String, page: Int): Flow<List<StoreModel>> =
-        storeRemoteSource.fetchStoreList(district, page).map { it.toModel() }
+    override fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreModel>> =
+        storeRemoteSource.fetchStoreList(district, storeTypes, page).map { it.toModel() }
 
     override fun fetchDetailStore(storeId: Int): Flow<StoreDetailModel> =
         storeRemoteSource.fetchDetailStore(storeId).map { it.toModel() }

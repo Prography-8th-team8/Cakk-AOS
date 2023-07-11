@@ -1,4 +1,4 @@
-package org.prography.home
+package org.prography.home.detail
 
 import android.content.Intent
 import android.net.Uri
@@ -31,13 +31,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import org.prography.cakk.data.api.model.enums.StoreType
+import org.prography.domain.model.enums.StoreType
 import org.prography.designsystem.R
 import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.store.BlogPostModel
-import org.prography.home.detail.HomeDetailAction
-import org.prography.home.detail.HomeDetailViewModel
 import org.prography.utility.extensions.toSp
 
 @Composable

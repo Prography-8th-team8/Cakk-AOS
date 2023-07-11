@@ -6,7 +6,7 @@ import org.prography.domain.model.store.StoreModel
 sealed class HomeUiAction : BaseAction {
     object Loading : HomeUiAction()
 
-    data class LoadStoreList(val districts: List<String>) : HomeUiAction()
+    data class LoadStoreList(val districts: List<String>, val storeTypes: String) : HomeUiAction()
 
     data class LoadedStoreList(val storeModels: List<StoreModel>) : HomeUiAction()
 
@@ -14,7 +14,9 @@ sealed class HomeUiAction : BaseAction {
 
     object BottomSheetExpandFull : HomeUiAction()
 
-    object BottomSheetExpandHalf : HomeUiAction()
+    object BottomSheetExpandQuarter : HomeUiAction()
 
     object BottomSheetExpandCollapsed : HomeUiAction()
+
+    object BottomSheetExpandHalf : HomeUiAction()
 }
