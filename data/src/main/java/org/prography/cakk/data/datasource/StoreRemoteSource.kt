@@ -15,6 +15,7 @@ import org.prography.network.CakkService.Parameter.NORTH_EAST_LONGITUDE
 import org.prography.network.CakkService.Parameter.PAGE
 import org.prography.network.CakkService.Parameter.SOUTH_WEST_LATITUDE
 import org.prography.network.CakkService.Parameter.SOUTH_WEST_LONGITUDE
+import org.prography.network.CakkService.Parameter.STORETYPE
 import org.prography.network.CakkService.Parameter.STORE_TYPES
 import org.prography.network.api.dto.response.StoreBlogResponse
 import org.prography.network.api.dto.response.StoreDetailResponse
@@ -30,7 +31,7 @@ class StoreRemoteSource @Inject constructor(
             httpClient.get {
                 url("$BASE_URL$STORE_LIST")
                 parameter(DISTRICT, district)
-                parameter(CakkService.Parameter.STORETYPE, storeTypes)
+                parameter(STORETYPE, storeTypes)
                 parameter(PAGE, page)
             }
         )
