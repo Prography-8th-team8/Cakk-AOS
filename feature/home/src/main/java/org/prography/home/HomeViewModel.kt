@@ -25,7 +25,10 @@ class HomeViewModel @Inject constructor(
             currentState
         }
         is HomeUiAction.LoadedStoreList -> {
-            currentState.copy(storeModels = currentState.storeModels + action.storeModels)
+            currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
+        }
+        is HomeUiAction.ReloadStore -> {
+            currentState.copy(storeModels = action.storeModels, isReload = true)
         }
     }
 
@@ -35,6 +38,30 @@ class HomeViewModel @Inject constructor(
             .flatMapMerge { storeRepository.fetchStoreList(it, storeTypes, 1) }
             .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
+            .launchIn(viewModelScope)
+    }
+
+    fun fetchStoreReload(
+        southwestLatitude: Double?,
+        southwestLongitude: Double?,
+        northeastLatitude: Double?,
+        northeastLongitude: Double?,
+        storeTypes: List<String> = listOf()
+    ) {
+        requireNotNull(southwestLatitude)
+        requireNotNull(southwestLongitude)
+        requireNotNull(northeastLatitude)
+        requireNotNull(northeastLongitude)
+
+        storeRepository.fetchStoreReload(
+            southwestLatitude,
+            southwestLongitude,
+            northeastLatitude,
+            northeastLongitude,
+            storeTypes = storeTypes
+        )
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
             .launchIn(viewModelScope)
     }
 }

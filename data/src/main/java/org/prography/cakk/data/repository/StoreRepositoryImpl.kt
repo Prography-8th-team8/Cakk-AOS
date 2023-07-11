@@ -22,4 +22,21 @@ class StoreRepositoryImpl @Inject constructor(
 
     override fun fetchStoreBlog(storeId: Int): Flow<StoreBlogModel> =
         storeRemoteSource.fetchStoreBlog(storeId).map { it.toModel() }
+
+    override fun fetchStoreReload(
+        southwestLatitude: Double,
+        southwestLongitude: Double,
+        northeastLatitude: Double,
+        northeastLongitude: Double,
+        page: Int,
+        storeTypes: List<String>
+    ): Flow<List<StoreModel>> =
+        storeRemoteSource.fetchStoreReload(
+            southwestLatitude = southwestLatitude,
+            southwestLongitude = southwestLongitude,
+            northeastLatitude = northeastLatitude,
+            northeastLongitude = northeastLongitude,
+            page = page,
+            storeTypes = storeTypes
+        ).map { it.toModel() }
 }

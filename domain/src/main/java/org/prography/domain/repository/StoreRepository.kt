@@ -11,4 +11,13 @@ interface StoreRepository {
     fun fetchDetailStore(storeId: Int): Flow<StoreDetailModel>
 
     fun fetchStoreBlog(storeId: Int): Flow<StoreBlogModel>
+
+    fun fetchStoreReload(
+        southwestLatitude: Double,
+        southwestLongitude: Double,
+        northeastLatitude: Double,
+        northeastLongitude: Double,
+        page: Int = 1,
+        storeTypes: List<String> = listOf()
+    ): Flow<List<StoreModel>>
 }
