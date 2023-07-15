@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import org.prography.home.HomeDetailScreen
+import org.prography.home.detail.HomeDetailScreen
 import org.prography.home.HomeScreen
 import org.prography.onboarding.OnBoardingScreen
 import org.prography.splash.SplashScreen
