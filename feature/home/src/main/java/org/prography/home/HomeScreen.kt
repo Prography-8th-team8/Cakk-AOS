@@ -333,7 +333,7 @@ private fun BottomSheet(
                                 .fillMaxWidth()
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = 4.dp)
-                                .clickable(enabled = selectFilter.count { it } > 0) {
+                                .clickable(enabled = selectFilter.isNotEmpty()) {
                                     StoreType.values()
                                         .forEachIndexed { index, storeType ->
                                             if (selectFilter[index]) filters.value += "${storeType.name},"
@@ -351,7 +351,7 @@ private fun BottomSheet(
                                         .value
                                 },
                             shape = RoundedCornerShape(15.dp),
-                            color = if (selectFilter.count { it } > 0) Light_Deep_Pink else Raisin_Black.copy(alpha = 0.2f),
+                            color = if (selectFilter.isNotEmpty()) Light_Deep_Pink else Raisin_Black.copy(alpha = 0.2f),
                         ) {
                             Text(
                                 text = stringResource(id = R.string.home_apply),
@@ -594,7 +594,7 @@ private fun BottomSheetTop(
                 color = Raisin_Black,
             )
             Text(
-                text = "$storeCount" + stringResource(id = R.string.home_num_of_cake_shop),
+                text = String.format(stringResource(id = R.string.home_num_of_cake_shop), storeCount),
                 modifier = modifier.padding(top = 12.dp),
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
