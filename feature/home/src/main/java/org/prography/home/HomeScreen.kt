@@ -263,11 +263,11 @@ private fun BottomSheet(
                             )
                             Text(
                                 text = stringResource(id = R.string.home_filter),
+                                modifier = Modifier.padding(top = 4.dp),
                                 fontFamily = pretendard,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.dp.toSp(),
                                 color = Black,
-                                modifier = Modifier.padding(top = 4.dp)
                             )
                             Row(
                                 modifier = Modifier.padding(top = 5.dp),
@@ -295,9 +295,6 @@ private fun BottomSheet(
                                 content = {
                                     StoreType.values().forEachIndexed { index, storeType ->
                                         Surface(
-                                            shape = RoundedCornerShape(50.dp),
-                                            color = storeType.toBackgroundColor(isSelected = selectFilter[index]),
-                                            border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
                                             modifier = Modifier
                                                 .padding(end = 4.dp, bottom = 6.dp)
                                                 .toggleable(
@@ -305,7 +302,10 @@ private fun BottomSheet(
                                                     onValueChange = {
                                                         selectFilter[index] = !selectFilter[index]
                                                     }
-                                                )
+                                                ),
+                                            shape = RoundedCornerShape(50.dp),
+                                            color = storeType.toBackgroundColor(isSelected = selectFilter[index]),
+                                            border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
                                         ) {
                                             Row(
                                                 modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
@@ -329,8 +329,6 @@ private fun BottomSheet(
                             )
                         }
                         Surface(
-                            shape = RoundedCornerShape(15.dp),
-                            color = if (selectFilter.count { it } > 0) Light_Deep_Pink else Raisin_Black.copy(alpha = 0.2f),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.BottomCenter)
@@ -352,13 +350,15 @@ private fun BottomSheet(
                                         .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
                                         .value
                                 },
+                            shape = RoundedCornerShape(15.dp),
+                            color = if (selectFilter.count { it } > 0) Light_Deep_Pink else Raisin_Black.copy(alpha = 0.2f),
                         ) {
                             Text(
                                 text = stringResource(id = R.string.home_apply),
+                                modifier = Modifier.padding(vertical = 10.dp),
                                 fontFamily = pretendard,
                                 fontWeight = FontWeight.Normal,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(vertical = 10.dp),
                                 fontSize = 18.dp.toSp(),
                                 color = White
                             )
@@ -402,7 +402,6 @@ private fun SearchArea(
     }
 
     Button(
-        modifier = modifier.padding(top = 24.dp),
         onClick = {
             homeViewModel.fetchStoreReload(
                 cameraPositionState.contentBounds?.southWest?.latitude,
@@ -412,6 +411,7 @@ private fun SearchArea(
             )
             canReload = false
         },
+        modifier = modifier.padding(top = 24.dp),
         enabled = canReload,
         shape = RoundedCornerShape(40.dp),
         colors = ButtonDefaults.buttonColors(
@@ -494,8 +494,8 @@ private fun BottomSheetContent(
 @Composable
 private fun StoreInfo(store: StoreModel) {
     Row(
+        modifier = Modifier.padding(start = 20.dp, top = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(start = 20.dp, top = 20.dp)
     ) {
         Text(
             text = store.name,
@@ -519,11 +519,11 @@ private fun StoreInfo(store: StoreModel) {
     }
     Text(
         text = store.location,
+        modifier = Modifier.padding(start = 20.dp, top = 12.dp),
         color = Raisin_Black.copy(alpha = 0.6f),
         fontFamily = pretendard,
         fontWeight = FontWeight.Normal,
         fontSize = 14.dp.toSp(),
-        modifier = Modifier.padding(start = 20.dp, top = 12.dp)
     )
 }
 
@@ -587,21 +587,19 @@ private fun BottomSheetTop(
         Column {
             Text(
                 text = title,
+                modifier = modifier.padding(top = 30.dp),
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.dp.toSp(),
                 color = Raisin_Black,
-                modifier = modifier
-                    .padding(top = 30.dp)
             )
             Text(
                 text = "$storeCount" + stringResource(id = R.string.home_num_of_cake_shop),
+                modifier = modifier.padding(top = 12.dp),
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.dp.toSp(),
                 color = Raisin_Black.copy(alpha = 0.8f),
-                modifier = modifier
-                    .padding(top = 12.dp)
             )
         }
         Row(
