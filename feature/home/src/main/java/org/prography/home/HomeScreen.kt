@@ -477,7 +477,7 @@ private fun BottomSheetContent(
                         .fillMaxWidth()
                         .clickable { onNavigateToDetail(store.id) },
                     shape = RoundedCornerShape(24.dp),
-                    color = OldLace
+                    color = Old_Lace
                 ) {
                     Column {
                         StoreInfo(store)

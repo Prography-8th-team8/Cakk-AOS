@@ -14,7 +14,7 @@ fun StoreType.toColor() = when (this) {
     StoreType.FIGURE -> Yankees_Blue
     StoreType.TIARA -> Cerise
     StoreType.LUXURY -> Cerise // 추후 색상 변경
-    StoreType.SOLID -> DeepMagenta
+    StoreType.SOLID -> Deep_Magenta
     StoreType.ETC -> Raisin_Black
 }
 
