@@ -14,6 +14,7 @@ data class StoreResponse(
     val location: String,
     val latitude: Double,
     val longitude: Double,
+    val imageUrls: List<String>,
     val storeTypes: List<String>,
 ) {
     fun toModel() = StoreModel(
@@ -26,6 +27,7 @@ data class StoreResponse(
         location = location,
         latitude = latitude,
         longitude = longitude,
+        imageUrls = imageUrls,
         storeTypes = storeTypes
     )
 }

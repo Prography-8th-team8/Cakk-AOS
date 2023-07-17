@@ -10,5 +10,6 @@ data class StoreModel(
     val location: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
+    val imageUrls: List<String> = listOf(),
     val storeTypes: List<String> = listOf(),
 )
