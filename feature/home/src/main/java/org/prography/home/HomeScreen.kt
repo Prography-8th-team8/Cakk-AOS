@@ -49,6 +49,7 @@ import org.prography.domain.model.enums.StoreType
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.prography.designsystem.R
+import org.prography.designsystem.component.StoreItemContent
 import org.prography.designsystem.mapper.toBackgroundColor
 import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.mapper.toIcon
@@ -392,7 +393,8 @@ private fun FilterSelectButton(
             .fillMaxWidth()
             .padding(bottom = 4.dp)
             .clickable(enabled = selectFilter.count { it } > 0) {
-                StoreType.values()
+                StoreType
+                    .values()
                     .forEachIndexed { index, storeType ->
                         if (selectFilter[index]) filters.value += "${storeType.name},"
                     }
@@ -504,21 +506,24 @@ private fun CakeStoreContent(
             modifier = Modifier.padding(top = 22.dp),
         ) {
             items(storeList) { store ->
-                Surface(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .clickable { onNavigateToDetail(store.id) },
-                    shape = RoundedCornerShape(24.dp),
-                    color = Old_Lace
-                ) {
-                    Column {
-                        StoreInfo(store)
-                        Spacer(modifier = Modifier.height(48.dp))
-                        StoreTags(store)
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
+//                Surface(
+//                    modifier = Modifier
+//                        .padding(horizontal = 16.dp)
+//                        .fillMaxWidth()
+//                        .clickable { onNavigateToDetail(store.id) },
+//                    shape = RoundedCornerShape(24.dp),
+//                    color = Old_Lace
+//                ) {
+//                    Column {
+//                        StoreInfo(store)
+//                        Spacer(modifier = Modifier.height(48.dp))
+//                        StoreTags(store)
+//                    }
+//                }
+                StoreItemContent(
+                    modifier = Modifier.fillMaxWidth(),
+                    storeModel = store
+                )
             }
         }
     }
@@ -535,19 +540,20 @@ private fun StoreInfo(store: StoreModel) {
             color = Raisin_Black,
             fontFamily = pretendard,
             fontWeight = FontWeight.Bold,
-            fontSize = 18.dp.toSp(),
+            fontSize = 16.dp.toSp(),
         )
         Divider(
             modifier = Modifier
                 .padding(horizontal = 4.dp)
-                .size(width = 1.dp, height = 12.dp)
+                .size(width = 1.dp, height = 12.5.dp)
+                .background(Raisin_Black.copy(alpha = 0.4f))
         )
         Text(
-            text = DistrictType.valueOf(store.district).districtKr,
+            text = String.format(stringResource(R.string.home_district_name), DistrictType.valueOf(store.district).districtKr),
             color = Raisin_Black,
             fontFamily = pretendard,
             fontWeight = FontWeight.Normal,
-            fontSize = 16.dp.toSp(),
+            fontSize = 12.dp.toSp(),
         )
     }
     Text(
@@ -556,7 +562,7 @@ private fun StoreInfo(store: StoreModel) {
         color = Raisin_Black.copy(alpha = 0.6f),
         fontFamily = pretendard,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.dp.toSp(),
+        fontSize = 12.dp.toSp(),
     )
 }
 

@@ -12,6 +12,7 @@
     <string name="home_current_location">현재 위치</string>
     <string name="home_current_map_location">현재 지도 위치</string>
     <string name="home_num_of_cake_shop">%d개의 케이크샵</string>
+    <string name="home_district_name">%s구</string>
 
     <!-- home_detail -->
     <string name="home_detail_app_bar">상세정보</string>
@@ -25,4 +26,5 @@
     <string name="home_detail_opening">영업중</string>
     <string name="home_detail_blog_review">블로그 리뷰</string>
     <string name="home_detail_blog_review_more">블로그 리뷰 더 보기</string>
+
 </resources>
