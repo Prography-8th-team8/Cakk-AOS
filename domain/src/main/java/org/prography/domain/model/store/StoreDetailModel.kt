@@ -11,6 +11,7 @@ data class StoreDetailModel(
     val link: String = "",
     val location: String = "",
     val longitude: Double = 0.0,
+    val thumbnail: String? = null,
     val modifiedAt: String = "",
     val name: String = "",
     val phoneNumber: String = "",
