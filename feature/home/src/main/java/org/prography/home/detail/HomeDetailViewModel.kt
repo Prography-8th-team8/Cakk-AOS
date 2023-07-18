@@ -18,32 +18,24 @@ class HomeDetailViewModel @Inject constructor(
     override fun reduceState(currentState: HomeDetailState, action: HomeDetailAction): HomeDetailState = when (action) {
         HomeDetailAction.Loading -> currentState
         is HomeDetailAction.LoadDetailInfo -> {
-            fetchDetailStore(action.id)
-            currentState
-        }
-        is HomeDetailAction.LoadedDetailInfo -> {
             currentState.copy(storeDetailModel = action.storeDetailModel)
         }
         is HomeDetailAction.LoadBlogInfos -> {
-            fetchStoreBlogInfos(action.id)
-            currentState
-        }
-        is HomeDetailAction.LoadedBlogInfos -> {
             currentState.copy(blogPosts = action.blogPosts)
         }
     }
 
-    private fun fetchDetailStore(id: Int) {
+    fun fetchDetailStore(id: Int) {
         storeRepository.fetchDetailStore(id)
             .onStart { sendAction(HomeDetailAction.Loading) }
-            .onEach { sendAction(HomeDetailAction.LoadedDetailInfo(it)) }
+            .onEach { sendAction(HomeDetailAction.LoadDetailInfo(it)) }
             .launchIn(viewModelScope)
     }
 
-    private fun fetchStoreBlogInfos(id: Int) {
+    fun fetchStoreBlogInfos(id: Int) {
         storeRepository.fetchStoreBlog(id)
             .onStart { sendAction(HomeDetailAction.Loading) }
-            .onEach { sendAction(HomeDetailAction.LoadedBlogInfos(it.blogPosts)) }
+            .onEach { sendAction(HomeDetailAction.LoadBlogInfos(it.blogPosts)) }
             .launchIn(viewModelScope)
     }
 }

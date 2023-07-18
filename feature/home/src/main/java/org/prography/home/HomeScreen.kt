@@ -125,16 +125,10 @@ fun HomeScreen(
 
     LaunchedEffect(homeViewModel) {
         if (homeState.value.storeModels.isEmpty()) {
-            if (districtsArg.isEmpty()) {
-                homeViewModel.sendAction(HomeUiAction.LoadStoreList(listOf("JONGNO"), StoreType.values().joinToString(",") { it.name }))
-            } else {
-                homeViewModel.sendAction(
-                    HomeUiAction.LoadStoreList(
-                        districtsArg.split(" "),
-                        StoreType.values().joinToString(",") { it.name }
-                    )
-                )
-            }
+            homeViewModel.fetchStoreList(
+                districts = if (districtsArg.isEmpty()) listOf("JONGNO") else districtsArg.split(" "),
+                storeTypes = StoreType.values().joinToString(",") { it.name }
+            )
         }
     }
 }
@@ -197,15 +191,15 @@ private fun BottomSheet(
                             onDragEnd = {
                                 expandedType = when {
                                     offsetY >= (screenHeight / 1.5).toFloat() -> {
-                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandFull)
+                                        homeViewModel.changeBottomSheetState(ExpandedType.FULL)
                                         ExpandedType.FULL
                                     }
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
-                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                                        homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                                         ExpandedType.QUARTER
                                     }
                                     else -> {
-                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandCollapsed)
+                                        homeViewModel.changeBottomSheetState(ExpandedType.COLLAPSED)
                                         ExpandedType.COLLAPSED
                                     }
                                 }
@@ -225,7 +219,7 @@ private fun BottomSheet(
                         onNavigateToOnBoarding = onNavigateToOnBoarding,
                         onNavigateToDetail = onNavigateToDetail,
                         openFilterSheet = {
-                            homeViewModel.sendAction(HomeUiAction.BottomSheetExpandHalf)
+                            homeViewModel.changeBottomSheetState(ExpandedType.HALF)
                             expandedType = ExpandedType.HALF
                             offsetY = expandedType
                                 .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
@@ -300,7 +294,7 @@ private fun FilterTopBar(
                 .padding(top = 22.dp)
                 .align(Alignment.End)
                 .clickable {
-                    homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                    homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                     backToCakeStore()
                 },
         )
@@ -397,13 +391,11 @@ private fun FilterSelectButton(
                     .forEachIndexed { index, storeType ->
                         if (selectFilter[index]) filters.value += "${storeType.name},"
                     }
-                homeViewModel.sendAction(
-                    HomeUiAction.LoadStoreList(
-                        districtsArg.split(" "),
-                        filters.value
-                    )
+                homeViewModel.fetchStoreList(
+                    districts = districtsArg.split(" "),
+                    storeTypes = filters.value
                 )
-                homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                 backToCakeStore()
             },
         shape = RoundedCornerShape(15.dp),

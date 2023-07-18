@@ -20,11 +20,7 @@ class HomeViewModel @Inject constructor(
         HomeUiAction.BottomSheetExpandCollapsed -> currentState.copy(lastExpandedType = ExpandedType.COLLAPSED)
         HomeUiAction.BottomSheetExpandHalf -> currentState.copy(lastExpandedType = ExpandedType.HALF)
         HomeUiAction.Loading -> currentState
-        is HomeUiAction.LoadStoreList -> {
-            fetchStoreList(action.districts, action.storeTypes)
-            currentState
-        }
-        is HomeUiAction.LoadedStoreType -> {
+        is HomeUiAction.LoadStoreType -> {
             currentState.copy(
                 storeModels = currentState.storeModels.map {
                     if (it.id == action.storeModel.id) {
@@ -35,7 +31,7 @@ class HomeViewModel @Inject constructor(
                 }
             )
         }
-        is HomeUiAction.LoadedStoreList -> {
+        is HomeUiAction.LoadStoreList -> {
             currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
         }
         is HomeUiAction.ReloadStore -> {
@@ -43,15 +39,25 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun changeBottomSheetState(expandedType: ExpandedType) {
+        when (expandedType) {
+            ExpandedType.FULL -> sendAction(HomeUiAction.BottomSheetExpandFull)
+            ExpandedType.QUARTER -> sendAction(HomeUiAction.BottomSheetExpandQuarter)
+            ExpandedType.HALF -> sendAction(HomeUiAction.BottomSheetExpandHalf)
+            ExpandedType.COLLAPSED -> sendAction(HomeUiAction.BottomSheetExpandCollapsed)
+            else -> return
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun fetchStoreList(districts: List<String>, storeTypes: String) {
+    fun fetchStoreList(districts: List<String>, storeTypes: String) {
         districts.sorted().asFlow()
             .flatMapMerge { storeRepository.fetchStoreList(it, storeTypes, 1) }
-            .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
+            .onEach { sendAction(HomeUiAction.LoadStoreList(it)) }
             .flatMapMerge { it.asFlow() }
             .flatMapMerge { storeRepository.fetchStoreType(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
-            .onEach { sendAction(HomeUiAction.LoadedStoreType(it)) }
+            .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
             .launchIn(viewModelScope)
     }
 
@@ -79,7 +85,7 @@ class HomeViewModel @Inject constructor(
             .flatMapMerge { it.asFlow() }
             .flatMapMerge { storeRepository.fetchStoreType(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
-            .onEach { sendAction(HomeUiAction.LoadedStoreType(it)) }
+            .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
             .launchIn(viewModelScope)
     }
 }

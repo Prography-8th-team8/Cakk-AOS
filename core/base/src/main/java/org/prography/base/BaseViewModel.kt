@@ -17,7 +17,7 @@ abstract class BaseViewModel<ACTION : BaseAction, STATE : BaseState, SE : BaseSi
     private val sideEffectChannel: Channel<SE> = Channel(Channel.UNLIMITED)
     val sideEffect: Flow<SE> = sideEffectChannel.receiveAsFlow()
 
-    fun sendAction(action: ACTION) {
+    protected fun sendAction(action: ACTION) {
         viewModelScope.launch {
             actionChannel.send(action)
         }
