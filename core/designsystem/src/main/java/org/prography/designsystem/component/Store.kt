@@ -21,9 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import org.prography.designsystem.R
 import org.prography.designsystem.mapper.toColor
-import org.prography.designsystem.ui.theme.Old_Lace
-import org.prography.designsystem.ui.theme.Raisin_Black
-import org.prography.designsystem.ui.theme.pretendard
+import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.StoreModel
@@ -91,8 +89,8 @@ internal fun StoreItemTagRow(
     modifier: Modifier = Modifier,
     storeTypes: List<String> = listOf()
 ) {
-    LazyRow(modifier = modifier) {
-        items(storeTypes, key = { it }) { storeType ->
+    Row(modifier) {
+        storeTypes.take(3).forEach { storeType ->
             Surface(
                 modifier = Modifier.padding(end = 4.dp),
                 shape = RoundedCornerShape(14.dp),
@@ -102,6 +100,22 @@ internal fun StoreItemTagRow(
                     text = StoreType.valueOf(storeType).tag,
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
                     color = StoreType.valueOf(storeType).toColor(),
+                    fontSize = 12.dp.toSp(),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = pretendard
+                )
+            }
+        }
+
+        if (storeTypes.size > 3) {
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = Black
+            ) {
+                Text(
+                    text = "+${storeTypes.size - 3}",
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
+                    color = White,
                     fontSize = 12.dp.toSp(),
                     fontWeight = FontWeight.Bold,
                     fontFamily = pretendard
