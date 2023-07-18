@@ -2,7 +2,7 @@ package org.prography.home
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.prography.base.BaseViewModel
 import org.prography.domain.repository.StoreRepository
@@ -24,6 +24,17 @@ class HomeViewModel @Inject constructor(
             fetchStoreList(action.districts, action.storeTypes)
             currentState
         }
+        is HomeUiAction.LoadedStoreType -> {
+            currentState.copy(
+                storeModels = currentState.storeModels.map {
+                    if (it.id == action.storeModel.id) {
+                        it.copy(storeTypes = action.storeModel.storeTypes)
+                    } else {
+                        it
+                    }
+                }
+            )
+        }
         is HomeUiAction.LoadedStoreList -> {
             currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
         }
@@ -32,15 +43,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun fetchStoreList(districts: List<String>, storeTypes: String) {
         districts.sorted().asFlow()
             .flatMapMerge { storeRepository.fetchStoreList(it, storeTypes, 1) }
-            .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
+            .flatMapMerge { it.asFlow() }
+            .flatMapMerge { storeRepository.fetchStoreType(it.id) }
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.LoadedStoreType(it)) }
             .launchIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun fetchStoreReload(
         southwestLatitude: Double?,
         southwestLongitude: Double?,
@@ -60,8 +75,11 @@ class HomeViewModel @Inject constructor(
             northeastLongitude,
             storeTypes = storeTypes
         )
-            .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
+            .flatMapMerge { it.asFlow() }
+            .flatMapMerge { storeRepository.fetchStoreType(it.id) }
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.LoadedStoreType(it)) }
             .launchIn(viewModelScope)
     }
 }

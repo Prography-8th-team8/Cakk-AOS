@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.filter
 import org.prography.designsystem.R
 import org.prography.designsystem.component.StoreItemContent
 import org.prography.designsystem.mapper.toBackgroundColor
-import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.store.StoreModel
@@ -506,97 +505,10 @@ private fun CakeStoreContent(
             modifier = Modifier.padding(top = 22.dp),
         ) {
             items(storeList) { store ->
-//                Surface(
-//                    modifier = Modifier
-//                        .padding(horizontal = 16.dp)
-//                        .fillMaxWidth()
-//                        .clickable { onNavigateToDetail(store.id) },
-//                    shape = RoundedCornerShape(24.dp),
-//                    color = Old_Lace
-//                ) {
-//                    Column {
-//                        StoreInfo(store)
-//                        Spacer(modifier = Modifier.height(48.dp))
-//                        StoreTags(store)
-//                    }
-//                }
                 StoreItemContent(
                     modifier = Modifier.fillMaxWidth(),
-                    storeModel = store
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun StoreInfo(store: StoreModel) {
-    Row(
-        modifier = Modifier.padding(start = 20.dp, top = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = store.name,
-            color = Raisin_Black,
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.dp.toSp(),
-        )
-        Divider(
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .size(width = 1.dp, height = 12.5.dp)
-                .background(Raisin_Black.copy(alpha = 0.4f))
-        )
-        Text(
-            text = String.format(stringResource(R.string.home_district_name), DistrictType.valueOf(store.district).districtKr),
-            color = Raisin_Black,
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Normal,
-            fontSize = 12.dp.toSp(),
-        )
-    }
-    Text(
-        text = store.location,
-        modifier = Modifier.padding(start = 20.dp, top = 12.dp),
-        color = Raisin_Black.copy(alpha = 0.6f),
-        fontFamily = pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.dp.toSp(),
-    )
-}
-
-@Composable
-private fun StoreTags(store: StoreModel) {
-    Row(modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)) {
-        store.storeTypes.forEach { storeType ->
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
-            ) {
-                Text(
-                    text = StoreType.valueOf(storeType).tag,
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = StoreType.valueOf(storeType).toColor(),
-                    fontSize = 12.dp.toSp(),
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.width(4.dp))
-        }
-        if (store.storeTypes.size - 3 > 0) {
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Black
-            ) {
-                Text(
-                    text = "+${store.storeTypes.size - 3}",
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                    color = White,
-                    fontSize = 12.dp.toSp(),
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Bold
+                    storeModel = store,
+                    onClick = { onNavigateToDetail(store.id) }
                 )
             }
         }
