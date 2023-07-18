@@ -14,5 +14,6 @@ data class StoreDetailModel(
     val modifiedAt: String = "",
     val name: String = "",
     val phoneNumber: String = "",
+    val imageUrls: List<String> = listOf(),
     val storeTypes: List<String> = listOf(),
 )
