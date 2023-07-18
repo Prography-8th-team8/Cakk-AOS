@@ -480,12 +480,12 @@ private fun CakeStoreContent(
         CakkStoreTopBar(
             modifier = Modifier.align(Alignment.Start),
             title = if (isReload) {
-                stringResource(id = R.string.home_current_map_location)
+                stringResource(id = R.string.home_near_by_cake_shops)
             } else {
                 if (districts.isNotEmpty()) {
                     districts.joinToString { it.districtKr }
                 } else {
-                    stringResource(id = R.string.home_current_location)
+                    stringResource(id = R.string.home_near_by_cake_shops)
                 }
             },
             storeCount = storeCount,

@@ -9,8 +9,7 @@
     <string name="home_filter">Filter</string>
     <string name="home_filter_recommend">원하는 디자인의 케이크 샵을 추천해 드려요!</string>
     <string name="home_apply">적용</string>
-    <string name="home_current_location">현재 위치</string>
-    <string name="home_current_map_location">현재 지도 위치</string>
+    <string name="home_near_by_cake_shops">이 근처 케이크샵</string>
     <string name="home_num_of_cake_shop">%d개의 케이크샵</string>
     <string name="home_district_name">%s구</string>
 
