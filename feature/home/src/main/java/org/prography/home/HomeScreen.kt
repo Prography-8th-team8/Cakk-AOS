@@ -49,8 +49,8 @@ import org.prography.domain.model.enums.StoreType
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.prography.designsystem.R
+import org.prography.designsystem.component.StoreItemContent
 import org.prography.designsystem.mapper.toBackgroundColor
-import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.store.StoreModel
@@ -125,16 +125,10 @@ fun HomeScreen(
 
     LaunchedEffect(homeViewModel) {
         if (homeState.value.storeModels.isEmpty()) {
-            if (districtsArg.isEmpty()) {
-                homeViewModel.sendAction(HomeUiAction.LoadStoreList(listOf("JONGNO"), StoreType.values().joinToString(",") { it.name }))
-            } else {
-                homeViewModel.sendAction(
-                    HomeUiAction.LoadStoreList(
-                        districtsArg.split(" "),
-                        StoreType.values().joinToString(",") { it.name }
-                    )
-                )
-            }
+            homeViewModel.fetchStoreList(
+                districts = if (districtsArg.isEmpty()) listOf("JONGNO") else districtsArg.split(" "),
+                storeTypes = StoreType.values().joinToString(",") { it.name }
+            )
         }
     }
 }
@@ -197,15 +191,15 @@ private fun BottomSheet(
                             onDragEnd = {
                                 expandedType = when {
                                     offsetY >= (screenHeight / 1.5).toFloat() -> {
-                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandFull)
+                                        homeViewModel.changeBottomSheetState(ExpandedType.FULL)
                                         ExpandedType.FULL
                                     }
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
-                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                                        homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                                         ExpandedType.QUARTER
                                     }
                                     else -> {
-                                        homeViewModel.sendAction(HomeUiAction.BottomSheetExpandCollapsed)
+                                        homeViewModel.changeBottomSheetState(ExpandedType.COLLAPSED)
                                         ExpandedType.COLLAPSED
                                     }
                                 }
@@ -225,7 +219,7 @@ private fun BottomSheet(
                         onNavigateToOnBoarding = onNavigateToOnBoarding,
                         onNavigateToDetail = onNavigateToDetail,
                         openFilterSheet = {
-                            homeViewModel.sendAction(HomeUiAction.BottomSheetExpandHalf)
+                            homeViewModel.changeBottomSheetState(ExpandedType.HALF)
                             expandedType = ExpandedType.HALF
                             offsetY = expandedType
                                 .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
@@ -300,7 +294,7 @@ private fun FilterTopBar(
                 .padding(top = 22.dp)
                 .align(Alignment.End)
                 .clickable {
-                    homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                    homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                     backToCakeStore()
                 },
         )
@@ -392,17 +386,16 @@ private fun FilterSelectButton(
             .fillMaxWidth()
             .padding(bottom = 4.dp)
             .clickable(enabled = selectFilter.count { it } > 0) {
-                StoreType.values()
+                StoreType
+                    .values()
                     .forEachIndexed { index, storeType ->
                         if (selectFilter[index]) filters.value += "${storeType.name},"
                     }
-                homeViewModel.sendAction(
-                    HomeUiAction.LoadStoreList(
-                        districtsArg.split(" "),
-                        filters.value
-                    )
+                homeViewModel.fetchStoreList(
+                    districts = districtsArg.split(" "),
+                    storeTypes = filters.value
                 )
-                homeViewModel.sendAction(HomeUiAction.BottomSheetExpandQuarter)
+                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                 backToCakeStore()
             },
         shape = RoundedCornerShape(15.dp),
@@ -487,12 +480,12 @@ private fun CakeStoreContent(
         CakkStoreTopBar(
             modifier = Modifier.align(Alignment.Start),
             title = if (isReload) {
-                stringResource(id = R.string.home_current_map_location)
+                stringResource(id = R.string.home_near_by_cake_shops)
             } else {
                 if (districts.isNotEmpty()) {
                     districts.joinToString { it.districtKr }
                 } else {
-                    stringResource(id = R.string.home_current_location)
+                    stringResource(id = R.string.home_near_by_cake_shops)
                 }
             },
             storeCount = storeCount,
@@ -504,93 +497,10 @@ private fun CakeStoreContent(
             modifier = Modifier.padding(top = 22.dp),
         ) {
             items(storeList) { store ->
-                Surface(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .clickable { onNavigateToDetail(store.id) },
-                    shape = RoundedCornerShape(24.dp),
-                    color = Old_Lace
-                ) {
-                    Column {
-                        StoreInfo(store)
-                        Spacer(modifier = Modifier.height(48.dp))
-                        StoreTags(store)
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-        }
-    }
-}
-
-@Composable
-private fun StoreInfo(store: StoreModel) {
-    Row(
-        modifier = Modifier.padding(start = 20.dp, top = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = store.name,
-            color = Raisin_Black,
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.dp.toSp(),
-        )
-        Divider(
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .size(width = 1.dp, height = 12.dp)
-        )
-        Text(
-            text = DistrictType.valueOf(store.district).districtKr,
-            color = Raisin_Black,
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.dp.toSp(),
-        )
-    }
-    Text(
-        text = store.location,
-        modifier = Modifier.padding(start = 20.dp, top = 12.dp),
-        color = Raisin_Black.copy(alpha = 0.6f),
-        fontFamily = pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.dp.toSp(),
-    )
-}
-
-@Composable
-private fun StoreTags(store: StoreModel) {
-    Row(modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)) {
-        store.storeTypes.forEach { storeType ->
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
-            ) {
-                Text(
-                    text = StoreType.valueOf(storeType).tag,
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = StoreType.valueOf(storeType).toColor(),
-                    fontSize = 12.dp.toSp(),
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.width(4.dp))
-        }
-        if (store.storeTypes.size - 3 > 0) {
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Black
-            ) {
-                Text(
-                    text = "+${store.storeTypes.size - 3}",
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                    color = White,
-                    fontSize = 12.dp.toSp(),
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Bold
+                StoreItemContent(
+                    modifier = Modifier.fillMaxWidth(),
+                    storeModel = store,
+                    onClick = { onNavigateToDetail(store.id) }
                 )
             }
         }

@@ -9,6 +9,7 @@ import org.prography.network.CakkService.Endpoint.STORE_BLOG
 import org.prography.network.CakkService.Endpoint.STORE_DETAIL
 import org.prography.network.CakkService.Endpoint.STORE_LIST
 import org.prography.network.CakkService.Endpoint.STORE_RELOAD
+import org.prography.network.CakkService.Endpoint.STORE_TYPE
 import org.prography.network.CakkService.Parameter.DISTRICT
 import org.prography.network.CakkService.Parameter.NORTH_EAST_LATITUDE
 import org.prography.network.CakkService.Parameter.NORTH_EAST_LONGITUDE
@@ -17,10 +18,7 @@ import org.prography.network.CakkService.Parameter.SOUTH_WEST_LATITUDE
 import org.prography.network.CakkService.Parameter.SOUTH_WEST_LONGITUDE
 import org.prography.network.CakkService.Parameter.STORETYPE
 import org.prography.network.CakkService.Parameter.STORE_TYPES
-import org.prography.network.api.dto.response.StoreBlogResponse
-import org.prography.network.api.dto.response.StoreDetailResponse
-import org.prography.network.api.dto.response.StoreReloadResponse
-import org.prography.network.api.dto.response.StoreResponse
+import org.prography.network.api.dto.response.*
 import javax.inject.Inject
 
 class StoreRemoteSource @Inject constructor(
@@ -33,6 +31,14 @@ class StoreRemoteSource @Inject constructor(
                 parameter(DISTRICT, district)
                 parameter(STORETYPE, storeTypes)
                 parameter(PAGE, page)
+            }
+        )
+    }
+
+    fun fetchStoreType(storeId: Int): Flow<StoreTypeResponse> = flow {
+        emit(
+            httpClient.get {
+                url("$BASE_URL$STORE_DETAIL/$storeId/$STORE_TYPE")
             }
         )
     }

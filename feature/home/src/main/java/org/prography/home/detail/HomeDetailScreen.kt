@@ -31,10 +31,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import org.prography.domain.model.enums.StoreType
 import org.prography.designsystem.R
 import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
+import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.BlogPostModel
 import org.prography.utility.extensions.toSp
 
@@ -45,8 +45,8 @@ fun HomeDetailScreen(
     storeId: Int,
 ) {
     LaunchedEffect(storeId) {
-        homeDetailViewModel.sendAction(HomeDetailAction.LoadDetailInfo(storeId))
-        homeDetailViewModel.sendAction(HomeDetailAction.LoadBlogInfos(storeId))
+        homeDetailViewModel.fetchDetailStore(storeId)
+        homeDetailViewModel.fetchStoreBlogInfos(storeId)
     }
 
     val storeDetailState = homeDetailViewModel.state.collectAsStateWithLifecycle()

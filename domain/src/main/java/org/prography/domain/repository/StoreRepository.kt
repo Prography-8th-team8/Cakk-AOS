@@ -8,6 +8,8 @@ import org.prography.domain.model.store.StoreModel
 interface StoreRepository {
     fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreModel>>
 
+    fun fetchStoreType(storeId: Int): Flow<StoreModel>
+
     fun fetchDetailStore(storeId: Int): Flow<StoreDetailModel>
 
     fun fetchStoreBlog(storeId: Int): Flow<StoreBlogModel>

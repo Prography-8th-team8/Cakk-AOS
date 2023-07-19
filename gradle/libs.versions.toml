@@ -13,7 +13,7 @@ androidxNavigation = "2.5.3"
 # 3rd-party
 kotlin = "1.8.10"
 dagger = "2.45"
-coil = "2.3.0"
+coil = "2.4.0"
 timber = "5.0.1"
 lottie = "6.0.0"
 kotlin-coroutine = "1.6.4"
@@ -84,7 +84,7 @@ ktor-serialization = { group = "io.ktor", name = "ktor-client-serialization", ve
 ktor-logging = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktor" }
 ## etc
 material = "com.google.android.material:material:1.8.0"
-coil-core = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 naver-map = { group = "io.github.fornewid", name = "naver-map-compose", version.ref = "naver-map" }

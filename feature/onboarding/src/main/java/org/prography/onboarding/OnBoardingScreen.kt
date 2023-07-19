@@ -33,7 +33,7 @@ fun OnBoardingScreen(
     onNavigateHome: (String, Int) -> Unit
 ) {
     LaunchedEffect(true) {
-        onBoardingViewModel.sendAction(OnBoardingAction.LoadDistrictList)
+        onBoardingViewModel.fetchDistrictList()
     }
 
     val districtListState = onBoardingViewModel.state.collectAsStateWithLifecycle()

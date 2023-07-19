@@ -29,6 +29,7 @@ data class StoreReloadResponse(
         location = location,
         latitude = latitude,
         longitude = longitude,
+        imageUrls = imageUrls,
         storeTypes = storeTypes
     )
 }

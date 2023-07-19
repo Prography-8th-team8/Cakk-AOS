@@ -2,7 +2,7 @@ package org.prography.home
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.prography.base.BaseViewModel
 import org.prography.domain.repository.StoreRepository
@@ -20,11 +20,18 @@ class HomeViewModel @Inject constructor(
         HomeUiAction.BottomSheetExpandCollapsed -> currentState.copy(lastExpandedType = ExpandedType.COLLAPSED)
         HomeUiAction.BottomSheetExpandHalf -> currentState.copy(lastExpandedType = ExpandedType.HALF)
         HomeUiAction.Loading -> currentState
-        is HomeUiAction.LoadStoreList -> {
-            fetchStoreList(action.districts, action.storeTypes)
-            currentState
+        is HomeUiAction.LoadStoreType -> {
+            currentState.copy(
+                storeModels = currentState.storeModels.map {
+                    if (it.id == action.storeModel.id) {
+                        it.copy(storeTypes = action.storeModel.storeTypes)
+                    } else {
+                        it
+                    }
+                }
+            )
         }
-        is HomeUiAction.LoadedStoreList -> {
+        is HomeUiAction.LoadStoreList -> {
             currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
         }
         is HomeUiAction.ReloadStore -> {
@@ -32,15 +39,29 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    @OptIn(FlowPreview::class)
-    private fun fetchStoreList(districts: List<String>, storeTypes: String) {
+    fun changeBottomSheetState(expandedType: ExpandedType) {
+        when (expandedType) {
+            ExpandedType.FULL -> sendAction(HomeUiAction.BottomSheetExpandFull)
+            ExpandedType.QUARTER -> sendAction(HomeUiAction.BottomSheetExpandQuarter)
+            ExpandedType.HALF -> sendAction(HomeUiAction.BottomSheetExpandHalf)
+            ExpandedType.COLLAPSED -> sendAction(HomeUiAction.BottomSheetExpandCollapsed)
+            else -> return
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun fetchStoreList(districts: List<String>, storeTypes: String) {
         districts.sorted().asFlow()
             .flatMapMerge { storeRepository.fetchStoreList(it, storeTypes, 1) }
+            .onEach { sendAction(HomeUiAction.LoadStoreList(it)) }
+            .flatMapMerge { it.asFlow() }
+            .flatMapMerge { storeRepository.fetchStoreType(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
-            .onEach { sendAction(HomeUiAction.LoadedStoreList(it)) }
+            .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
             .launchIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun fetchStoreReload(
         southwestLatitude: Double?,
         southwestLongitude: Double?,
@@ -60,8 +81,11 @@ class HomeViewModel @Inject constructor(
             northeastLongitude,
             storeTypes = storeTypes
         )
-            .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
+            .flatMapMerge { it.asFlow() }
+            .flatMapMerge { storeRepository.fetchStoreType(it.id) }
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
             .launchIn(viewModelScope)
     }
 }

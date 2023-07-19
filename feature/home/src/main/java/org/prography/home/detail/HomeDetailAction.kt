@@ -6,8 +6,6 @@ import org.prography.domain.model.store.StoreDetailModel
 
 sealed class HomeDetailAction : BaseAction {
     object Loading : HomeDetailAction()
-    data class LoadDetailInfo(val id: Int) : HomeDetailAction()
-    data class LoadedDetailInfo(val storeDetailModel: StoreDetailModel) : HomeDetailAction()
-    data class LoadBlogInfos(val id: Int) : HomeDetailAction()
-    data class LoadedBlogInfos(val blogPosts: List<BlogPostModel>) : HomeDetailAction()
+    data class LoadDetailInfo(val storeDetailModel: StoreDetailModel) : HomeDetailAction()
+    data class LoadBlogInfos(val blogPosts: List<BlogPostModel>) : HomeDetailAction()
 }

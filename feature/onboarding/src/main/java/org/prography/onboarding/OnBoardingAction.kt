@@ -5,9 +5,8 @@ import org.prography.domain.model.district.DistrictModel
 
 sealed class OnBoardingAction : BaseAction {
     object Loading : OnBoardingAction()
-    object LoadDistrictList : OnBoardingAction()
 
-    data class LoadedDistrictList(
+    data class LoadDistrictList(
         val districts: List<DistrictModel>
     ) : OnBoardingAction()
 }

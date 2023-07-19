@@ -28,6 +28,9 @@ android {
 dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
+    implementation(project(":core:utility"))
+
+    implementation(libs.coil.compose)
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
 }
