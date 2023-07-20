@@ -18,6 +18,7 @@ android {
 dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:utility"))
+    implementation(project(":core:localdb"))
     implementation(project(":domain"))
 
     implementation(libs.gson)
