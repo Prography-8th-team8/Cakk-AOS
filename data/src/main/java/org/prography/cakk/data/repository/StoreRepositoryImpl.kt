@@ -3,14 +3,18 @@ package org.prography.cakk.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.prography.cakk.data.datasource.StoreRemoteSource
+import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.domain.repository.StoreRepository
+import org.prography.localdb.dao.BookmarkDao
+import org.prography.localdb.entity.BookmarkData
 import org.prography.utility.mapper.toModel
 import javax.inject.Inject
 
 class StoreRepositoryImpl @Inject constructor(
+    private val bookmarkDao: BookmarkDao,
     private val storeRemoteSource: StoreRemoteSource
 ) : StoreRepository {
 
@@ -42,4 +46,16 @@ class StoreRepositoryImpl @Inject constructor(
             page = page,
             storeTypes = storeTypes
         ).map { it.toModel() }
+
+    override fun fetchBookmarks(): Flow<List<BookmarkModel>> = bookmarkDao.getAll().map {
+        it.map { data ->
+            data.toModel()
+        }
+    }
+
+    override suspend fun bookmarkStore(bookmarkModel: BookmarkModel) =
+        bookmarkDao.bookmarkCakeStore(BookmarkData(bookmarkModel.id, bookmarkModel.name))
+
+    override suspend fun unBookmarkStore(bookmarkModel: BookmarkModel) =
+        bookmarkDao.unBookmarkCakeStore(BookmarkData(bookmarkModel.id, bookmarkModel.name))
 }
