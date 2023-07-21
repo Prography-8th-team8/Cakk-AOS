@@ -6,10 +6,6 @@ plugins {
 
 android {
     namespace = "org.prography.base"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

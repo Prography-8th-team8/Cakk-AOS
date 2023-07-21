@@ -10,10 +10,6 @@ plugins {
 
 android {
     namespace = "org.prography.localdb"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

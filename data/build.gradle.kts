@@ -10,10 +10,6 @@ plugins {
 
 android {
     namespace = "org.prography.cakk.data"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 dependencies {
     implementation(project(":core:network"))
