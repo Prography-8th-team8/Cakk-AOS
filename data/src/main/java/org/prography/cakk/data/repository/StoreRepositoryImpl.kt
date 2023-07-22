@@ -9,7 +9,7 @@ import org.prography.domain.model.store.StoreDetailModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.domain.repository.StoreRepository
 import org.prography.localdb.dao.BookmarkDao
-import org.prography.localdb.entity.BookmarkData
+import org.prography.localdb.entity.BookmarkEntity
 import org.prography.utility.mapper.toModel
 import javax.inject.Inject
 
@@ -54,8 +54,8 @@ class StoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun bookmarkStore(bookmarkModel: BookmarkModel) =
-        bookmarkDao.bookmarkCakeStore(BookmarkData(bookmarkModel.id, bookmarkModel.name))
+        bookmarkDao.bookmarkCakeStore(BookmarkEntity(bookmarkModel.id, bookmarkModel.name))
 
     override suspend fun unBookmarkStore(bookmarkModel: BookmarkModel) =
-        bookmarkDao.unBookmarkCakeStore(BookmarkData(bookmarkModel.id, bookmarkModel.name))
+        bookmarkDao.unBookmarkCakeStore(BookmarkEntity(bookmarkModel.id, bookmarkModel.name))
 }
