@@ -113,12 +113,20 @@ private fun HomeDetailContent(
         }
 
         when (tabType) {
-            TabType.IMAGES -> {
-                showGridImage(storeDetailModel.imageUrls)
-            }
-            TabType.BLOG_REVIES -> {
-            }
+            TabType.IMAGES -> showGridImage(storeDetailModel.imageUrls)
+            TabType.BLOG_REVIES -> showBlogReviews(storeBlogPosts)
         }
+    }
+}
+
+private fun LazyGridScope.showBlogReviews(
+    storeBlogPosts: List<BlogPostModel>,
+) {
+    item(span = { GridItemSpan(3) }) {
+        HomeDetailBlogRow(
+            modifier = Modifier.fillMaxWidth(),
+            blogPosts = storeBlogPosts
+        )
     }
 }
 
@@ -151,14 +159,14 @@ private fun HomeDetailTabRow(
                     fontFamily = pretendard
                 )
             }
-            if (currentType == TabType.IMAGES) {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Raisin_Black)
-                )
-            }
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        if (currentType == TabType.IMAGES) Raisin_Black else Raisin_Black.copy(0.2f)
+                    )
+            )
         }
 
         Column(
@@ -180,14 +188,14 @@ private fun HomeDetailTabRow(
                     fontFamily = pretendard
                 )
             }
-            if (currentType == TabType.BLOG_REVIES) {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Raisin_Black)
-                )
-            }
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        if (currentType == TabType.BLOG_REVIES) Raisin_Black else Raisin_Black.copy(0.2f)
+                    )
+            )
         }
     }
 }
@@ -235,7 +243,7 @@ private fun LazyGridScope.showGridImage(
                     .padding(bottom = 6.dp)
                     .padding(end = if (index % 3 != 2) 6.dp else 0.dp)
                     .height(116.dp),
-                contentScale = ContentScale.FillHeight
+                contentScale = ContentScale.FillBounds
             )
         }
     }
@@ -456,46 +464,35 @@ private fun HomeDetailBlogRow(
     modifier: Modifier = Modifier,
     blogPosts: List<BlogPostModel>,
 ) {
-    Column(modifier) {
-        Text(
-            text = stringResource(R.string.home_detail_blog_review),
-            color = Raisin_Black,
-            fontSize = 18.dp.toSp(),
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.03).em
-        )
-
-        Spacer(
-            modifier = Modifier
-                .padding(top = 24.dp)
-                .height(1.dp)
-                .fillMaxWidth()
-                .background(Platinum)
-        )
-
-        blogPosts.take(3).forEach { blogPost ->
+    Column(
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp)
+    ) {
+        blogPosts.take(3).forEachIndexed { index, blogPost ->
             HomeDetailBlogItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 23.dp),
+                    .padding(top = 16.dp),
                 blogPost = blogPost
             )
 
-            Spacer(
-                modifier = Modifier
-                    .padding(top = 24.dp)
-                    .height(1.dp)
-                    .fillMaxWidth()
-                    .background(Platinum)
-            )
+            if (index < 2) {
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 24.dp)
+                        .height(1.dp)
+                        .fillMaxWidth()
+                        .background(Platinum)
+                )
+            }
         }
 
         Button(
             onClick = { /*TODO*/ },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
+                .padding(top = 24.dp, bottom = 16.dp),
             shape = RoundedCornerShape(8.dp),
             border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
             elevation = ButtonDefaults.elevation(0.dp),
@@ -523,12 +520,12 @@ private fun HomeDetailBlogItem(
     val year = blogPost.postdate.substring(0, 4)
     val month = blogPost.postdate.substring(4, 6)
     val day = blogPost.postdate.substring(6)
-
     val context = LocalContext.current
     Column(
-        modifier = modifier.clickable {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogPost.link)))
-        }
+        modifier = modifier
+            .clickable {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(blogPost.link)))
+            }
     ) {
         Row {
             Text(
