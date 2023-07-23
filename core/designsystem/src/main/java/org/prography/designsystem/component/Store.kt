@@ -91,8 +91,8 @@ fun StoreItemTagRow(
     storeTypes: List<String> = listOf(),
     maxCount: Int = storeTypes.size
 ) {
-    Row(modifier) {
-        storeTypes.take(maxCount).forEach { storeType ->
+    LazyRow(modifier) {
+        items(storeTypes.take(maxCount), key = { it }) { storeType ->
             Surface(
                 modifier = Modifier.padding(end = 4.dp),
                 shape = RoundedCornerShape(14.dp),
@@ -110,18 +110,20 @@ fun StoreItemTagRow(
         }
 
         if (storeTypes.size > maxCount) {
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Black
-            ) {
-                Text(
-                    text = "+${storeTypes.size - 3}",
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                    color = White,
-                    fontSize = 12.dp.toSp(),
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = pretendard
-                )
+            item {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = Black
+                ) {
+                    Text(
+                        text = "+${storeTypes.size - 3}",
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
+                        color = White,
+                        fontSize = 12.dp.toSp(),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = pretendard
+                    )
+                }
             }
         }
     }
