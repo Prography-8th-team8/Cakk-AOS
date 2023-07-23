@@ -43,8 +43,6 @@ plugin-secrets-gradle = { group = "com.google.android.libraries.mapsplatform.sec
 
 # accompanist
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
-accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanist" }
-accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanist" }
 
 # AndroidX
 androidx-arch-coreTesting = "androidx.arch.core:core-testing:2.1.0"
