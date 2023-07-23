@@ -28,6 +28,8 @@
     <string name="home_detail_opening">영업중</string>
     <string name="home_detail_blog_review">블로그 리뷰</string>
     <string name="home_detail_blog_review_more">블로그 리뷰 더 보기</string>
-    <string name="home_detail_no_keyword">등록된 키워드가 없어요</string>
+    <string name="home_detail_empty_keyword">등록된 키워드가 없어요</string>
+    <string name="home_detail_empty_cakeshop_image">표시할 데이터가 없어요!</string>
+    <string name="home_detail_empty_cakeshop_guide_message">빠른 시일내에 준비하겠습니다.</string>
 
 </resources>

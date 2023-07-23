@@ -6,13 +6,16 @@ import android.text.Html
 import android.text.Html.FROM_HTML_OPTION_USE_CSS_COLORS
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +39,10 @@ import org.prography.domain.model.store.BlogPostModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.utility.extensions.toSp
 
+private enum class TabType(val label: String) {
+    IMAGES("케이크 이미지"), BLOG_REVIES("블로그 리뷰")
+}
+
 @Composable
 fun HomeDetailScreen(
     homeDetailViewModel: HomeDetailViewModel = hiltViewModel(),
@@ -48,110 +55,189 @@ fun HomeDetailScreen(
     }
 
     val storeDetailUiState = homeDetailViewModel.state.collectAsStateWithLifecycle().value
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White)
-    ) {
+    Scaffold(
+        topBar = {
+            CakkAppbarWithBack(
+                title = stringResource(R.string.home_detail_app_bar),
+                onClick = onBack
+            )
+        }
+    ) { paddingValues ->
         HomeDetailContent(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(White),
             storeDetailModel = storeDetailUiState.storeDetailModel,
-            storeBlogPosts = storeDetailUiState.blogPosts,
-            onBack = onBack
+            storeBlogPosts = storeDetailUiState.blogPosts
         )
     }
 }
 
 @Composable
 private fun HomeDetailContent(
+    modifier: Modifier = Modifier,
     storeDetailModel: StoreDetailModel,
     storeBlogPosts: List<BlogPostModel>,
-    onBack: () -> Unit
 ) {
-    val scrollState = rememberScrollState()
-    CakkAppbarWithBack(
-        title = stringResource(R.string.home_detail_app_bar),
-        onClick = onBack
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
+    var tabType by remember { mutableStateOf(TabType.IMAGES) }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = modifier
     ) {
-        HomeDetailHeader(
-            modifier = Modifier.fillMaxWidth(),
-            storeName = storeDetailModel.name,
-            storeLocation = storeDetailModel.location,
-            storeLink = storeDetailModel.link,
-            storeThumbnail = storeDetailModel.thumbnail
-        )
+        item(span = { GridItemSpan(3) }) {
+            Column {
+                HomeDetailHeader(
+                    modifier = Modifier.fillMaxWidth(),
+                    storeName = storeDetailModel.name,
+                    storeLocation = storeDetailModel.location,
+                    storeLink = storeDetailModel.link,
+                    storeThumbnail = storeDetailModel.thumbnail
+                )
+                HomeDetailKeywordRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    storeTypes = storeDetailModel.storeTypes
+                )
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Raisin_Black.copy(alpha = 0.05f))
+                )
+                HomeDetailTabRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    currentType = tabType,
+                    onChangeType = { tabType = it }
+                )
+            }
+        }
 
-        HomeDetailKeywordRow(
-            modifier = Modifier.fillMaxWidth(),
-            storeTypes = storeDetailModel.storeTypes
-        )
+        when (tabType) {
+            TabType.IMAGES -> {
+                showGridImage(storeDetailModel.imageUrls)
+            }
+            TabType.BLOG_REVIES -> {
+            }
+        }
+    }
+}
 
-        Image(
-            painter = painterResource(id = R.drawable.img_default_cakeshop),
-            contentDescription = null,
+@Composable
+private fun HomeDetailTabRow(
+    modifier: Modifier = Modifier,
+    currentType: TabType,
+    onChangeType: (TabType) -> Unit
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(360 / 176f)
-        )
+                .weight(1f)
+                .height(54.dp)
+                .clickable { onChangeType(TabType.IMAGES) },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = TabType.IMAGES.label,
+                    color = Black,
+                    fontSize = 16.dp.toSp(),
+                    fontWeight = if (currentType == TabType.IMAGES) FontWeight.Bold else FontWeight.Normal,
+                    fontFamily = pretendard
+                )
+            }
+            if (currentType == TabType.IMAGES) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .background(Raisin_Black)
+                )
+            }
+        }
 
-        Text(
-            text = storeDetailModel.name,
+        Column(
             modifier = Modifier
-                .padding(top = 40.dp)
-                .align(Alignment.CenterHorizontally),
-            color = Raisin_Black,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.dp.toSp(),
-            fontFamily = pretendard,
-            letterSpacing = (-0.03).em
-        )
+                .weight(1f)
+                .height(54.dp)
+                .clickable { onChangeType(TabType.BLOG_REVIES) },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = TabType.BLOG_REVIES.label,
+                    color = Black,
+                    fontSize = 16.dp.toSp(),
+                    fontWeight = if (currentType == TabType.BLOG_REVIES) FontWeight.Bold else FontWeight.Normal,
+                    fontFamily = pretendard
+                )
+            }
+            if (currentType == TabType.BLOG_REVIES) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .background(Raisin_Black)
+                )
+            }
+        }
+    }
+}
 
-        Text(
-            text = storeDetailModel.location,
-            modifier = Modifier
-                .padding(top = 12.dp)
-                .align(Alignment.CenterHorizontally),
-            color = Raisin_Black.copy(alpha = 0.8f),
-            fontSize = 16.dp.toSp(),
-            fontFamily = pretendard,
-            letterSpacing = (-0.03).em
-        )
-
-        Spacer(
-            modifier = Modifier
-                .padding(top = if (storeDetailModel.storeTypes.isNotEmpty()) 22.dp else 32.dp)
-                .height(10.dp)
-                .fillMaxWidth()
-                .background(Platinum)
-        )
-
-        HomeDetailInfoRow(
-            modifier = Modifier
-                .padding(top = 40.dp)
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            location = storeDetailModel.location
-        )
-
-        Spacer(
-            modifier = Modifier
-                .padding(top = 26.5.dp)
-                .height(10.dp)
-                .fillMaxWidth()
-                .background(Platinum)
-        )
-
-        HomeDetailBlogRow(
-            modifier = Modifier
-                .padding(top = 40.dp, bottom = 60.dp)
-                .padding(horizontal = 16.dp),
-            blogPosts = storeBlogPosts
-        )
+private fun LazyGridScope.showGridImage(
+    imageUrls: List<String>
+) {
+    if (imageUrls.isEmpty()) {
+        item(span = { GridItemSpan(3) }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 95.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.img_empty_cakeshop),
+                    contentDescription = null,
+                    modifier = Modifier.size(100.dp)
+                )
+                Text(
+                    text = stringResource(R.string.home_detail_empty_cakeshop_image),
+                    modifier = Modifier.padding(top = 20.dp),
+                    color = Raisin_Black,
+                    fontSize = 16.dp.toSp(),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = pretendard
+                )
+                Text(
+                    text = stringResource(R.string.home_detail_empty_cakeshop_guide_message),
+                    modifier = Modifier.padding(top = 10.dp),
+                    color = Raisin_Black.copy(alpha = 0.6f),
+                    fontSize = 14.dp.toSp(),
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = pretendard
+                )
+            }
+        }
+    } else {
+        itemsIndexed(imageUrls) { index, imageUrl ->
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = imageUrl,
+                modifier = Modifier
+                    .padding(bottom = 6.dp)
+                    .padding(end = if (index % 3 != 2) 6.dp else 0.dp)
+                    .height(116.dp),
+                contentScale = ContentScale.FillHeight
+            )
+        }
     }
 }
 
@@ -188,7 +274,7 @@ private fun HomeDetailKeywordRow(
                     tint = Color.Unspecified
                 )
                 Text(
-                    text = stringResource(R.string.home_detail_no_keyword),
+                    text = stringResource(R.string.home_detail_empty_keyword),
                     modifier = Modifier.padding(start = 4.dp),
                     color = White,
                     fontSize = 12.dp.toSp(),
@@ -498,127 +584,5 @@ private fun HomeDetailBlogItem(
             letterSpacing = (-0.03).em,
             lineHeight = (22.4).dp.toSp()
         )
-    }
-}
-
-@Composable
-private fun HomeDetailInfoRow(
-    modifier: Modifier = Modifier,
-    location: String,
-) {
-    Column(modifier) {
-        Text(
-            text = stringResource(R.string.home_detail_info),
-            color = Raisin_Black,
-            fontSize = 18.dp.toSp(),
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.03).em
-        )
-
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .padding(top = 24.dp)
-                .background(Platinum)
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 15.dp)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_location),
-                contentDescription = null,
-            )
-
-            Text(
-                text = location,
-                modifier = Modifier
-                    .padding(start = 12.dp)
-                    .weight(1f, false),
-                color = Raisin_Black,
-                fontSize = 14.dp.toSp(),
-                fontFamily = pretendard,
-                letterSpacing = (-0.03).em,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = "∙",
-                modifier = Modifier.padding(start = 4.dp),
-                color = Raisin_Black.copy(alpha = 0.2f),
-                fontSize = 14.dp.toSp(),
-                fontFamily = pretendard
-            )
-
-            Text(
-                text = stringResource(R.string.home_detail_address_copy),
-                modifier = Modifier.padding(start = 4.dp),
-                color = Raisin_Black,
-                fontSize = 14.dp.toSp(),
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.03).em
-            )
-        }
-
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .padding(top = 16.dp)
-                .background(Platinum)
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 17.5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_clock),
-                contentDescription = null
-            )
-
-            Text(
-                text = stringResource(R.string.home_detail_opening),
-                modifier = Modifier.padding(start = 12.dp),
-                color = Raisin_Black,
-                fontSize = 14.dp.toSp(),
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.03).em
-            )
-
-            Text(
-                text = "∙",
-                modifier = Modifier.padding(start = 4.dp),
-                color = Raisin_Black.copy(alpha = 0.2f),
-                fontSize = 14.dp.toSp(),
-                fontFamily = pretendard
-            )
-
-            // TODO 변경 예정
-            Text(
-                text = "22:30에 영업 종료",
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .weight(1f, false),
-                color = Raisin_Black,
-                fontSize = 14.dp.toSp(),
-                fontFamily = pretendard
-            )
-
-            Image(
-                painter = painterResource(R.drawable.ic_down_arrow),
-                contentDescription = null,
-                modifier = Modifier.padding(start = 4.dp)
-            )
-        }
     }
 }
