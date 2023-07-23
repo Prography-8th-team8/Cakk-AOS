@@ -37,6 +37,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.hilt.navigation)
     implementation(libs.androidx.compose.navigation)
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
     implementation(libs.material)
     implementation(libs.timber)
     implementation(libs.coil.compose)
