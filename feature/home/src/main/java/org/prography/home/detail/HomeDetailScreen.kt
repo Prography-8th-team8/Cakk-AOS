@@ -8,8 +8,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -18,12 +16,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -32,9 +30,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import org.prography.designsystem.R
 import org.prography.designsystem.component.CakkAppbarWithBack
-import org.prography.designsystem.mapper.toColor
+import org.prography.designsystem.component.StoreItemTagRow
 import org.prography.designsystem.ui.theme.*
-import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.BlogPostModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.utility.extensions.toSp
@@ -89,6 +86,11 @@ private fun HomeDetailContent(
             storeThumbnail = storeDetailModel.thumbnail
         )
 
+        HomeDetailKeywordRow(
+            modifier = Modifier.fillMaxWidth(),
+            storeTypes = storeDetailModel.storeTypes
+        )
+
         Image(
             painter = painterResource(id = R.drawable.img_default_cakeshop),
             contentDescription = null,
@@ -120,15 +122,6 @@ private fun HomeDetailContent(
             letterSpacing = (-0.03).em
         )
 
-        if (storeDetailModel.storeTypes.isNotEmpty()) {
-            HomeDetailKeywordRow(
-                modifier = Modifier
-                    .padding(top = 32.dp)
-                    .fillMaxWidth(),
-                storeTypes = storeDetailModel.storeTypes.map { StoreType.valueOf(it) }
-            )
-        }
-
         Spacer(
             modifier = Modifier
                 .padding(top = if (storeDetailModel.storeTypes.isNotEmpty()) 22.dp else 32.dp)
@@ -159,6 +152,56 @@ private fun HomeDetailContent(
                 .padding(horizontal = 16.dp),
             blogPosts = storeBlogPosts
         )
+    }
+}
+
+@Composable
+private fun HomeDetailKeywordRow(
+    modifier: Modifier = Modifier,
+    storeTypes: List<String>
+) {
+    Column(
+        modifier = modifier
+            .padding(vertical = 24.dp)
+            .padding(start = 16.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.home_detail_keyword),
+            color = Raisin_Black,
+            fontSize = 18.dp.toSp(),
+            fontWeight = FontWeight.Bold,
+            fontFamily = pretendard
+        )
+
+        if (storeTypes.isEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .background(Raisin_Black, RoundedCornerShape(14.dp))
+                    .padding(vertical = 7.dp, horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_alert),
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = Color.Unspecified
+                )
+                Text(
+                    text = stringResource(R.string.home_detail_no_keyword),
+                    modifier = Modifier.padding(start = 4.dp),
+                    color = White,
+                    fontSize = 12.dp.toSp(),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = pretendard
+                )
+            }
+        } else {
+            StoreItemTagRow(
+                modifier = Modifier.padding(top = 16.dp),
+                storeTypes = storeTypes
+            )
+        }
     }
 }
 
@@ -576,60 +619,6 @@ private fun HomeDetailInfoRow(
                 contentDescription = null,
                 modifier = Modifier.padding(start = 4.dp)
             )
-        }
-    }
-}
-
-@Composable
-private fun HomeDetailKeywordRow(
-    modifier: Modifier = Modifier,
-    storeTypes: List<StoreType>,
-) {
-    Column(modifier) {
-        Spacer(
-            modifier = Modifier
-                .height(1.dp)
-                .fillMaxWidth()
-                .background(Platinum)
-        )
-
-        Text(
-            text = stringResource(R.string.home_detail_keyword),
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .padding(top = 40.dp),
-            color = Raisin_Black,
-            fontSize = 18.dp.toSp(),
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.03).em
-        )
-
-        LazyRow(
-            modifier = Modifier
-                .padding(top = 24.dp)
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(storeTypes, key = { it.tag }) {
-                Text(
-                    text = it.tag,
-                    modifier = Modifier
-                        .background(
-                            it
-                                .toColor()
-                                .copy(alpha = 0.2f),
-                            RoundedCornerShape(14.dp)
-                        )
-                        .padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = it.toColor(),
-                    fontSize = 12.dp.toSp(),
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = pretendard,
-                    letterSpacing = (-0.03).em,
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }
