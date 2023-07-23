@@ -28,5 +28,6 @@
     <string name="home_detail_opening">영업중</string>
     <string name="home_detail_blog_review">블로그 리뷰</string>
     <string name="home_detail_blog_review_more">블로그 리뷰 더 보기</string>
+    <string name="home_detail_no_keyword">등록된 키워드가 없어요</string>
 
 </resources>
