@@ -53,7 +53,8 @@ fun StoreItemContent(
 
             StoreItemTagRow(
                 modifier = Modifier.padding(top = 12.dp),
-                storeTypes = storeModel.storeTypes
+                storeTypes = storeModel.storeTypes,
+                maxCount = 3
             )
 
             StoreItemImageRow(
@@ -85,12 +86,13 @@ internal fun StoreItemImageRow(
 }
 
 @Composable
-internal fun StoreItemTagRow(
+fun StoreItemTagRow(
     modifier: Modifier = Modifier,
-    storeTypes: List<String> = listOf()
+    storeTypes: List<String> = listOf(),
+    maxCount: Int = storeTypes.size
 ) {
     Row(modifier) {
-        storeTypes.take(3).forEach { storeType ->
+        storeTypes.take(maxCount).forEach { storeType ->
             Surface(
                 modifier = Modifier.padding(end = 4.dp),
                 shape = RoundedCornerShape(14.dp),
@@ -107,7 +109,7 @@ internal fun StoreItemTagRow(
             }
         }
 
-        if (storeTypes.size > 3) {
+        if (storeTypes.size > maxCount) {
             Surface(
                 shape = RoundedCornerShape(14.dp),
                 color = Black
