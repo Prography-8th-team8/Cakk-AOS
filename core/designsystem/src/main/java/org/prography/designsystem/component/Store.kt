@@ -55,7 +55,21 @@ fun StoreItemContent(
                 modifier = Modifier.padding(top = 12.dp),
                 storeTypes = storeModel.storeTypes,
                 maxCount = 3
-            )
+            ) { size ->
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = Black
+                ) {
+                    Text(
+                        text = String.format(stringResource(R.string.home_num_of_keyword), size),
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
+                        color = White,
+                        fontSize = 12.dp.toSp(),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = pretendard
+                    )
+                }
+            }
 
             StoreItemImageRow(
                 modifier = Modifier.padding(top = 32.dp),
@@ -89,7 +103,8 @@ internal fun StoreItemImageRow(
 fun StoreItemTagRow(
     modifier: Modifier = Modifier,
     storeTypes: List<String> = listOf(),
-    maxCount: Int = storeTypes.size
+    maxCount: Int = storeTypes.size,
+    overFlow: @Composable (Int) -> Unit = {}
 ) {
     LazyRow(modifier) {
         items(storeTypes.take(maxCount), key = { it }) { storeType ->
@@ -110,21 +125,7 @@ fun StoreItemTagRow(
         }
 
         if (storeTypes.size > maxCount) {
-            item {
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = Black
-                ) {
-                    Text(
-                        text = "+${storeTypes.size - 3}",
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                        color = White,
-                        fontSize = 12.dp.toSp(),
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = pretendard
-                    )
-                }
-            }
+            item { overFlow(storeTypes.size - maxCount) }
         }
     }
 }

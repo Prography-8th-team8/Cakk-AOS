@@ -10,12 +10,35 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +57,12 @@ import coil.compose.AsyncImage
 import org.prography.designsystem.R
 import org.prography.designsystem.component.CakkAppbarWithBack
 import org.prography.designsystem.component.StoreItemTagRow
-import org.prography.designsystem.ui.theme.*
+import org.prography.designsystem.ui.theme.Black
+import org.prography.designsystem.ui.theme.Palatinate_Blue
+import org.prography.designsystem.ui.theme.Platinum
+import org.prography.designsystem.ui.theme.Raisin_Black
+import org.prography.designsystem.ui.theme.White
+import org.prography.designsystem.ui.theme.pretendard
 import org.prography.domain.model.store.BlogPostModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.utility.extensions.toSp
@@ -377,19 +405,15 @@ private fun HomeDetailHeaderTab(
 ) {
     Row(modifier) {
         HomeDetailHeaderTabItem(
-            iconRes = if (storeLink.isEmpty()) {
-                R.drawable.ic_kakao
-            } else if (storeLink.contains("instagram")) {
-                R.drawable.ic_instagram
-            } else {
-                R.drawable.ic_website
+            iconRes = when {
+                storeLink.isEmpty() -> R.drawable.ic_kakao
+                storeLink.contains(stringResource(R.string.infix_instagram_url)) -> R.drawable.ic_instagram
+                else -> R.drawable.ic_website
             },
-            stringRes = if (storeLink.isEmpty()) {
-                R.string.home_detail_kakao_tab
-            } else if (storeLink.contains("instagram")) {
-                R.string.home_detail_instagram_tab
-            } else {
-                R.string.home_detail_website_tab
+            stringRes = when {
+                storeLink.isEmpty() -> R.string.home_detail_kakao_tab
+                storeLink.contains(stringResource(R.string.infix_instagram_url)) -> R.string.home_detail_instagram_tab
+                else -> R.string.home_detail_website_tab
             }
         )
 

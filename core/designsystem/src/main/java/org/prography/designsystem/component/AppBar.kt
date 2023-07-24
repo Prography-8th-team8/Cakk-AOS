@@ -31,10 +31,10 @@ fun CakkAppbarWithBack(
             Icon(
                 painter = painterResource(R.drawable.ic_left_arrow),
                 contentDescription = null,
-                tint = Color.Unspecified,
                 modifier = Modifier
                     .padding(start = 16.dp)
-                    .size(18.dp, 24.dp)
+                    .size(18.dp, 24.dp),
+                tint = Color.Unspecified
             )
         }
 
