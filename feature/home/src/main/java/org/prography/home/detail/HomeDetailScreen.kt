@@ -75,7 +75,7 @@ private enum class TabType(val label: String) {
 fun HomeDetailScreen(
     homeDetailViewModel: HomeDetailViewModel = hiltViewModel(),
     storeId: Int,
-    onBack: () -> Unit
+    onBack: () -> Unit = {}
 ) {
     LaunchedEffect(storeId) {
         homeDetailViewModel.fetchDetailStore(storeId)

@@ -20,5 +20,6 @@ sealed class HomeUiAction : BaseAction {
     object BottomSheetExpandHalf : HomeUiAction()
 
     object BottomSheetStoreList : HomeUiAction()
+    data class BottomSheetStoreDetail(val storeId: Int) : HomeUiAction()
     object BottomSheetFilter : HomeUiAction()
 }

@@ -53,6 +53,7 @@ import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.StoreModel
+import org.prography.home.detail.HomeDetailScreen
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
 import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_STORE_COUNT
@@ -174,7 +175,7 @@ private fun BottomSheet(
                     }
             ) {
                 when (bottomSheetType) {
-                    BottomSheetType.STORE_LIST -> {
+                    BottomSheetType.StoreList -> {
                         CakeStoreContent(
                             isReload = homeUiState.isReload,
                             storeList = homeUiState.storeModels,
@@ -184,7 +185,7 @@ private fun BottomSheet(
                             onNavigateToOnBoarding = onNavigateToOnBoarding,
                             onNavigateToDetail = onNavigateToDetail,
                             openFilterSheet = {
-                                homeViewModel.changeBottomSheetType(BottomSheetType.FILTER)
+                                homeViewModel.changeBottomSheetType(BottomSheetType.Filter)
                                 homeViewModel.changeBottomSheetState(ExpandedType.HALF)
                                 expandedType = ExpandedType.HALF
                                 offsetY = expandedType
@@ -194,7 +195,7 @@ private fun BottomSheet(
                         )
                     }
 
-                    BottomSheetType.FILTER -> {
+                    BottomSheetType.Filter -> {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -207,7 +208,7 @@ private fun BottomSheet(
                             val filters = remember { mutableStateOf("") }
 
                             FilterTopBar(selectFilter) {
-                                homeViewModel.changeBottomSheetType(BottomSheetType.STORE_LIST)
+                                homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
                                 homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                                 expandedType = ExpandedType.QUARTER
                                 offsetY = expandedType
@@ -221,7 +222,7 @@ private fun BottomSheet(
                                 homeViewModel,
                                 districtsArg,
                             ) {
-                                homeViewModel.changeBottomSheetType(BottomSheetType.STORE_LIST)
+                                homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
                                 homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                                 expandedType = ExpandedType.QUARTER
                                 offsetY = expandedType
@@ -230,8 +231,9 @@ private fun BottomSheet(
                             }
                         }
                     }
-                    BottomSheetType.STORE_DETAIL -> {
 
+                    is BottomSheetType.StoreDetail -> {
+                        HomeDetailScreen(storeId = bottomSheetType.storeId)
                     }
                 }
             }
@@ -607,6 +609,8 @@ private fun CakkMap(
                 isHideCollidedMarkers = true,
                 onClick = {
                     isClickedIndex = index
+                    homeViewModel.changeBottomSheetType(BottomSheetType.StoreDetail(store.id))
+                    homeViewModel.changeBottomSheetState(ExpandedType.HALF)
                     true
                 },
             )
