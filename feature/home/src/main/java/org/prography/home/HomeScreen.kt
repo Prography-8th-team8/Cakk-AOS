@@ -120,7 +120,7 @@ private fun BottomSheet(
     )
     val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
     var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
-    var expandedType by rememberSaveable { mutableStateOf(homeUiState.lastExpandedType) }
+    var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
@@ -607,9 +607,6 @@ private fun CakkMap(
 private fun LocationPermission(
     fromOnBoarding: Boolean,
     onNavigateToOnBoarding: () -> Unit
-//    permissions: Array<String>,
-//    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
-//    launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
 ) {
     val context = LocalContext.current
     val permissions = arrayOf(
