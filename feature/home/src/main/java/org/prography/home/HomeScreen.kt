@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Looper
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
@@ -44,8 +43,6 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
-import org.prography.domain.model.enums.DistrictType
-import org.prography.domain.model.enums.StoreType
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.prography.designsystem.R
@@ -53,6 +50,8 @@ import org.prography.designsystem.component.StoreItemContent
 import org.prography.designsystem.mapper.toBackgroundColor
 import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
+import org.prography.domain.model.enums.DistrictType
+import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
@@ -72,44 +71,12 @@ fun HomeScreen(
     onNavigateToDetail: (Int) -> Unit,
 ) {
     val fromOnBoarding = districtsArg != DEFAULT_DISTRICTS_INFO && storeCountArg != DEFAULT_STORE_COUNT
-    val permissions = arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-    )
-
-    val settingResultRequest = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { activityResult ->
-        if (activityResult.resultCode == RESULT_OK) {
-            Timber.d("위치 설정이 동의되었습니다.")
-            startLocationUpdates()
-        } else {
-            Timber.d("위치 설정이 거부되었습니다.")
-        }
-    }
-
-    val launcherMultiplePermissions = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions(),
-    ) { permissionsMap ->
-        val areGranted = permissionsMap.values.reduceOrNull { acc, next -> acc && next }
-
-        if (areGranted == true) {
-            Timber.i("권한이 동의되었습니다.")
-        } else {
-            Timber.i("권한이 거부되었습니다.")
-            onNavigateToOnBoarding()
-        }
-    }
-
     LocationPermission(
         fromOnBoarding = fromOnBoarding,
-        permissions = permissions,
-        settingResultRequest = settingResultRequest,
-        launcherMultiplePermissions = launcherMultiplePermissions
+        onNavigateToOnBoarding = onNavigateToOnBoarding
     )
 
     val homeState = homeViewModel.state.collectAsStateWithLifecycle()
-
     BottomSheet(
         homeViewModel = homeViewModel,
         fromOnBoarding = fromOnBoarding,
@@ -124,9 +91,9 @@ fun HomeScreen(
     )
 
     LaunchedEffect(homeViewModel) {
-        if (homeState.value.storeModels.isEmpty()) {
+        if (fromOnBoarding) {
             homeViewModel.fetchStoreList(
-                districts = if (districtsArg.isEmpty()) listOf("JONGNO") else districtsArg.split(" "),
+                districts = districtsArg.split(" "),
                 storeTypes = StoreType.values().joinToString(",") { it.name }
             )
         }
@@ -194,10 +161,12 @@ private fun BottomSheet(
                                         homeViewModel.changeBottomSheetState(ExpandedType.FULL)
                                         ExpandedType.FULL
                                     }
+
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
                                         homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                                         ExpandedType.QUARTER
                                     }
+
                                     else -> {
                                         homeViewModel.changeBottomSheetState(ExpandedType.COLLAPSED)
                                         ExpandedType.COLLAPSED
@@ -266,6 +235,7 @@ private fun BottomSheet(
             rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
         Box(modifier = Modifier.fillMaxSize()) {
             CakkMap(
+                homeViewModel = homeViewModel,
                 cameraPositionState = cameraPositionState,
                 fromOnBoarding = fromOnBoarding,
                 isReload = isReload,
@@ -577,6 +547,7 @@ private fun CakkStoreTopBar(
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
 private fun CakkMap(
+    homeViewModel: HomeViewModel,
     cameraPositionState: CameraPositionState,
     fromOnBoarding: Boolean,
     isReload: Boolean,
@@ -593,6 +564,12 @@ private fun CakkMap(
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     cameraPositionState.position = CameraPosition(LatLng(location.latitude, location.longitude), 16.0)
+                    homeViewModel.fetchStoreReload(
+                        cameraPositionState.contentBounds?.southWest?.latitude,
+                        cameraPositionState.contentBounds?.southWest?.longitude,
+                        cameraPositionState.contentBounds?.northEast?.latitude,
+                        cameraPositionState.contentBounds?.northEast?.longitude
+                    )
                 }
             }
         }
@@ -626,11 +603,40 @@ private fun CakkMap(
 @Composable
 private fun LocationPermission(
     fromOnBoarding: Boolean,
-    permissions: Array<String>,
-    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
-    launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
+    onNavigateToOnBoarding: () -> Unit
+//    permissions: Array<String>,
+//    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
+//    launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
 ) {
     val context = LocalContext.current
+    val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+
+    val settingResultRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { activityResult ->
+        if (activityResult.resultCode == RESULT_OK) {
+            Timber.d("위치 설정이 동의되었습니다.")
+            startLocationUpdates()
+        } else {
+            Timber.d("위치 설정이 거부되었습니다.")
+        }
+    }
+
+    val launcherMultiplePermissions = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissionsMap ->
+        val areGranted = permissionsMap.values.reduceOrNull { acc, next -> acc && next }
+
+        if (areGranted == true) {
+            Timber.i("권한이 동의되었습니다.")
+        } else {
+            Timber.i("권한이 거부되었습니다.")
+            onNavigateToOnBoarding()
+        }
+    }
 
     LaunchedEffect(true) {
         if (!fromOnBoarding) {
