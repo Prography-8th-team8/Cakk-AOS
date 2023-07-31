@@ -12,7 +12,6 @@ fun StoreType.toIcon() = when (this) {
     StoreType.PHOTO -> R.drawable.ic_photo
     StoreType.FIGURE -> R.drawable.ic_figure
     StoreType.TIARA -> R.drawable.ic_tiara
-    StoreType.LUXURY -> null
     StoreType.SOLID -> R.drawable.ic_solid
     StoreType.ETC -> null
 }

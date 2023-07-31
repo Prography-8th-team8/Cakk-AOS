@@ -10,6 +10,5 @@ enum class StoreType(val tag: String) {
     LETTERING("레터링"),
     RICE("떡케이크"),
     TIARA("티아라"),
-    LUXURY("럭셔리"), // 추후 태그명 변경
     ETC("기타")
 }
