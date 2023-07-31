@@ -15,9 +15,11 @@ data class StoreDetailResponse(
     val link: String,
     val location: String,
     val longitude: Double,
+    val thumbnail: String?,
     val modifiedAt: String,
     val name: String,
     val phoneNumber: String,
+    val imageUrls: List<String>,
     val storeTypes: List<String>,
 ) {
     fun toModel() = StoreDetailModel(
@@ -31,9 +33,11 @@ data class StoreDetailResponse(
         link = link,
         location = location,
         longitude = longitude,
+        thumbnail = thumbnail,
         modifiedAt = modifiedAt,
         name = name,
         phoneNumber = phoneNumber,
+        imageUrls = imageUrls,
         storeTypes = storeTypes
     )
 }

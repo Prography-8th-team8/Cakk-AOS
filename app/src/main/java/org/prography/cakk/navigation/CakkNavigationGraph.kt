@@ -59,7 +59,11 @@ fun CakkNavigationGraph(navController: NavHostController) {
             arguments = CakkDestination.HomeDetail.arguments
         ) { navBackStackEntry ->
             val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.HomeDetail.STORE_ID)
-            storeId?.let { HomeDetailScreen(navHostController = navController, storeId = it) }
+            storeId?.let {
+                HomeDetailScreen(storeId = it) {
+                    navController.popBackStack()
+                }
+            }
         }
 
         composable(route = CakkDestination.OnBoarding.route) {

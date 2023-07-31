@@ -12,6 +12,7 @@
     <string name="home_near_by_cake_shops">이 근처 케이크샵</string>
     <string name="home_num_of_cake_shop">%d개의 케이크샵</string>
     <string name="home_district_name">%s구</string>
+    <string name="home_num_of_keyword">+%d</string>
 
     <!-- home content description -->
     <string name="home_content_description_filter_close_btn">close_filter</string>
@@ -19,6 +20,9 @@
 
     <!-- home_detail -->
     <string name="home_detail_app_bar">상세정보</string>
+    <string name="home_detail_instagram_tab">인스타그램</string>
+    <string name="home_detail_website_tab">웹사이트</string>
+    <string name="home_detail_kakao_tab">카카오톡</string>
     <string name="home_detail_phone">전화하기</string>
     <string name="home_detail_bookmark">북마크</string>
     <string name="home_detail_navigation">길 안내</string>
@@ -29,4 +33,8 @@
     <string name="home_detail_opening">영업중</string>
     <string name="home_detail_blog_review">블로그 리뷰</string>
     <string name="home_detail_blog_review_more">블로그 리뷰 더 보기</string>
+    <string name="home_detail_empty_keyword">등록된 키워드가 없어요</string>
+    <string name="home_detail_empty_cakeshop_image">표시할 데이터가 없어요!</string>
+    <string name="home_detail_empty_cakeshop_guide_message">빠른 시일내에 준비하겠습니다.</string>
+    <string name="infix_instagram_url">instagram</string>
 </resources>
