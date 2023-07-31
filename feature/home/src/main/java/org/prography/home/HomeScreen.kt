@@ -76,16 +76,11 @@ fun HomeScreen(
         onNavigateToOnBoarding = onNavigateToOnBoarding
     )
 
-    val homeState = homeViewModel.state.collectAsStateWithLifecycle()
     BottomSheet(
         homeViewModel = homeViewModel,
         fromOnBoarding = fromOnBoarding,
-        isReload = homeState.value.isReload,
-        storeList = homeState.value.storeModels,
-        districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
-        storeCount = if (storeCountArg >= 0 && homeState.value.isReload.not()) storeCountArg else homeState.value.storeModels.size,
-        bottomExpandedType = homeState.value.lastExpandedType,
         districtsArg = districtsArg,
+        storeCountArg = storeCountArg,
         onNavigateToOnBoarding = onNavigateToOnBoarding,
         onNavigateToDetail = onNavigateToDetail
     )
@@ -106,12 +101,8 @@ fun HomeScreen(
 private fun BottomSheet(
     homeViewModel: HomeViewModel = hiltViewModel(),
     fromOnBoarding: Boolean,
-    isReload: Boolean,
-    storeList: List<StoreModel>,
-    districts: List<DistrictType>,
-    storeCount: Int,
-    bottomExpandedType: ExpandedType,
     districtsArg: String,
+    storeCountArg: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
@@ -127,8 +118,9 @@ private fun BottomSheet(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
+    val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
     var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
-    var expandedType by rememberSaveable { mutableStateOf(bottomExpandedType) }
+    var expandedType by rememberSaveable { mutableStateOf(homeUiState.lastExpandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
@@ -181,10 +173,10 @@ private fun BottomSheet(
             ) {
                 if (expandedType != ExpandedType.HALF) {
                     CakeStoreContent(
-                        isReload = isReload,
-                        storeList = storeList,
-                        districts = districts,
-                        storeCount = storeCount,
+                        isReload = homeUiState.isReload,
+                        storeList = homeUiState.storeModels,
+                        districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
+                        storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) storeCountArg else homeUiState.storeModels.size,
                         onNavigateToOnBoarding = onNavigateToOnBoarding,
                         onNavigateToDetail = onNavigateToDetail,
                         openFilterSheet = {
@@ -238,8 +230,8 @@ private fun BottomSheet(
                 homeViewModel = homeViewModel,
                 cameraPositionState = cameraPositionState,
                 fromOnBoarding = fromOnBoarding,
-                isReload = isReload,
-                storeList = storeList
+                isReload = homeUiState.isReload,
+                storeList = homeUiState.storeModels
             )
             SearchArea(
                 homeViewModel = homeViewModel,
@@ -544,6 +536,8 @@ private fun CakkStoreTopBar(
     }
 }
 
+private const val DEFAULT_CLICKED_INEDX = -1
+
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
 private fun CakkMap(
@@ -554,6 +548,7 @@ private fun CakkMap(
     storeList: List<StoreModel>,
 ) {
     val context = LocalContext.current
+    var isClickedIndex by remember { mutableStateOf(DEFAULT_CLICKED_INEDX) }
     if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
             cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
@@ -591,10 +586,18 @@ private fun CakkMap(
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState,
     ) {
-        storeList.forEach { store ->
+        storeList.forEachIndexed { index, store ->
             Marker(
                 state = MarkerState(position = LatLng(store.latitude, store.longitude)),
-                icon = OverlayImage.fromResource(R.drawable.ic_marker),
+                icon = OverlayImage.fromResource(
+                    if (isClickedIndex == index) R.drawable.ic_clicked_marker
+                    else R.drawable.ic_marker
+                ),
+                isHideCollidedMarkers = true,
+                onClick = {
+                    isClickedIndex = index
+                    true
+                },
             )
         }
     }
