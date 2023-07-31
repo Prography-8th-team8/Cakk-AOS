@@ -7,13 +7,17 @@ import org.prography.domain.model.store.StoreModel
 
 data class HomeUiState(
     val storeModels: List<StoreModel> = listOf(),
-    val bottomSheetType: BottomSheetType = BottomSheetType.STORE_LIST,
+    val bottomSheetType: BottomSheetType = BottomSheetType.StoreList,
     val expandedType: ExpandedType = ExpandedType.QUARTER,
     val isReload: Boolean = false
 ) : BaseState
 
-enum class BottomSheetType {
-    STORE_LIST, STORE_DETAIL, FILTER
+sealed class BottomSheetType {
+    object StoreList : BottomSheetType()
+
+    class StoreDetail(val storeId: Int) : BottomSheetType()
+
+    object Filter : BottomSheetType()
 }
 
 enum class ExpandedType {
