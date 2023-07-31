@@ -227,25 +227,31 @@ private fun BottomSheet(
                         }
                     )
                 } else {
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(horizontal = 20.dp),
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         val selectFilter = remember {
                             mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
                         }
                         val filters = remember { mutableStateOf("") }
 
-                        FilterTopBar(homeViewModel, selectFilter) {
-                            expandedType = ExpandedType.QUARTER
-                            offsetY = expandedType
-                                .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                .value
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            FilterTopBar(
+                                modifier = Modifier.align(Alignment.End),
+                                homeViewModel,
+                                selectFilter
+                            ) {
+                                expandedType = ExpandedType.QUARTER
+                                offsetY = expandedType
+                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                    .value
+                            }
+                            Filters(selectFilter)
                         }
                         FilterSelectButton(
-                            modifier = Modifier.align(Alignment.BottomCenter),
                             selectFilter,
                             filters,
                             homeViewModel,
@@ -282,51 +288,48 @@ private fun BottomSheet(
 
 @Composable
 private fun FilterTopBar(
+    modifier: Modifier,
     homeViewModel: HomeViewModel,
     selectFilter: SnapshotStateList<Boolean>,
     backToCakeStore: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Image(
-            painterResource(R.drawable.ic_close),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(top = 22.dp)
-                .align(Alignment.End)
-                .clickable {
-                    homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
-                    backToCakeStore()
-                },
-        )
+    Image(
+        painterResource(R.drawable.ic_close),
+        contentDescription = stringResource(id = R.string.home_content_description_filter_close_btn),
+        modifier = modifier
+            .padding(top = 22.dp, end = 20.dp)
+            .clickable {
+                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
+                backToCakeStore()
+            },
+    )
+    Text(
+        text = stringResource(id = R.string.home_filter),
+        modifier = Modifier.padding(start = 21.dp, top = 9.dp),
+        color = Black,
+        fontSize = 18.dp.toSp(),
+        fontWeight = FontWeight.Bold,
+        fontFamily = pretendard,
+    )
+    Row(
+        modifier = Modifier.padding(start = 20.dp, top = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
-            text = stringResource(id = R.string.home_filter),
-            modifier = Modifier.padding(top = 4.dp),
+            text = stringResource(id = R.string.home_filter_recommend),
+            color = Black.copy(alpha = 0.6f),
+            fontSize = 16.dp.toSp(),
+            fontWeight = FontWeight.Normal,
             fontFamily = pretendard,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.dp.toSp(),
-            color = Black,
         )
-        Row(
-            modifier = Modifier.padding(top = 5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.home_filter_recommend),
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.dp.toSp(),
-                color = Black.copy(alpha = 0.6f),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Image(
-                painterResource(id = R.drawable.ic_refresh),
-                contentDescription = null,
-                modifier = Modifier.clickable {
-                    selectFilter.indices.forEach { selectFilter[it] = false }
-                }
-            )
-        }
-        Filters(selectFilter)
+        Spacer(modifier = Modifier.width(9.dp))
+        Image(
+            painterResource(id = R.drawable.ic_refresh),
+            contentDescription = stringResource(id = R.string.home_content_description_filter_refresh_btn),
+            modifier = Modifier.clickable {
+                selectFilter.indices.forEach { selectFilter[it] = false }
+            }
+        )
     }
 }
 
@@ -334,47 +337,45 @@ private fun FilterTopBar(
 @OptIn(ExperimentalLayoutApi::class)
 private fun Filters(selectFilter: SnapshotStateList<Boolean>) {
     FlowRow(
-        modifier = Modifier.padding(top = 15.dp),
-        content = {
-            StoreType.values().forEachIndexed { index, storeType ->
-                Surface(
-                    modifier = Modifier
-                        .padding(end = 4.dp, bottom = 6.dp)
-                        .toggleable(
-                            value = selectFilter[index],
-                            onValueChange = {
-                                selectFilter[index] = !selectFilter[index]
-                            }
-                        ),
-                    shape = RoundedCornerShape(50.dp),
-                    color = storeType.toBackgroundColor(isSelected = selectFilter[index]),
-                    border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        storeType.toIcon()?.let { icon ->
-                            Image(painter = painterResource(id = icon), contentDescription = null)
+        modifier = Modifier.padding(start = 16.dp, top = 25.dp, end = 16.dp)
+    ) {
+        StoreType.values().forEachIndexed { index, storeType ->
+            Row(
+                modifier = Modifier
+                    .padding(end = 7.dp, bottom = 12.dp)
+                    .border(BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)), RoundedCornerShape(50.dp))
+                    .background(storeType.toBackgroundColor(selectFilter[index]), RoundedCornerShape(50.dp))
+                    .toggleable(
+                        value = selectFilter[index],
+                        onValueChange = {
+                            selectFilter[index] = !selectFilter[index]
                         }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = storeType.tag,
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.dp.toSp(),
-                            color = Raisin_Black
-                        )
-                    }
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                storeType.toIcon()?.let { icon ->
+                    Image(
+                        painter = painterResource(id = icon),
+                        contentDescription = storeType.tag,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
                 }
+                Spacer(modifier = Modifier.width(if (storeType.toIcon() == null) 12.dp else 4.dp))
+                Text(
+                    text = storeType.tag,
+                    modifier = Modifier.padding(top = 9.dp, end = 12.dp, bottom = 9.dp),
+                    color = Raisin_Black,
+                    fontSize = 14.dp.toSp(),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = pretendard,
+                )
             }
         }
-    )
+    }
 }
 
 @Composable
 private fun FilterSelectButton(
-    modifier: Modifier,
     selectFilter: SnapshotStateList<Boolean>,
     filters: MutableState<String>,
     homeViewModel: HomeViewModel,
@@ -382,9 +383,10 @@ private fun FilterSelectButton(
     backToCakeStore: () -> Unit,
 ) {
     Surface(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 4.dp)
+            .wrapContentHeight()
+            .padding(start = 16.dp, bottom = 12.dp, end = 16.dp)
             .clickable(enabled = selectFilter.count { it } > 0) {
                 StoreType
                     .values()
@@ -403,12 +405,12 @@ private fun FilterSelectButton(
     ) {
         Text(
             text = stringResource(id = R.string.home_apply),
-            modifier = Modifier.padding(vertical = 10.dp),
-            fontFamily = pretendard,
-            fontWeight = FontWeight.Normal,
-            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(vertical = 19.dp),
+            color = White,
             fontSize = 18.dp.toSp(),
-            color = White
+            fontWeight = FontWeight.Bold,
+            fontFamily = pretendard,
+            textAlign = TextAlign.Center,
         )
     }
 }
