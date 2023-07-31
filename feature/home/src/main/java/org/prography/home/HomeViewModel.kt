@@ -19,6 +19,8 @@ class HomeViewModel @Inject constructor(
         HomeUiAction.BottomSheetExpandQuarter -> currentState.copy(expandedType = ExpandedType.QUARTER)
         HomeUiAction.BottomSheetExpandCollapsed -> currentState.copy(expandedType = ExpandedType.COLLAPSED)
         HomeUiAction.BottomSheetExpandHalf -> currentState.copy(expandedType = ExpandedType.HALF)
+        HomeUiAction.BottomSheetFilter -> currentState.copy(bottomSheetType = BottomSheetType.FILTER)
+        HomeUiAction.BottomSheetStoreList -> currentState.copy(bottomSheetType = BottomSheetType.STORE_LIST)
         HomeUiAction.Loading -> currentState
         is HomeUiAction.LoadStoreType -> {
             currentState.copy(
@@ -45,6 +47,14 @@ class HomeViewModel @Inject constructor(
             ExpandedType.QUARTER -> sendAction(HomeUiAction.BottomSheetExpandQuarter)
             ExpandedType.HALF -> sendAction(HomeUiAction.BottomSheetExpandHalf)
             ExpandedType.COLLAPSED -> sendAction(HomeUiAction.BottomSheetExpandCollapsed)
+            else -> return
+        }
+    }
+
+    fun changeBottomSheetType(bottomSheetType: BottomSheetType){
+        when(bottomSheetType){
+            BottomSheetType.STORE_LIST -> sendAction(HomeUiAction.BottomSheetStoreList)
+            BottomSheetType.FILTER -> sendAction(HomeUiAction.BottomSheetFilter)
             else -> return
         }
     }

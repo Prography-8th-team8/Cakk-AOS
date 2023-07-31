@@ -119,6 +119,8 @@ private fun BottomSheet(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
     val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
+    val bottomSheetType = homeUiState.bottomSheetType
+
     var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
     var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
@@ -171,52 +173,65 @@ private fun BottomSheet(
                         )
                     }
             ) {
-                if (expandedType != ExpandedType.HALF) {
-                    CakeStoreContent(
-                        isReload = homeUiState.isReload,
-                        storeList = homeUiState.storeModels,
-                        districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
-                        storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) storeCountArg else homeUiState.storeModels.size,
-                        onNavigateToOnBoarding = onNavigateToOnBoarding,
-                        onNavigateToDetail = onNavigateToDetail,
-                        openFilterSheet = {
-                            homeViewModel.changeBottomSheetState(ExpandedType.HALF)
-                            expandedType = ExpandedType.HALF
-                            offsetY = expandedType
-                                .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                .value
-                        }
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(horizontal = 20.dp),
-                    ) {
-                        val selectFilter = remember {
-                            mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
-                        }
-                        val filters = remember { mutableStateOf("") }
+                when (bottomSheetType) {
+                    BottomSheetType.STORE_LIST -> {
+                        CakeStoreContent(
+                            isReload = homeUiState.isReload,
+                            storeList = homeUiState.storeModels,
+                            districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ")
+                                .map { DistrictType.getName(it) } else listOf(),
+                            storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) storeCountArg else homeUiState.storeModels.size,
+                            onNavigateToOnBoarding = onNavigateToOnBoarding,
+                            onNavigateToDetail = onNavigateToDetail,
+                            openFilterSheet = {
+                                homeViewModel.changeBottomSheetType(BottomSheetType.FILTER)
+                                homeViewModel.changeBottomSheetState(ExpandedType.HALF)
+                                expandedType = ExpandedType.HALF
+                                offsetY = expandedType
+                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                    .value
+                            }
+                        )
+                    }
 
-                        FilterTopBar(homeViewModel, selectFilter) {
-                            expandedType = ExpandedType.QUARTER
-                            offsetY = expandedType
-                                .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                .value
-                        }
-                        FilterSelectButton(
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                            selectFilter,
-                            filters,
-                            homeViewModel,
-                            districtsArg,
+                    BottomSheetType.FILTER -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(horizontal = 20.dp),
                         ) {
-                            expandedType = ExpandedType.QUARTER
-                            offsetY = expandedType
-                                .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                .value
+                            val selectFilter = remember {
+                                mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
+                            }
+                            val filters = remember { mutableStateOf("") }
+
+                            FilterTopBar(selectFilter) {
+                                homeViewModel.changeBottomSheetType(BottomSheetType.STORE_LIST)
+                                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
+                                expandedType = ExpandedType.QUARTER
+                                offsetY = expandedType
+                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                    .value
+                            }
+                            FilterSelectButton(
+                                modifier = Modifier.align(Alignment.BottomCenter),
+                                selectFilter,
+                                filters,
+                                homeViewModel,
+                                districtsArg,
+                            ) {
+                                homeViewModel.changeBottomSheetType(BottomSheetType.STORE_LIST)
+                                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
+                                expandedType = ExpandedType.QUARTER
+                                offsetY = expandedType
+                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                    .value
+                            }
                         }
+                    }
+                    BottomSheetType.STORE_DETAIL -> {
+
                     }
                 }
             }
@@ -244,7 +259,6 @@ private fun BottomSheet(
 
 @Composable
 private fun FilterTopBar(
-    homeViewModel: HomeViewModel,
     selectFilter: SnapshotStateList<Boolean>,
     backToCakeStore: () -> Unit,
 ) {
@@ -255,10 +269,7 @@ private fun FilterTopBar(
             modifier = Modifier
                 .padding(top = 22.dp)
                 .align(Alignment.End)
-                .clickable {
-                    homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
-                    backToCakeStore()
-                },
+                .clickable { backToCakeStore() },
         )
         Text(
             text = stringResource(id = R.string.home_filter),
