@@ -14,6 +14,10 @@
     <string name="home_district_name">%s구</string>
     <string name="home_num_of_keyword">+%d</string>
 
+    <!-- home content description -->
+    <string name="home_content_description_filter_close_btn">close_filter</string>
+    <string name="home_content_description_filter_refresh_btn">refresh_filter</string>
+
     <!-- home_detail -->
     <string name="home_detail_app_bar">상세정보</string>
     <string name="home_detail_instagram_tab">인스타그램</string>
@@ -32,7 +36,5 @@
     <string name="home_detail_empty_keyword">등록된 키워드가 없어요</string>
     <string name="home_detail_empty_cakeshop_image">표시할 데이터가 없어요!</string>
     <string name="home_detail_empty_cakeshop_guide_message">빠른 시일내에 준비하겠습니다.</string>
-
     <string name="infix_instagram_url">instagram</string>
-
 </resources>

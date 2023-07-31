@@ -13,7 +13,6 @@ fun StoreType.toColor() = when (this) {
     StoreType.PHOTO -> Congo_Pink
     StoreType.FIGURE -> Yankees_Blue
     StoreType.TIARA -> Cerise
-    StoreType.LUXURY -> Cerise // 추후 색상 변경
     StoreType.SOLID -> Deep_Magenta
     StoreType.ETC -> Raisin_Black
 }
@@ -27,7 +26,6 @@ fun StoreType.toBackgroundColor(isSelected: Boolean) = when (this) {
     StoreType.PHOTO -> if (isSelected) Yankees_Blue.copy(alpha = 0.2f) else White
     StoreType.FIGURE -> if (isSelected) Metallic_Sunburst.copy(alpha = 0.2f) else White
     StoreType.TIARA -> if (isSelected) Palatinate_Blue.copy(alpha = 0.1f) else White
-    StoreType.LUXURY -> White // 추후 색상 변경
     StoreType.SOLID -> if (isSelected) Cerise.copy(alpha = 0.2f) else White
     StoreType.ETC -> if (isSelected) Raisin_Black.copy(alpha = 0.2f) else White
 }
