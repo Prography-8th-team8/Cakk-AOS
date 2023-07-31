@@ -13,6 +13,10 @@
     <string name="home_num_of_cake_shop">%d개의 케이크샵</string>
     <string name="home_district_name">%s구</string>
 
+    <!-- home content description -->
+    <string name="home_content_description_filter_close_btn">close_filter</string>
+    <string name="home_content_description_filter_refresh_btn">refresh_filter</string>
+
     <!-- home_detail -->
     <string name="home_detail_app_bar">상세정보</string>
     <string name="home_detail_phone">전화하기</string>
@@ -25,5 +29,4 @@
     <string name="home_detail_opening">영업중</string>
     <string name="home_detail_blog_review">블로그 리뷰</string>
     <string name="home_detail_blog_review_more">블로그 리뷰 더 보기</string>
-
 </resources>
