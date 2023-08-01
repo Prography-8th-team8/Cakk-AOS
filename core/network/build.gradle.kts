@@ -15,7 +15,6 @@ android {
     namespace = "org.prography.network"
 
     defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "CAKK_BASE_URL", gradleLocalProperties(rootDir).getProperty("CAKK_BASE_URL"))
     }
 }
