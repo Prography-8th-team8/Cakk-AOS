@@ -1,14 +1,14 @@
 [versions]
-androidGradlePlugin = "7.4.1"
+androidGradlePlugin = "8.1.0"
 accompanist = "0.31.5-beta"
 
 # androidX
 androidxComposeCompiler = "1.4.3"
-androidxCore = "1.9.0"
-androidxLifecycle = "2.6.0"
-androidxActivity = "1.6.1"
+androidxCore = "1.10.1"
+androidxLifecycle = "2.6.1"
+androidxActivity = "1.7.2"
 androidxComposeUi = "1.3.1"
-androidxNavigation = "2.5.3"
+androidxNavigation = "2.6.0"
 
 # 3rd-party
 kotlin = "1.8.10"
@@ -16,7 +16,7 @@ dagger = "2.45"
 coil = "2.4.0"
 timber = "5.0.1"
 lottie = "6.0.0"
-kotlin-coroutine = "1.6.4"
+kotlin-coroutine = "1.7.1"
 ktlint = "11.3.1"
 naver-map = "1.3.3"
 secrets-gradle = "2.0.1"
@@ -45,13 +45,14 @@ plugin-secrets-gradle = { group = "com.google.android.libraries.mapsplatform.sec
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
 
 # AndroidX
-androidx-arch-coreTesting = "androidx.arch.core:core-testing:2.1.0"
+androidx-arch-coreTesting = "androidx.arch.core:core-testing:2.2.0"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
-androidx-splashScreen = "androidx.core:core-splashscreen:1.0.0-beta02"
+androidx-splashScreen = "androidx.core:core-splashscreen:1.1.0-alpha01"
 androidx-test-junit = "androidx.test.ext:junit:1.1.5"
 androidx-test-espresso = "androidx.test.espresso:espresso-core:3.5.1"
 androidx-security = "androidx.security:security-crypto:1.0.0"
+androidx-datastore = "androidx.datastore:datastore-preferences:1.0.0"
 ## Lifecycle
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
@@ -84,7 +85,7 @@ ktor-android = { group = "io.ktor", name = "ktor-client-android", version.ref = 
 ktor-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
 ktor-logging = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktor" }
 ## etc
-material = "com.google.android.material:material:1.8.0"
+material = "com.google.android.material:material:1.9.0"
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
