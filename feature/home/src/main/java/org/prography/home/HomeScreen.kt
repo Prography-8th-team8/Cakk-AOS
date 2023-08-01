@@ -120,7 +120,7 @@ private fun BottomSheet(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
     val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
-    val bottomSheetType = homeUiState.bottomSheetType
+    var isFullDetailScreen = false
 
     var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
     var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
@@ -148,6 +148,12 @@ private fun BottomSheet(
                                 if (offsetY - (dragAmount.y * 0.5).toFloat() <= screenHeight) {
                                     change.consume()
                                     offsetY -= (dragAmount.y * 0.5).toFloat()
+                                }else{
+                                    if((homeUiState.bottomSheetType is BottomSheetType.StoreDetail) && isFullDetailScreen.not()){
+                                        isFullDetailScreen = true
+                                        onNavigateToDetail((homeUiState.bottomSheetType as BottomSheetType.StoreDetail).storeId)
+                                        return@detectDragGestures
+                                    }
                                 }
                             },
                             onDragEnd = {
@@ -174,7 +180,7 @@ private fun BottomSheet(
                         )
                     }
             ) {
-                when (bottomSheetType) {
+                when (homeUiState.bottomSheetType) {
                     BottomSheetType.StoreList -> {
                         CakeStoreContent(
                             isReload = homeUiState.isReload,
@@ -233,7 +239,7 @@ private fun BottomSheet(
                     }
 
                     is BottomSheetType.StoreDetail -> {
-                        HomeDetailScreen(storeId = bottomSheetType.storeId)
+                        HomeDetailScreen(storeId = (homeUiState.bottomSheetType as BottomSheetType.StoreDetail).storeId)
                     }
                 }
             }
