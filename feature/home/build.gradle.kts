@@ -12,9 +12,6 @@ plugins {
 android {
     namespace = "org.prography.home"
 
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
     buildFeatures {
         compose = true
     }
