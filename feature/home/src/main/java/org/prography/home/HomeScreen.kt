@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Looper
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
@@ -44,8 +43,6 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
-import org.prography.domain.model.enums.DistrictType
-import org.prography.domain.model.enums.StoreType
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.prography.designsystem.R
@@ -53,7 +50,10 @@ import org.prography.designsystem.component.StoreItemContent
 import org.prography.designsystem.mapper.toBackgroundColor
 import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
+import org.prography.domain.model.enums.DistrictType
+import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.StoreModel
+import org.prography.home.detail.HomeDetailScreen
 import org.prography.utility.extensions.toSp
 import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
 import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_STORE_COUNT
@@ -72,61 +72,24 @@ fun HomeScreen(
     onNavigateToDetail: (Int) -> Unit,
 ) {
     val fromOnBoarding = districtsArg != DEFAULT_DISTRICTS_INFO && storeCountArg != DEFAULT_STORE_COUNT
-    val permissions = arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-    )
-
-    val settingResultRequest = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { activityResult ->
-        if (activityResult.resultCode == RESULT_OK) {
-            Timber.d("위치 설정이 동의되었습니다.")
-            startLocationUpdates()
-        } else {
-            Timber.d("위치 설정이 거부되었습니다.")
-        }
-    }
-
-    val launcherMultiplePermissions = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions(),
-    ) { permissionsMap ->
-        val areGranted = permissionsMap.values.reduceOrNull { acc, next -> acc && next }
-
-        if (areGranted == true) {
-            Timber.i("권한이 동의되었습니다.")
-        } else {
-            Timber.i("권한이 거부되었습니다.")
-            onNavigateToOnBoarding()
-        }
-    }
-
     LocationPermission(
         fromOnBoarding = fromOnBoarding,
-        permissions = permissions,
-        settingResultRequest = settingResultRequest,
-        launcherMultiplePermissions = launcherMultiplePermissions
+        onNavigateToOnBoarding = onNavigateToOnBoarding
     )
-
-    val homeState = homeViewModel.state.collectAsStateWithLifecycle()
 
     BottomSheet(
         homeViewModel = homeViewModel,
         fromOnBoarding = fromOnBoarding,
-        isReload = homeState.value.isReload,
-        storeList = homeState.value.storeModels,
-        districts = if (districtsArg.isNotEmpty()) districtsArg.split(" ").map { DistrictType.getName(it) } else listOf(),
-        storeCount = if (storeCountArg >= 0 && homeState.value.isReload.not()) storeCountArg else homeState.value.storeModels.size,
-        bottomExpandedType = homeState.value.lastExpandedType,
         districtsArg = districtsArg,
+        storeCountArg = storeCountArg,
         onNavigateToOnBoarding = onNavigateToOnBoarding,
         onNavigateToDetail = onNavigateToDetail
     )
 
     LaunchedEffect(homeViewModel) {
-        if (homeState.value.storeModels.isEmpty()) {
+        if (fromOnBoarding) {
             homeViewModel.fetchStoreList(
-                districts = if (districtsArg.isEmpty()) listOf("JONGNO") else districtsArg.split(" "),
+                districts = districtsArg.split(" "),
                 storeTypes = StoreType.values().joinToString(",") { it.name }
             )
         }
@@ -139,12 +102,8 @@ fun HomeScreen(
 private fun BottomSheet(
     homeViewModel: HomeViewModel = hiltViewModel(),
     fromOnBoarding: Boolean,
-    isReload: Boolean,
-    storeList: List<StoreModel>,
-    districts: List<DistrictType>,
-    storeCount: Int,
-    bottomExpandedType: ExpandedType,
     districtsArg: String,
+    storeCountArg: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
@@ -160,8 +119,11 @@ private fun BottomSheet(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Expanded),
     )
+    val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
+    var isFullDetailScreen = false
+
     var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
-    var expandedType by rememberSaveable { mutableStateOf(bottomExpandedType) }
+    var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
     BottomSheetScaffold(
@@ -186,6 +148,12 @@ private fun BottomSheet(
                                 if (offsetY - (dragAmount.y * 0.5).toFloat() <= screenHeight) {
                                     change.consume()
                                     offsetY -= (dragAmount.y * 0.5).toFloat()
+                                } else {
+                                    if ((homeUiState.bottomSheetType is BottomSheetType.StoreDetail) && isFullDetailScreen.not()) {
+                                        isFullDetailScreen = true
+                                        onNavigateToDetail((homeUiState.bottomSheetType as BottomSheetType.StoreDetail).storeId)
+                                        return@detectDragGestures
+                                    }
                                 }
                             },
                             onDragEnd = {
@@ -194,10 +162,12 @@ private fun BottomSheet(
                                         homeViewModel.changeBottomSheetState(ExpandedType.FULL)
                                         ExpandedType.FULL
                                     }
+
                                     offsetY >= (screenHeight / 4).toFloat() && offsetY < (screenHeight / 1.5).toFloat() -> {
                                         homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                                         ExpandedType.QUARTER
                                     }
+
                                     else -> {
                                         homeViewModel.changeBottomSheetState(ExpandedType.COLLAPSED)
                                         ExpandedType.COLLAPSED
@@ -210,58 +180,69 @@ private fun BottomSheet(
                         )
                     }
             ) {
-                if (expandedType != ExpandedType.HALF) {
-                    CakeStoreContent(
-                        isReload = isReload,
-                        storeList = storeList,
-                        districts = districts,
-                        storeCount = storeCount,
-                        onNavigateToOnBoarding = onNavigateToOnBoarding,
-                        onNavigateToDetail = onNavigateToDetail,
-                        openFilterSheet = {
-                            homeViewModel.changeBottomSheetState(ExpandedType.HALF)
-                            expandedType = ExpandedType.HALF
-                            offsetY = expandedType
-                                .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                .value
-                        }
-                    )
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        val selectFilter = remember {
-                            mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
-                        }
-                        val filters = remember { mutableStateOf("") }
+                when (homeUiState.bottomSheetType) {
+                    BottomSheetType.StoreList -> {
+                        CakeStoreContent(
+                            isReload = homeUiState.isReload,
+                            storeList = homeUiState.storeModels,
+                            districts = if (districtsArg.isNotEmpty()) {
+                                districtsArg.split(" ")
+                                    .map { DistrictType.getName(it) }
+                            } else {
+                                listOf()
+                            },
+                            storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) storeCountArg else homeUiState.storeModels.size,
+                            onNavigateToOnBoarding = onNavigateToOnBoarding,
+                            onNavigateToDetail = onNavigateToDetail,
+                            openFilterSheet = {
+                                homeViewModel.changeBottomSheetType(BottomSheetType.Filter)
+                                homeViewModel.changeBottomSheetState(ExpandedType.HALF)
+                                expandedType = ExpandedType.HALF
+                                offsetY = expandedType
+                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                    .value
+                            }
+                        )
+                    }
 
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            FilterTopBar(
-                                modifier = Modifier.align(Alignment.End),
-                                homeViewModel,
-                                selectFilter
-                            ) {
+                    BottomSheetType.Filter -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(horizontal = 20.dp),
+                        ) {
+                            val selectFilter = remember {
+                                mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
+                            }
+                            val filters = remember { mutableStateOf("") }
+
+                            FilterTopBar(selectFilter) {
+                                homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
+                                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                                 expandedType = ExpandedType.QUARTER
                                 offsetY = expandedType
                                     .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
                                     .value
                             }
-                            Filters(selectFilter)
+                            FilterSelectButton(
+                                selectFilter,
+                                filters,
+                                homeViewModel,
+                                districtsArg,
+                            ) {
+                                homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
+                                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
+                                expandedType = ExpandedType.QUARTER
+                                offsetY = expandedType
+                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                    .value
+                            }
                         }
-                        FilterSelectButton(
-                            selectFilter,
-                            filters,
-                            homeViewModel,
-                            districtsArg,
-                        ) {
-                            expandedType = ExpandedType.QUARTER
-                            offsetY = expandedType
-                                .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                .value
-                        }
+                    }
+
+                    is BottomSheetType.StoreDetail -> {
+                        HomeDetailScreen(storeId = (homeUiState.bottomSheetType as BottomSheetType.StoreDetail).storeId)
                     }
                 }
             }
@@ -272,10 +253,11 @@ private fun BottomSheet(
             rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
         Box(modifier = Modifier.fillMaxSize()) {
             CakkMap(
+                homeViewModel = homeViewModel,
                 cameraPositionState = cameraPositionState,
                 fromOnBoarding = fromOnBoarding,
-                isReload = isReload,
-                storeList = storeList
+                isReload = homeUiState.isReload,
+                storeList = homeUiState.storeModels
             )
             SearchArea(
                 homeViewModel = homeViewModel,
@@ -288,33 +270,18 @@ private fun BottomSheet(
 
 @Composable
 private fun FilterTopBar(
-    modifier: Modifier,
-    homeViewModel: HomeViewModel,
     selectFilter: SnapshotStateList<Boolean>,
     backToCakeStore: () -> Unit,
 ) {
-    Image(
-        painterResource(R.drawable.ic_close),
-        contentDescription = stringResource(id = R.string.home_content_description_filter_close_btn),
-        modifier = modifier
-            .padding(top = 22.dp, end = 20.dp)
-            .clickable {
-                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
-                backToCakeStore()
-            },
-    )
-    Text(
-        text = stringResource(id = R.string.home_filter),
-        modifier = Modifier.padding(start = 21.dp, top = 9.dp),
-        color = Black,
-        fontSize = 18.dp.toSp(),
-        fontWeight = FontWeight.Bold,
-        fontFamily = pretendard,
-    )
-    Row(
-        modifier = Modifier.padding(start = 20.dp, top = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Image(
+            painterResource(R.drawable.ic_close),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(top = 22.dp)
+                .align(Alignment.End)
+                .clickable { backToCakeStore() },
+        )
         Text(
             text = stringResource(id = R.string.home_filter_recommend),
             color = Black.copy(alpha = 0.6f),
@@ -576,15 +543,19 @@ private fun CakkStoreTopBar(
     }
 }
 
+private const val DEFAULT_CLICKED_INEDX = -1
+
 @Composable
 @OptIn(ExperimentalNaverMapApi::class)
 private fun CakkMap(
+    homeViewModel: HomeViewModel,
     cameraPositionState: CameraPositionState,
     fromOnBoarding: Boolean,
     isReload: Boolean,
     storeList: List<StoreModel>,
 ) {
     val context = LocalContext.current
+    var isClickedIndex by remember { mutableStateOf(DEFAULT_CLICKED_INEDX) }
     if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
             cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
@@ -595,6 +566,12 @@ private fun CakkMap(
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     cameraPositionState.position = CameraPosition(LatLng(location.latitude, location.longitude), 16.0)
+                    homeViewModel.fetchStoreReload(
+                        cameraPositionState.contentBounds?.southWest?.latitude,
+                        cameraPositionState.contentBounds?.southWest?.longitude,
+                        cameraPositionState.contentBounds?.northEast?.latitude,
+                        cameraPositionState.contentBounds?.northEast?.longitude
+                    )
                 }
             }
         }
@@ -616,10 +593,23 @@ private fun CakkMap(
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState,
     ) {
-        storeList.forEach { store ->
+        storeList.forEachIndexed { index, store ->
             Marker(
                 state = MarkerState(position = LatLng(store.latitude, store.longitude)),
-                icon = OverlayImage.fromResource(R.drawable.ic_marker),
+                icon = OverlayImage.fromResource(
+                    if (isClickedIndex == index) {
+                        R.drawable.ic_clicked_marker
+                    } else {
+                        R.drawable.ic_marker
+                    }
+                ),
+                isHideCollidedMarkers = true,
+                onClick = {
+                    isClickedIndex = index
+                    homeViewModel.changeBottomSheetType(BottomSheetType.StoreDetail(store.id))
+                    homeViewModel.changeBottomSheetState(ExpandedType.HALF)
+                    true
+                },
             )
         }
     }
@@ -628,11 +618,37 @@ private fun CakkMap(
 @Composable
 private fun LocationPermission(
     fromOnBoarding: Boolean,
-    permissions: Array<String>,
-    settingResultRequest: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>,
-    launcherMultiplePermissions: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
+    onNavigateToOnBoarding: () -> Unit
 ) {
     val context = LocalContext.current
+    val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+
+    val settingResultRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { activityResult ->
+        if (activityResult.resultCode == RESULT_OK) {
+            Timber.d("위치 설정이 동의되었습니다.")
+            startLocationUpdates()
+        } else {
+            Timber.d("위치 설정이 거부되었습니다.")
+        }
+    }
+
+    val launcherMultiplePermissions = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissionsMap ->
+        val areGranted = permissionsMap.values.reduceOrNull { acc, next -> acc && next }
+
+        if (areGranted == true) {
+            Timber.i("권한이 동의되었습니다.")
+        } else {
+            Timber.i("권한이 거부되었습니다.")
+            onNavigateToOnBoarding()
+        }
+    }
 
     LaunchedEffect(true) {
         if (!fromOnBoarding) {

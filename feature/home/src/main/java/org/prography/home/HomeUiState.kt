@@ -7,9 +7,18 @@ import org.prography.domain.model.store.StoreModel
 
 data class HomeUiState(
     val storeModels: List<StoreModel> = listOf(),
-    val lastExpandedType: ExpandedType = ExpandedType.QUARTER,
+    val bottomSheetType: BottomSheetType = BottomSheetType.StoreList,
+    val expandedType: ExpandedType = ExpandedType.QUARTER,
     val isReload: Boolean = false
 ) : BaseState
+
+sealed class BottomSheetType {
+    object StoreList : BottomSheetType()
+
+    class StoreDetail(val storeId: Int) : BottomSheetType()
+
+    object Filter : BottomSheetType()
+}
 
 enum class ExpandedType {
     HALF, FULL, COLLAPSED, QUARTER, MOVING;
@@ -19,15 +28,19 @@ enum class ExpandedType {
             FULL -> {
                 (screenHeight - statusBarHeight).dp
             }
+
             QUARTER -> {
                 ((screenHeight / 2.5).toInt()).dp
             }
+
             COLLAPSED -> {
                 53.dp
             }
+
             HALF -> {
                 (screenHeight / 2).dp
             }
+
             MOVING -> {
                 offsetY.dp
             }
