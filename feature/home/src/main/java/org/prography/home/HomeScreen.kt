@@ -242,7 +242,10 @@ private fun BottomSheet(
                     }
 
                     is BottomSheetType.StoreDetail -> {
-                        HomeDetailScreen(storeId = (homeUiState.bottomSheetType as BottomSheetType.StoreDetail).storeId)
+                        HomeDetailScreen(
+                            storeId = (homeUiState.bottomSheetType as BottomSheetType.StoreDetail).storeId,
+                            fromHome = true
+                        )
                     }
                 }
             }
@@ -255,6 +258,7 @@ private fun BottomSheet(
             CakkMap(
                 homeViewModel = homeViewModel,
                 cameraPositionState = cameraPositionState,
+                bottomSheetType = homeUiState.bottomSheetType,
                 fromOnBoarding = fromOnBoarding,
                 isReload = homeUiState.isReload,
                 storeList = homeUiState.storeModels
@@ -550,12 +554,22 @@ private const val DEFAULT_CLICKED_INEDX = -1
 private fun CakkMap(
     homeViewModel: HomeViewModel,
     cameraPositionState: CameraPositionState,
+    bottomSheetType: BottomSheetType,
     fromOnBoarding: Boolean,
     isReload: Boolean,
     storeList: List<StoreModel>,
 ) {
     val context = LocalContext.current
-    var isClickedIndex by remember { mutableStateOf(DEFAULT_CLICKED_INEDX) }
+    var isClickedIndex by rememberSaveable {
+        mutableStateOf(
+            if (bottomSheetType is BottomSheetType.StoreDetail) {
+                storeList.indexOfFirst { it.id == bottomSheetType.storeId }
+            } else {
+                DEFAULT_CLICKED_INEDX
+            }
+        )
+    }
+    Timber.d("CakkMap $isClickedIndex $bottomSheetType")
     if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
             cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
