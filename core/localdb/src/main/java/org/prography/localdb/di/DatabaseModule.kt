@@ -20,7 +20,7 @@ import kotlinx.coroutines.SupervisorJob
 import org.prography.localdb.dao.BookmarkDao
 import org.prography.localdb.database.CakkDatabase
 import javax.inject.Singleton
-import org.prography.localdb.BuildConfig.FILTER_PREFERENCES_NAME
+import org.prography.localdb.BuildConfig.FILTER_PREFERENCES
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -45,9 +45,9 @@ object DatabaseModule {
             corruptionHandler = ReplaceFileCorruptionHandler(
                 produceNewData = { emptyPreferences() },
             ),
-            migrations = listOf(SharedPreferencesMigration(context, FILTER_PREFERENCES_NAME)),
+            migrations = listOf(SharedPreferencesMigration(context, FILTER_PREFERENCES)),
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = { context.preferencesDataStoreFile(FILTER_PREFERENCES_NAME) }
+            produceFile = { context.preferencesDataStoreFile(FILTER_PREFERENCES) }
         )
     }
 }

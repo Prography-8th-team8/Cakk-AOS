@@ -48,6 +48,11 @@ jobs:
             NAVER_API_MAP_KEY: ${{ secrets.NAVER_API_MAP_KEY }}
         run: echo "NAVER_API_MAP_KEY=\"$NAVER_API_MAP_KEY\"" >> local.properties
 
+      - name: Access FILTER_PREFERENCES
+        env:
+          FILTER_PREFERENCES: ${{ secrets.FILTER_PREFERENCES }}
+        run: echo "FILTER_PREFERENCES=\"FILTER_PREFERENCES\"" >> local.properties
+
       - name: Lint Check
         run: ./gradlew ktlintCheck
 
