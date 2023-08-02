@@ -14,7 +14,7 @@ android {
     namespace = "org.prography.localdb"
 
     defaultConfig {
-        buildConfigField("String", "FILTER_PREFERENCES_NAME", gradleLocalProperties(rootDir).getProperty("FILTER_PREFERENCES_NAME"))
+        buildConfigField("String", "FILTER_PREFERENCES", gradleLocalProperties(rootDir).getProperty("FILTER_PREFERENCES"))
     }
 }
 
