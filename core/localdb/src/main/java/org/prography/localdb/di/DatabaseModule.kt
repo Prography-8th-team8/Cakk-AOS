@@ -1,15 +1,26 @@
 package org.prography.localdb.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.SharedPreferencesMigration
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.prography.localdb.dao.BookmarkDao
 import org.prography.localdb.database.CakkDatabase
 import javax.inject.Singleton
+import org.prography.localdb.BuildConfig.FILTER_PREFERENCES_NAME
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -26,4 +37,17 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideBookmarkDao(cakkDatabase: CakkDatabase): BookmarkDao = cakkDatabase.bookmarkDao()
+
+    @Singleton
+    @Provides
+    fun providePreferencesDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() },
+            ),
+            migrations = listOf(SharedPreferencesMigration(context, FILTER_PREFERENCES_NAME)),
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+            produceFile = { context.preferencesDataStoreFile(FILTER_PREFERENCES_NAME) }
+        )
+    }
 }
