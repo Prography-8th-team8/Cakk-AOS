@@ -5,8 +5,10 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import org.prography.cakk.data.repository.DistrictRepositoryImpl
+import org.prography.cakk.data.repository.FilterRepositoryImpl
 import org.prography.cakk.data.repository.StoreRepositoryImpl
 import org.prography.domain.repository.DistrictRepository
+import org.prography.domain.repository.FilterRepository
 import org.prography.domain.repository.StoreRepository
 import javax.inject.Singleton
 
@@ -25,4 +27,10 @@ interface RepositoryModule {
     fun bindDistrictRepository(
         districtRepositoryImpl: DistrictRepositoryImpl,
     ): DistrictRepository
+
+    @Binds
+    @Singleton
+    fun bindFilterRepository(
+        filterRepositoryImpl: FilterRepositoryImpl
+    ): FilterRepository
 }
