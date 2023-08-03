@@ -573,7 +573,19 @@ private fun CakkMap(
 
     if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
-            cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
+            when(bottomSheetType){
+                BottomSheetType.StoreList -> {
+                    cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
+                }
+                is BottomSheetType.StoreDetail -> {
+                    val detailStore = storeList.find { it.id == bottomSheetType.storeId }
+                    detailStore?.let { store ->
+                        cameraPositionState.position = CameraPosition(LatLng(store.latitude, store.longitude), 16.0)
+                    }
+                }
+                else -> Unit
+            }
+
         }
     } else {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
