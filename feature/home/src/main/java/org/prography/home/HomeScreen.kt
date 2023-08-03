@@ -244,7 +244,8 @@ private fun BottomSheet(
                     is BottomSheetType.StoreDetail -> {
                         HomeDetailScreen(
                             storeId = (homeUiState.bottomSheetType as BottomSheetType.StoreDetail).storeId,
-                            fromHome = true
+                            fromHome = true,
+                            onBack = { homeViewModel.changeBottomSheetType(BottomSheetType.StoreList) }
                         )
                     }
                 }
@@ -560,16 +561,16 @@ private fun CakkMap(
     storeList: List<StoreModel>,
 ) {
     val context = LocalContext.current
-    var isClickedIndex by rememberSaveable {
+    var isClickedStoreId by remember {
         mutableStateOf(
             if (bottomSheetType is BottomSheetType.StoreDetail) {
-                storeList.indexOfFirst { it.id == bottomSheetType.storeId }
+                bottomSheetType.storeId
             } else {
                 DEFAULT_CLICKED_INEDX
             }
         )
     }
-    Timber.d("CakkMap $isClickedIndex $bottomSheetType")
+
     if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
             cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
@@ -607,11 +608,11 @@ private fun CakkMap(
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState,
     ) {
-        storeList.forEachIndexed { index, store ->
+        storeList.forEach { store ->
             Marker(
                 state = MarkerState(position = LatLng(store.latitude, store.longitude)),
                 icon = OverlayImage.fromResource(
-                    if (isClickedIndex == index) {
+                    if (isClickedStoreId == store.id && bottomSheetType is BottomSheetType.StoreDetail) {
                         R.drawable.ic_clicked_marker
                     } else {
                         R.drawable.ic_marker
@@ -619,7 +620,7 @@ private fun CakkMap(
                 ),
                 isHideCollidedMarkers = true,
                 onClick = {
-                    isClickedIndex = index
+                    isClickedStoreId = store.id
                     homeViewModel.changeBottomSheetType(BottomSheetType.StoreDetail(store.id))
                     homeViewModel.changeBottomSheetState(ExpandedType.HALF)
                     true
