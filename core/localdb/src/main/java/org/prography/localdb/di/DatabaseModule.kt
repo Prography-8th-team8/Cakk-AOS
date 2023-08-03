@@ -15,12 +15,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.prography.localdb.dao.BookmarkDao
 import org.prography.localdb.database.CakkDatabase
 import javax.inject.Singleton
-import org.prography.localdb.BuildConfig.FILTER_PREFERENCES
+
+private const val FILTER_PREFERENCES = "filter_preferences"
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -46,7 +46,7 @@ object DatabaseModule {
                 produceNewData = { emptyPreferences() },
             ),
             migrations = listOf(SharedPreferencesMigration(context, FILTER_PREFERENCES)),
-            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+            scope = CoroutineScope(SupervisorJob()),
             produceFile = { context.preferencesDataStoreFile(FILTER_PREFERENCES) }
         )
     }

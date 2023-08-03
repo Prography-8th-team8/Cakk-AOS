@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.android)
@@ -12,10 +10,6 @@ plugins {
 
 android {
     namespace = "org.prography.localdb"
-
-    defaultConfig {
-        buildConfigField("String", "FILTER_PREFERENCES", gradleLocalProperties(rootDir).getProperty("FILTER_PREFERENCES"))
-    }
 }
 
 dependencies {
