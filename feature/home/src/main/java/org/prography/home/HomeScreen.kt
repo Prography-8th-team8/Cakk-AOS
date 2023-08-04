@@ -45,6 +45,8 @@ import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import org.prography.common.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
+import org.prography.common.navigation.destination.CakkDestination.Home.DEFAULT_STORE_COUNT
 import org.prography.designsystem.R
 import org.prography.designsystem.component.StoreItemContent
 import org.prography.designsystem.mapper.toBackgroundColor
@@ -55,8 +57,6 @@ import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.StoreModel
 import org.prography.home.detail.HomeDetailScreen
 import org.prography.utility.extensions.toSp
-import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
-import org.prography.utility.navigation.destination.CakkDestination.Home.DEFAULT_STORE_COUNT
 import timber.log.Timber
 
 var locationCallback: LocationCallback? = null
@@ -573,16 +573,18 @@ private fun CakkMap(
 
     if (fromOnBoarding && isReload.not()) {
         if (storeList.isNotEmpty()) {
-            when(bottomSheetType){
+            when (bottomSheetType) {
                 BottomSheetType.StoreList -> {
                     cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
                 }
+
                 is BottomSheetType.StoreDetail -> {
                     val detailStore = storeList.find { it.id == bottomSheetType.storeId }
                     detailStore?.let { store ->
                         cameraPositionState.position = CameraPosition(LatLng(store.latitude, store.longitude), 16.0)
                     }
                 }
+
                 else -> Unit
             }
 
