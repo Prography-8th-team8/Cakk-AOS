@@ -1,3 +1,10 @@
 package org.prography.base
 
-interface BaseBottomDestination
+import androidx.annotation.DrawableRes
+
+interface BaseBottomDestination {
+    val label: String
+
+    @get:DrawableRes
+    val icon: Int
+}
