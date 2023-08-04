@@ -82,21 +82,24 @@ class HomeViewModel @Inject constructor(
         northeastLongitude: Double?,
         storeTypes: List<String> = listOf()
     ) {
-        if (southwestLatitude != null && southwestLongitude != null && northeastLatitude != null && northeastLongitude != null) {
-            storeRepository.fetchStoreReload(
-                southwestLatitude,
-                southwestLongitude,
-                northeastLatitude,
-                northeastLongitude,
-                storeTypes = storeTypes
-            )
-                .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
-                .catch { sendAction(HomeUiAction.LoadStoreList(listOf())) }
-                .flatMapMerge { it.asFlow() }
-                .flatMapMerge { storeRepository.fetchStoreType(it.id) }
-                .onStart { sendAction(HomeUiAction.Loading) }
-                .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
-                .launchIn(viewModelScope)
-        }
+        requireNotNull(southwestLatitude)
+        requireNotNull(southwestLongitude)
+        requireNotNull(northeastLatitude)
+        requireNotNull(northeastLongitude)
+
+        storeRepository.fetchStoreReload(
+            southwestLatitude,
+            southwestLongitude,
+            northeastLatitude,
+            northeastLongitude,
+            storeTypes = storeTypes
+        )
+            .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
+            .catch { sendAction(HomeUiAction.LoadStoreList(listOf())) }
+            .flatMapMerge { it.asFlow() }
+            .flatMapMerge { storeRepository.fetchStoreType(it.id) }
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
+            .launchIn(viewModelScope)
     }
 }
