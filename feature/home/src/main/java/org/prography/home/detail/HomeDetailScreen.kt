@@ -75,7 +75,8 @@ private enum class TabType(val label: String) {
 fun HomeDetailScreen(
     homeDetailViewModel: HomeDetailViewModel = hiltViewModel(),
     storeId: Int,
-    onBack: () -> Unit
+    fromHome: Boolean = false,
+    onBack: () -> Unit = {}
 ) {
     LaunchedEffect(storeId) {
         homeDetailViewModel.fetchDetailStore(storeId)
@@ -96,6 +97,7 @@ fun HomeDetailScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
                 .background(White),
+            fromHome = fromHome,
             storeDetailModel = storeDetailUiState.storeDetailModel,
             storeBlogPosts = storeDetailUiState.blogPosts
         )
@@ -105,13 +107,15 @@ fun HomeDetailScreen(
 @Composable
 private fun HomeDetailContent(
     modifier: Modifier = Modifier,
+    fromHome: Boolean = false,
     storeDetailModel: StoreDetailModel,
     storeBlogPosts: List<BlogPostModel>,
 ) {
     var tabType by remember { mutableStateOf(TabType.IMAGES) }
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        modifier = modifier
+        modifier = modifier,
+        userScrollEnabled = fromHome.not()
     ) {
         item(span = { GridItemSpan(3) }) {
             Column {

@@ -15,11 +15,14 @@ class HomeViewModel @Inject constructor(
     initialState = HomeUiState()
 ) {
     override fun reduceState(currentState: HomeUiState, action: HomeUiAction): HomeUiState = when (action) {
-        HomeUiAction.BottomSheetExpandFull -> currentState.copy(lastExpandedType = ExpandedType.FULL)
-        HomeUiAction.BottomSheetExpandQuarter -> currentState.copy(lastExpandedType = ExpandedType.QUARTER)
-        HomeUiAction.BottomSheetExpandCollapsed -> currentState.copy(lastExpandedType = ExpandedType.COLLAPSED)
-        HomeUiAction.BottomSheetExpandHalf -> currentState.copy(lastExpandedType = ExpandedType.HALF)
         HomeUiAction.Loading -> currentState
+        HomeUiAction.BottomSheetExpandFull -> currentState.copy(expandedType = ExpandedType.FULL)
+        HomeUiAction.BottomSheetExpandQuarter -> currentState.copy(expandedType = ExpandedType.QUARTER)
+        HomeUiAction.BottomSheetExpandCollapsed -> currentState.copy(expandedType = ExpandedType.COLLAPSED)
+        HomeUiAction.BottomSheetExpandHalf -> currentState.copy(expandedType = ExpandedType.HALF)
+        HomeUiAction.BottomSheetFilter -> currentState.copy(bottomSheetType = BottomSheetType.Filter)
+        HomeUiAction.BottomSheetStoreList -> currentState.copy(bottomSheetType = BottomSheetType.StoreList)
+        is HomeUiAction.BottomSheetStoreDetail -> currentState.copy(bottomSheetType = BottomSheetType.StoreDetail(action.storeId))
         is HomeUiAction.LoadStoreType -> {
             currentState.copy(
                 storeModels = currentState.storeModels.map {
@@ -31,9 +34,11 @@ class HomeViewModel @Inject constructor(
                 }
             )
         }
+
         is HomeUiAction.LoadStoreList -> {
             currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
         }
+
         is HomeUiAction.ReloadStore -> {
             currentState.copy(storeModels = action.storeModels, isReload = true)
         }
@@ -46,6 +51,14 @@ class HomeViewModel @Inject constructor(
             ExpandedType.HALF -> sendAction(HomeUiAction.BottomSheetExpandHalf)
             ExpandedType.COLLAPSED -> sendAction(HomeUiAction.BottomSheetExpandCollapsed)
             else -> return
+        }
+    }
+
+    fun changeBottomSheetType(bottomSheetType: BottomSheetType) {
+        when (bottomSheetType) {
+            BottomSheetType.StoreList -> sendAction(HomeUiAction.BottomSheetStoreList)
+            is BottomSheetType.StoreDetail -> sendAction(HomeUiAction.BottomSheetStoreDetail(bottomSheetType.storeId))
+            BottomSheetType.Filter -> sendAction(HomeUiAction.BottomSheetFilter)
         }
     }
 
@@ -82,6 +95,7 @@ class HomeViewModel @Inject constructor(
             storeTypes = storeTypes
         )
             .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
+            .catch { sendAction(HomeUiAction.LoadStoreList(listOf())) }
             .flatMapMerge { it.asFlow() }
             .flatMapMerge { storeRepository.fetchStoreType(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
