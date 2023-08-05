@@ -1,9 +1,10 @@
 package org.prography.cakk.navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
@@ -13,6 +14,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -101,8 +103,8 @@ fun CakkNavigationGraph(navController: NavHostController) {
                 OnBoardingScreen { districts, storeCount ->
                     navController.navigate(
                         CakkDestination.Home.route + "?" +
-                                "$DISTRICTS_INFO=$districts" + "&" +
-                                "$STORE_COUNT=$storeCount"
+                            "$DISTRICTS_INFO=$districts" + "&" +
+                            "$STORE_COUNT=$storeCount"
                     ) {
                         popUpTo(CakkDestination.OnBoarding.route) {
                             inclusive = true
@@ -145,8 +147,7 @@ private fun CakkBottomBar(navHostController: NavHostController) {
     if (hasBottomNavigation) {
         BottomNavigation(
             modifier = Modifier.fillMaxWidth(),
-            backgroundColor = White.copy(0.75f),
-            contentColor = White.copy(0.75f)
+            backgroundColor = White
         ) {
             bottomDestinations.forEach { bottomDestination ->
                 CakkBottomBarItem(
@@ -166,17 +167,39 @@ private fun RowScope.CakkBottomBarItem(
     navHostController: NavHostController
 ) {
     check(bottomDestination is BaseBottomDestination)
-    val selected = bottomDestination.route == currentDestination?.route
+    val destinationRoute = when (bottomDestination) {
+        is CakkDestination.Home -> bottomDestination.routeWithArgs
+        CakkDestination.Feed -> bottomDestination.route
+        CakkDestination.My -> bottomDestination.route
+        else -> throw java.lang.IllegalStateException()
+    }
+
+    val selected = currentDestination?.route == destinationRoute
     BottomNavigationItem(
         selected = selected,
-        onClick = { },
+        onClick = {
+            navHostController.navigate(destinationRoute) {
+                popUpTo(destinationRoute) {
+                    inclusive = false
+                }
+                launchSingleTop = true
+            }
+        },
         icon = {
-            Icon(
-                painter = painterResource(bottomDestination.icon),
-                contentDescription = null,
-                modifier = Modifier.size(22.dp),
-                tint = if (selected) Light_Deep_Pink else Color.Unspecified
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .size(56.dp, 2.dp)
+                        .background(if (selected) Light_Deep_Pink else Color.Transparent)
+                )
+                Icon(
+                    painter = painterResource(bottomDestination.icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = if (selected) Light_Deep_Pink else Color.Unspecified
+                )
+            }
         },
         label = {
             Text(
