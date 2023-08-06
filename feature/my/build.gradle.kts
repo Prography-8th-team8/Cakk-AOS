@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "org.prography.home"
+    namespace = "org.prography.my"
 
     buildFeatures {
         compose = true
@@ -26,12 +26,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":core:base"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:utility"))
+    implementation(project(":core:base"))
     implementation(project(":domain"))
-    implementation(project(":data"))
 
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.hilt.navigation)

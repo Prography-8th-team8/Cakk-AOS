@@ -1,17 +1,23 @@
-package org.prography.utility.navigation.destination
+package org.prography.common.navigation.destination
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import org.prography.base.BaseBottomDestination
+import org.prography.designsystem.R
 
 sealed class CakkDestination(
     val route: String,
 ) {
     object Splash : CakkDestination(route = SPLASH)
-    object Home : CakkDestination(route = HOME) {
+    object Home : CakkDestination(route = HOME), BaseBottomDestination {
+        override val label = HOME
+        override val icon = R.drawable.ic_tabbar_home
+
         const val DISTRICTS_INFO = "DISTRICTS_INFO"
         const val STORE_COUNT = "STORE_COUNT"
         const val DEFAULT_DISTRICTS_INFO = ""
         const val DEFAULT_STORE_COUNT = -1
+
         val routeWithArgs = "$route?$DISTRICTS_INFO={$DISTRICTS_INFO}&$STORE_COUNT={$STORE_COUNT}"
         val arguments = listOf(
             navArgument(DISTRICTS_INFO) {
@@ -35,10 +41,22 @@ sealed class CakkDestination(
 
     object OnBoarding : CakkDestination(route = ON_BOARDING)
 
+    object Feed : CakkDestination(route = FEED), BaseBottomDestination {
+        override val label = FEED
+        override val icon = R.drawable.ic_feed
+    }
+
+    object My : CakkDestination(route = MY), BaseBottomDestination {
+        override val label = MY
+        override val icon = R.drawable.ic_tabbar_my
+    }
+
     companion object {
-        private const val SPLASH = "splash"
-        private const val HOME = "home"
-        private const val HOME_DETAIL = "home_detail"
-        private const val ON_BOARDING = "onBoarding"
+        private const val SPLASH = "SPLASH"
+        private const val HOME = "HOME"
+        private const val HOME_DETAIL = "HOME_DETAIL"
+        private const val ON_BOARDING = "ON_BOARDING"
+        private const val FEED = "FEED"
+        private const val MY = "MY"
     }
 }

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "org.prography.utility"
+    namespace = "org.prography.common"
 
     buildFeatures {
         compose = true
@@ -23,10 +23,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
     implementation(project(":core:base"))
-    implementation(project(":core:network"))
-
+    implementation(project(":core:designsystem"))
     implementation(libs.timber)
     implementation(libs.material)
     implementation(libs.bundles.androidx.compose)
