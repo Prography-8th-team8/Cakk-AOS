@@ -1,6 +1,7 @@
 package org.prography.designsystem.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -84,17 +85,28 @@ internal fun StoreItemImageRow(
     modifier: Modifier = Modifier,
     storeImageUrls: List<String> = listOf()
 ) {
-    LazyRow(modifier = modifier) {
-        items(storeImageUrls, key = { it }) { storeImageUrl ->
-            AsyncImage(
-                model = storeImageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .size(96.dp)
-                    .clip(RoundedCornerShape(20.dp))
-            )
+    if (storeImageUrls.isEmpty()) {
+        Image(
+            painter = painterResource(R.drawable.img_no_photo),
+            contentDescription = null,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 20.dp)
+                .aspectRatio(320 / 96f)
+        )
+    } else {
+        LazyRow(modifier = modifier) {
+            items(storeImageUrls, key = { it }) { storeImageUrl ->
+                AsyncImage(
+                    model = storeImageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(96.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                )
+            }
         }
     }
 }
