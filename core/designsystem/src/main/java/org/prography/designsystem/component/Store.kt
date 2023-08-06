@@ -53,7 +53,7 @@ fun StoreItemContent(
 
             StoreItemTagRow(
                 modifier = Modifier.padding(top = 12.dp),
-                storeTypes = storeModel.storeTypes,
+                storeTypes = listOf(),
                 maxCount = 3
             ) { size ->
                 Surface(
@@ -106,26 +106,50 @@ fun StoreItemTagRow(
     maxCount: Int = storeTypes.size,
     overFlow: @Composable (Int) -> Unit = {}
 ) {
-    LazyRow(modifier) {
-        items(storeTypes.take(maxCount), key = { it }) { storeType ->
-            Surface(
-                modifier = Modifier.padding(end = 4.dp),
-                shape = RoundedCornerShape(14.dp),
-                color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
-            ) {
-                Text(
-                    text = StoreType.valueOf(storeType).tag,
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = StoreType.valueOf(storeType).toColor(),
-                    fontSize = 12.dp.toSp(),
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = pretendard
-                )
-            }
+    if (storeTypes.isEmpty()) {
+        Row(
+            modifier = modifier
+                .background(Raisin_Black.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
+                .padding(vertical = 7.dp, horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_alert),
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = Color.Unspecified
+            )
+            Text(
+                text = stringResource(R.string.home_detail_empty_keyword),
+                modifier = Modifier.padding(start = 4.dp),
+                color = White,
+                fontSize = 12.dp.toSp(),
+                fontWeight = FontWeight.Bold,
+                fontFamily = pretendard
+            )
         }
+    } else {
+        LazyRow(modifier) {
+            items(storeTypes.take(maxCount), key = { it }) { storeType ->
+                Surface(
+                    modifier = Modifier.padding(end = 4.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
+                ) {
+                    Text(
+                        text = StoreType.valueOf(storeType).tag,
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
+                        color = StoreType.valueOf(storeType).toColor(),
+                        fontSize = 12.dp.toSp(),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = pretendard
+                    )
+                }
+            }
 
-        if (storeTypes.size > maxCount) {
-            item { overFlow(storeTypes.size - maxCount) }
+            if (storeTypes.size > maxCount) {
+                item { overFlow(storeTypes.size - maxCount) }
+            }
         }
     }
 }
