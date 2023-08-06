@@ -37,4 +37,5 @@
     <string name="home_detail_empty_cakeshop_image">표시할 데이터가 없어요!</string>
     <string name="home_detail_empty_cakeshop_guide_message">빠른 시일내에 준비하겠습니다.</string>
     <string name="infix_instagram_url">instagram</string>
+    <string name="infix_kakao_url">kakao</string>
 </resources>
