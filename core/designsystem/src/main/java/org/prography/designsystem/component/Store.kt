@@ -54,7 +54,7 @@ fun StoreItemContent(
 
             StoreItemTagRow(
                 modifier = Modifier.padding(top = 12.dp),
-                storeTypes = listOf(),
+                storeTypes = storeModel.storeTypes,
                 maxCount = 3
             ) { size ->
                 Surface(
