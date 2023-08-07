@@ -238,7 +238,7 @@ private fun LazyGridScope.showBlogReviews(
     item(span = { GridItemSpan(3) }) {
         HomeDetailBlogRow(
             modifier = Modifier.fillMaxWidth(),
-            blogPosts = storeBlogPosts + storeBlogPosts
+            blogPosts = storeBlogPosts
         )
     }
 }
