@@ -411,6 +411,8 @@ private fun HomeDetailHeader(
             modifier = Modifier
                 .padding(top = 16.dp)
                 .fillMaxWidth(),
+            storeName = storeName,
+            storeLocation = storeLocation,
             storeLink = storeLink,
             onChangeDialogState = onChangeDialogState
         )
@@ -462,6 +464,8 @@ private fun HomeDetailHeaderInfo(
 @Composable
 private fun HomeDetailHeaderTab(
     modifier: Modifier = Modifier,
+    storeName: String,
+    storeLocation: String,
     storeLink: String,
     onChangeDialogState: () -> Unit
 ) {
@@ -516,7 +520,16 @@ private fun HomeDetailHeaderTab(
         HomeDetailHeaderTabItem(
             iconRes = R.drawable.ic_share,
             stringRes = R.string.home_detail_share
-        )
+        ) {
+            if (storeLink.isNotEmpty()) {
+                context.startActivity(
+                    Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, "$storeName\n$storeLocation\n$storeLink")
+                    }
+                )
+            }
+        }
     }
 }
 
