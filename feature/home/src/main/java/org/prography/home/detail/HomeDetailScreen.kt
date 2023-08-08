@@ -32,7 +32,6 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -128,70 +127,70 @@ private fun HomeDetailContent(
         item(span = { GridItemSpan(3) }) {
             if (isVisibleDialog) {
                 Dialog(onDismissRequest = { }) {
-                    Surface(
-                        modifier = Modifier.size(328.dp, 166.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        color = White
+                    Column(
+                        modifier = Modifier
+                            .size(328.dp, 166.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(White),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.home_detail_find_naver_map),
-                                modifier = Modifier.padding(top = 48.dp),
-                                color = Raisin_Black,
-                                fontSize = 18.dp.toSp(),
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = pretendard
-                            )
-                            Row(
+                        Text(
+                            text = stringResource(R.string.home_detail_find_naver_map),
+                            modifier = Modifier.padding(top = 48.dp),
+                            color = Raisin_Black,
+                            fontSize = 18.dp.toSp(),
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = pretendard
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 36.dp),
+                        ) {
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .padding(top = 36.dp),
+                                    .size(144.dp, 44.dp)
+                                    .background(Raisin_Black.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
+                                    .clickable { isVisibleDialog = false },
+                                contentAlignment = Alignment.Center
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(144.dp, 44.dp)
-                                        .background(Raisin_Black.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-                                        .clickable { isVisibleDialog = false },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.dialog_cancel),
-                                        color = Raisin_Black.copy(alpha = 0.6f),
-                                        fontSize = 16.dp.toSp(),
-                                        fontWeight = FontWeight.Normal,
-                                        fontFamily = pretendard
-                                    )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .padding(start = 8.dp)
-                                        .size(144.dp, 44.dp)
-                                        .background(Light_Deep_Pink, RoundedCornerShape(12.dp))
-                                        .clickable {
-                                            val naverMapUri = Uri.Builder()
-                                                .scheme("nmap")
-                                                .authority("route")
-                                                .appendPath("public")
-                                                .appendQueryParameter("dlat", storeLatitude.toString())
-                                                .appendQueryParameter("dlng", storeLongitude.toString())
-                                                .appendQueryParameter("dname", storeDetailModel.name)
-                                                .appendQueryParameter("appname", "com.prography.cakk")
-                                                .build()
+                                Text(
+                                    text = stringResource(R.string.dialog_cancel),
+                                    color = Raisin_Black.copy(alpha = 0.6f),
+                                    fontSize = 16.dp.toSp(),
+                                    fontWeight = FontWeight.Normal,
+                                    fontFamily = pretendard
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .size(144.dp, 44.dp)
+                                    .background(Light_Deep_Pink, RoundedCornerShape(12.dp))
+                                    .clickable {
+                                        val naverMapUri = Uri.Builder()
+                                            .scheme("nmap")
+                                            .authority("route")
+                                            .appendPath("public")
+                                            .appendQueryParameter("dlat", storeLatitude.toString())
+                                            .appendQueryParameter("dlng", storeLongitude.toString())
+                                            .appendQueryParameter("dname", storeDetailModel.name)
+                                            .appendQueryParameter("appname", "com.prography.cakk")
+                                            .build()
 
-                                            context.startActivity(Intent(Intent.ACTION_VIEW, naverMapUri))
-                                            isVisibleDialog = false
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.dialog_confirm),
-                                        color = White,
-                                        fontSize = 16.dp.toSp(),
-                                        fontWeight = FontWeight.Normal,
-                                        fontFamily = pretendard
-                                    )
-                                }
+                                        context.startActivity(Intent(Intent.ACTION_VIEW, naverMapUri))
+                                        isVisibleDialog = false
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.dialog_confirm),
+                                    color = White,
+                                    fontSize = 16.dp.toSp(),
+                                    fontWeight = FontWeight.Normal,
+                                    fontFamily = pretendard
+                                )
                             }
                         }
                     }
