@@ -42,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -298,36 +297,10 @@ private fun HomeDetailKeywordRow(
             fontWeight = FontWeight.Bold,
             fontFamily = pretendard
         )
-
-        if (storeTypes.isEmpty()) {
-            Row(
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .background(Raisin_Black, RoundedCornerShape(14.dp))
-                    .padding(vertical = 7.dp, horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_alert),
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = Color.Unspecified
-                )
-                Text(
-                    text = stringResource(R.string.home_detail_empty_keyword),
-                    modifier = Modifier.padding(start = 4.dp),
-                    color = White,
-                    fontSize = 12.dp.toSp(),
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = pretendard
-                )
-            }
-        } else {
-            StoreItemTagRow(
-                modifier = Modifier.padding(top = 16.dp),
-                storeTypes = storeTypes
-            )
-        }
+        StoreItemTagRow(
+            modifier = Modifier.padding(top = 16.dp),
+            storeTypes = storeTypes
+        )
     }
 }
 

@@ -1,6 +1,7 @@
 package org.prography.designsystem.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -84,17 +85,28 @@ internal fun StoreItemImageRow(
     modifier: Modifier = Modifier,
     storeImageUrls: List<String> = listOf()
 ) {
-    LazyRow(modifier = modifier) {
-        items(storeImageUrls, key = { it }) { storeImageUrl ->
-            AsyncImage(
-                model = storeImageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .size(96.dp)
-                    .clip(RoundedCornerShape(20.dp))
-            )
+    if (storeImageUrls.isEmpty()) {
+        Image(
+            painter = painterResource(R.drawable.img_no_photo),
+            contentDescription = null,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 20.dp)
+                .aspectRatio(320 / 96f)
+        )
+    } else {
+        LazyRow(modifier = modifier) {
+            items(storeImageUrls, key = { it }) { storeImageUrl ->
+                AsyncImage(
+                    model = storeImageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(96.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                )
+            }
         }
     }
 }
@@ -106,26 +118,50 @@ fun StoreItemTagRow(
     maxCount: Int = storeTypes.size,
     overFlow: @Composable (Int) -> Unit = {}
 ) {
-    LazyRow(modifier) {
-        items(storeTypes.take(maxCount), key = { it }) { storeType ->
-            Surface(
-                modifier = Modifier.padding(end = 4.dp),
-                shape = RoundedCornerShape(14.dp),
-                color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
-            ) {
-                Text(
-                    text = StoreType.valueOf(storeType).tag,
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                    color = StoreType.valueOf(storeType).toColor(),
-                    fontSize = 12.dp.toSp(),
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = pretendard
-                )
-            }
+    if (storeTypes.isEmpty()) {
+        Row(
+            modifier = modifier
+                .background(Raisin_Black.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
+                .padding(vertical = 7.dp, horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_alert),
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = Color.Unspecified
+            )
+            Text(
+                text = stringResource(R.string.home_detail_empty_keyword),
+                modifier = Modifier.padding(start = 4.dp),
+                color = White,
+                fontSize = 12.dp.toSp(),
+                fontWeight = FontWeight.Bold,
+                fontFamily = pretendard
+            )
         }
+    } else {
+        LazyRow(modifier) {
+            items(storeTypes.take(maxCount), key = { it }) { storeType ->
+                Surface(
+                    modifier = Modifier.padding(end = 4.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
+                ) {
+                    Text(
+                        text = StoreType.valueOf(storeType).tag,
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
+                        color = StoreType.valueOf(storeType).toColor(),
+                        fontSize = 12.dp.toSp(),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = pretendard
+                    )
+                }
+            }
 
-        if (storeTypes.size > maxCount) {
-            item { overFlow(storeTypes.size - maxCount) }
+            if (storeTypes.size > maxCount) {
+                item { overFlow(storeTypes.size - maxCount) }
+            }
         }
     }
 }
