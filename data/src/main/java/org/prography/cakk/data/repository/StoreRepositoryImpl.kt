@@ -1,9 +1,16 @@
 package org.prography.cakk.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.prography.cakk.data.datasource.FeedPagingSource
+import org.prography.cakk.data.datasource.PAGE_SIZE
 import org.prography.cakk.data.datasource.StoreRemoteSource
 import org.prography.domain.model.store.BookmarkModel
+import org.prography.domain.model.store.FeedModel
 import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.domain.model.store.StoreModel
@@ -15,7 +22,8 @@ import javax.inject.Inject
 
 class StoreRepositoryImpl @Inject constructor(
     private val bookmarkDao: BookmarkDao,
-    private val storeRemoteSource: StoreRemoteSource
+    private val storeRemoteSource: StoreRemoteSource,
+    private val feedPagingSource: FeedPagingSource
 ) : StoreRepository {
 
     override fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreModel>> =
@@ -46,6 +54,21 @@ class StoreRepositoryImpl @Inject constructor(
             page = page,
             storeTypes = storeTypes
         ).map { it.toModel() }
+
+    override fun fetchStoreFeed(page: Int): Flow<PagingData<FeedModel>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGE_SIZE,
+                initialLoadSize = PAGE_SIZE
+            ),
+            pagingSourceFactory = { feedPagingSource }
+        ).flow
+            .map { pagingData ->
+                pagingData.map { response ->
+                    response.toModel()
+                }
+            }
+    }
 
     override fun fetchBookmarks(): Flow<List<BookmarkModel>> = bookmarkDao.getAll().map {
         it.map { data ->
