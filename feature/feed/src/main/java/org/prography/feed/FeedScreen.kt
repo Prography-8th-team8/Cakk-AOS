@@ -1,5 +1,6 @@
 package org.prography.feed
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +22,8 @@ import org.prography.designsystem.R
 
 @Composable
 fun FeedScreen(
-    feedViewModel: FeedViewModel = hiltViewModel()
+    feedViewModel: FeedViewModel = hiltViewModel(),
+    onNavigateFeedDetail: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -37,7 +39,8 @@ fun FeedScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize(),
-            feedViewModel = feedViewModel
+            feedViewModel = feedViewModel,
+            onNavigateFeedDetail = onNavigateFeedDetail
         )
     }
 }
@@ -45,7 +48,8 @@ fun FeedScreen(
 @Composable
 private fun FeedContent(
     modifier: Modifier = Modifier,
-    feedViewModel: FeedViewModel
+    feedViewModel: FeedViewModel,
+    onNavigateFeedDetail: () -> Unit
 ) {
     val feedItems = feedViewModel.feedItems.collectAsLazyPagingItems()
     LazyVerticalGrid(
@@ -62,7 +66,8 @@ private fun FeedContent(
                         .size(116.dp)
                         .padding(top = 3.dp)
                         .padding(bottom = 3.dp)
-                        .padding(horizontal = if (index % 3 == 1) 6.dp else 0.dp),
+                        .padding(horizontal = if (index % 3 == 1) 6.dp else 0.dp)
+                        .clickable { onNavigateFeedDetail() },
                     contentScale = ContentScale.FillBounds
                 )
             }

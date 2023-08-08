@@ -46,6 +46,8 @@ sealed class CakkDestination(
         override val icon = R.drawable.ic_feed
     }
 
+    object FeedDetail : CakkDestination(route = FEED_DETAIL)
+
     object My : CakkDestination(route = MY), BaseBottomDestination {
         override val label = MY
         override val icon = R.drawable.ic_tabbar_my
@@ -57,6 +59,7 @@ sealed class CakkDestination(
         private const val HOME_DETAIL = "HOME_DETAIL"
         private const val ON_BOARDING = "ON_BOARDING"
         private const val FEED = "FEED"
+        private const val FEED_DETAIL = "FEED_DETAIL"
         private const val MY = "MY"
     }
 }
