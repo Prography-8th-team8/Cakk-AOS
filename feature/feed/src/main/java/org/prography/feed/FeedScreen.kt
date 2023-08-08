@@ -23,7 +23,7 @@ import org.prography.designsystem.R
 @Composable
 fun FeedScreen(
     feedViewModel: FeedViewModel = hiltViewModel(),
-    onNavigateFeedDetail: () -> Unit
+    onNavigateFeedDetail: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -49,7 +49,7 @@ fun FeedScreen(
 private fun FeedContent(
     modifier: Modifier = Modifier,
     feedViewModel: FeedViewModel,
-    onNavigateFeedDetail: () -> Unit
+    onNavigateFeedDetail: (Int) -> Unit
 ) {
     val feedItems = feedViewModel.feedItems.collectAsLazyPagingItems()
     LazyVerticalGrid(
@@ -67,7 +67,7 @@ private fun FeedContent(
                         .padding(top = 3.dp)
                         .padding(bottom = 3.dp)
                         .padding(horizontal = if (index % 3 == 1) 6.dp else 0.dp)
-                        .clickable { onNavigateFeedDetail() },
+                        .clickable { onNavigateFeedDetail(item.storeId) },
                     contentScale = ContentScale.FillBounds
                 )
             }

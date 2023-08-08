@@ -46,7 +46,13 @@ sealed class CakkDestination(
         override val icon = R.drawable.ic_feed
     }
 
-    object FeedDetail : CakkDestination(route = FEED_DETAIL)
+    object FeedDetail : CakkDestination(route = FEED_DETAIL) {
+        const val STORE_ID = "STORE_ID"
+        val routeWithArgs = "$route/{$STORE_ID}"
+        val arguments = listOf(
+            navArgument(STORE_ID) { type = NavType.IntType }
+        )
+    }
 
     object My : CakkDestination(route = MY), BaseBottomDestination {
         override val label = MY

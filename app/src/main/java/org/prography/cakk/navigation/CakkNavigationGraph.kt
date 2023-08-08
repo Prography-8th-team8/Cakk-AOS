@@ -115,13 +115,21 @@ fun CakkNavigationGraph(navController: NavHostController) {
             }
 
             composable(route = CakkDestination.Feed.route) {
-                FeedScreen {
-                    navController.navigate(CakkDestination.FeedDetail.route)
+                FeedScreen { storeId ->
+                    navController.navigate("${CakkDestination.FeedDetail.route}/$storeId")
                 }
             }
 
-            composable(route = CakkDestination.FeedDetail.route) {
-                FeedDetailScreen { navController.popBackStack() }
+            composable(
+                route = CakkDestination.FeedDetail.routeWithArgs,
+                arguments = CakkDestination.FeedDetail.arguments
+            ) { navBackStackEntry ->
+                val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.FeedDetail.STORE_ID)
+                storeId?.let {
+                    FeedDetailScreen(storeId = it) {
+                        navController.popBackStack()
+                    }
+                }
             }
 
             composable(route = CakkDestination.My.route) {
