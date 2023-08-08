@@ -22,6 +22,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.datastore)
+    implementation(libs.androidx.paging.runtime)
     implementation(libs.bundles.ktor)
     implementation(libs.material)
     implementation(libs.junit)
