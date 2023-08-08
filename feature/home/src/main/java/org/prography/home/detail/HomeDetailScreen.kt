@@ -521,11 +521,16 @@ private fun HomeDetailHeaderTab(
             stringRes = R.string.home_detail_share
         ) {
             if (storeLink.isNotEmpty()) {
+                val data = "$storeName\n$storeLocation\n$storeLink"
                 context.startActivity(
-                    Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, "$storeName\n$storeLocation\n$storeLink")
-                    }
+                    Intent.createChooser(
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, data)
+                        },
+                        data
+                    )
+
                 )
             }
         }
