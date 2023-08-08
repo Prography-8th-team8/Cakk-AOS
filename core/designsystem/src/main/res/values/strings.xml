@@ -38,4 +38,9 @@
     <string name="home_detail_empty_cakeshop_guide_message">빠른 시일내에 준비하겠습니다.</string>
     <string name="infix_instagram_url">instagram</string>
     <string name="infix_kakao_url">kakao</string>
+    <string name="home_detail_find_naver_map">네이버 지도에서 여시겠어요?</string>
+
+
+    <string name="dialog_cancel">취소</string>
+    <string name="dialog_confirm">확인</string>
 </resources>
