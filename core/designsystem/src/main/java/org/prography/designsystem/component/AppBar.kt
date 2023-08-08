@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import org.prography.designsystem.R
 import org.prography.designsystem.ui.theme.Raisin_Black
 import org.prography.designsystem.ui.theme.pretendard
@@ -69,5 +70,40 @@ fun CakkAppbar(
             fontWeight = FontWeight.Bold,
             fontFamily = pretendard
         )
+    }
+}
+
+@Composable
+fun CakkAppbarWithClose(
+    modifier: Modifier = Modifier,
+    title: String,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = title,
+            color = Raisin_Black,
+            fontSize = 17.dp.toSp(),
+            fontWeight = FontWeight.Bold,
+            fontFamily = pretendard,
+            letterSpacing = (-0.04).em
+        )
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 13.dp)
+                .size(21.dp, 23.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_close),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                tint = Raisin_Black
+            )
+        }
     }
 }
