@@ -380,19 +380,24 @@ private fun HomeDetailHeaderTab(
     modifier: Modifier = Modifier,
     storeLink: String
 ) {
+    val context = LocalContext.current
     Row(modifier) {
         HomeDetailHeaderTabItem(
             iconRes = when {
-                storeLink.isEmpty() -> R.drawable.ic_kakao
+                storeLink.contains(stringResource(R.string.infix_kakao_url)) -> R.drawable.ic_kakao
                 storeLink.contains(stringResource(R.string.infix_instagram_url)) -> R.drawable.ic_instagram
                 else -> R.drawable.ic_website
             },
             stringRes = when {
-                storeLink.isEmpty() -> R.string.home_detail_kakao_tab
+                storeLink.contains(stringResource(R.string.infix_kakao_url)) -> R.string.home_detail_kakao_tab
                 storeLink.contains(stringResource(R.string.infix_instagram_url)) -> R.string.home_detail_instagram_tab
                 else -> R.string.home_detail_website_tab
             }
-        )
+        ) {
+            if (storeLink.isNotEmpty()) {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(storeLink)))
+            }
+        }
 
         Spacer(
             modifier = Modifier
