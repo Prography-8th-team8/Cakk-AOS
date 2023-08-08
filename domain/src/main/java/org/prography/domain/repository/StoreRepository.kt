@@ -26,7 +26,7 @@ interface StoreRepository {
         storeTypes: List<String> = listOf()
     ): Flow<List<StoreModel>>
 
-    fun fetchStoreFeed(page: Int): Flow<PagingData<FeedModel>>
+    fun fetchStoreFeed(): Flow<PagingData<FeedModel>>
 
     fun fetchBookmarks(): Flow<List<BookmarkModel>>
 

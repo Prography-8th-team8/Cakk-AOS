@@ -55,7 +55,7 @@ class StoreRepositoryImpl @Inject constructor(
             storeTypes = storeTypes
         ).map { it.toModel() }
 
-    override fun fetchStoreFeed(page: Int): Flow<PagingData<FeedModel>> {
+    override fun fetchStoreFeed(): Flow<PagingData<FeedModel>> {
         return Pager(
             config = PagingConfig(
                 pageSize = PAGE_SIZE,
