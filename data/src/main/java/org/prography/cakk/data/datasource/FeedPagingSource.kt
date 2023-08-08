@@ -7,6 +7,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.url
 import org.prography.network.CakkService.BASE_URL
 import org.prography.network.CakkService.Endpoint.STORE_FEED
+import org.prography.network.CakkService.Parameter.PAGE
 import org.prography.network.api.dto.response.FeedResponse
 import javax.inject.Inject
 
@@ -27,12 +28,12 @@ class FeedPagingSource @Inject constructor(
         try {
             val pageKey = params.key ?: STARTING_KEY
             val response = httpClient.get<List<FeedResponse>> {
-                url("$BASE_URL$STORE_FEED")
+                url("$BASE_URL$STORE_FEED?$PAGE=$pageKey")
             }
             return LoadResult.Page(
                 response,
                 prevKey = null,
-                nextKey = pageKey + 1
+                nextKey = if (response.isEmpty()) null else pageKey + 1
             )
         } catch (e: Exception) {
             return LoadResult.Error(e)
