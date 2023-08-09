@@ -81,8 +81,16 @@ fun StoreItemContent(
             )
 
             StoreItemImageRow(
-                modifier = Modifier.padding(top = 32.dp),
-                storeImageUrls = storeModel.imageUrls
+                storeImageUrls = storeModel.imageUrls,
+                emptyContent = {
+                    EmptyStoreItemImage(Modifier.padding(top = 32.dp))
+                },
+                content = {
+                    StoreItemImage(
+                        modifier = Modifier.padding(top = 32.dp),
+                        storeImageUrls = storeModel.imageUrls
+                    )
+                }
             )
         }
     }
@@ -90,31 +98,43 @@ fun StoreItemContent(
 
 @Composable
 internal fun StoreItemImageRow(
+    storeImageUrls: List<String> = listOf(),
+    emptyContent: @Composable () -> Unit = {},
+    content: @Composable () -> Unit = {}
+) {
+    if (storeImageUrls.isEmpty()) emptyContent() else content()
+}
+
+@Composable
+private fun EmptyStoreItemImage(
+    modifier: Modifier = Modifier
+) {
+    Image(
+        painter = painterResource(R.drawable.img_no_photo),
+        contentDescription = null,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(end = 20.dp)
+            .aspectRatio(320 / 96f)
+    )
+}
+
+@Composable
+private fun StoreItemImage(
     modifier: Modifier = Modifier,
     storeImageUrls: List<String> = listOf()
 ) {
-    if (storeImageUrls.isEmpty()) {
-        Image(
-            painter = painterResource(R.drawable.img_no_photo),
-            contentDescription = null,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(end = 20.dp)
-                .aspectRatio(320 / 96f)
-        )
-    } else {
-        LazyRow(modifier = modifier) {
-            items(storeImageUrls, key = { it }) { storeImageUrl ->
-                AsyncImage(
-                    model = storeImageUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(96.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                )
-            }
+    LazyRow(modifier = modifier) {
+        items(storeImageUrls, key = { it }) { storeImageUrl ->
+            AsyncImage(
+                model = storeImageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(96.dp)
+                    .clip(RoundedCornerShape(20.dp))
+            )
         }
     }
 }
