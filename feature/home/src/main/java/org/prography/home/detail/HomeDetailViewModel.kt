@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import org.prography.base.BaseViewModel
 import org.prography.domain.repository.StoreRepository
 import javax.inject.Inject
@@ -20,8 +21,13 @@ class HomeDetailViewModel @Inject constructor(
         is HomeDetailAction.LoadDetailInfo -> {
             currentState.copy(storeDetailModel = action.storeDetailModel)
         }
+
         is HomeDetailAction.LoadBlogInfos -> {
             currentState.copy(blogPosts = action.blogPosts)
+        }
+
+        is HomeDetailAction.ChangeShowBlogCount -> {
+            currentState.copy(showBlogPostCount = action.count)
         }
     }
 
@@ -37,5 +43,11 @@ class HomeDetailViewModel @Inject constructor(
             .onStart { sendAction(HomeDetailAction.Loading) }
             .onEach { sendAction(HomeDetailAction.LoadBlogInfos(it.blogPosts)) }
             .launchIn(viewModelScope)
+    }
+
+    fun changeShowBlogCount(count: Int) {
+        viewModelScope.launch {
+            sendAction(HomeDetailAction.ChangeShowBlogCount(count))
+        }
     }
 }
