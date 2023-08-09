@@ -46,4 +46,5 @@
 
     <!-- feed -->
     <string name="feed_app_bar">Feed</string>
+    <string name="feed_detail_visit_cakeshop">케이크샵 방문</string>
 </resources>
