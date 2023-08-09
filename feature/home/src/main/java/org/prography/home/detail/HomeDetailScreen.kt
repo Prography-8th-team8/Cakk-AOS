@@ -57,6 +57,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import org.prography.designsystem.R
 import org.prography.designsystem.component.CakkAppbarWithBack
+import org.prography.designsystem.component.EmptyStoreItemTag
+import org.prography.designsystem.component.StoreItemTag
 import org.prography.designsystem.component.StoreItemTagRow
 import org.prography.designsystem.ui.theme.Black
 import org.prography.designsystem.ui.theme.Light_Deep_Pink
@@ -380,8 +382,16 @@ private fun HomeDetailKeywordRow(
             fontFamily = pretendard
         )
         StoreItemTagRow(
-            modifier = Modifier.padding(top = 16.dp),
-            storeTypes = storeTypes
+            storeTypes = storeTypes,
+            emptyContent = {
+                EmptyStoreItemTag(Modifier.padding(top = 16.dp))
+            },
+            content = {
+                StoreItemTag(
+                    modifier = Modifier.padding(top = 16.dp),
+                    storeTypes = storeTypes
+                )
+            }
         )
     }
 }
@@ -556,23 +566,24 @@ private fun HomeDetailBlogRow(
     modifier: Modifier = Modifier,
     blogPosts: List<BlogPostModel>,
 ) {
+    var showCount by remember { mutableStateOf(3) }
     Column(
         modifier = modifier
             .padding(horizontal = 16.dp)
             .padding(top = 16.dp)
     ) {
-        blogPosts.take(3).forEachIndexed { index, blogPost ->
+        blogPosts.take(showCount).forEachIndexed { index, blogPost ->
             HomeDetailBlogItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .padding(top = 16.dp)
+                    .padding(bottom = 24.dp),
                 blogPost = blogPost
             )
 
-            if (index < 2) {
+            if (index < showCount - 1) {
                 Spacer(
                     modifier = Modifier
-                        .padding(top = 24.dp)
                         .height(1.dp)
                         .fillMaxWidth()
                         .background(Platinum)
@@ -580,26 +591,28 @@ private fun HomeDetailBlogRow(
             }
         }
 
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, bottom = 16.dp),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
-            elevation = ButtonDefaults.elevation(0.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = White
-            )
-        ) {
-            Text(
-                text = stringResource(R.string.home_detail_blog_review_more),
-                color = Raisin_Black,
-                fontSize = 14.dp.toSp(),
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.03).em
-            )
+        if (showCount == 3 && blogPosts.size > showCount) {
+            Button(
+                onClick = { showCount = blogPosts.size },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
+                elevation = ButtonDefaults.elevation(0.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = White
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.home_detail_blog_review_more),
+                    color = Raisin_Black,
+                    fontSize = 14.dp.toSp(),
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.03).em
+                )
+            }
         }
     }
 }
