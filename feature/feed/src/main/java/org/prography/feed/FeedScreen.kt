@@ -53,16 +53,14 @@ private fun FeedContent(
         modifier = modifier
     ) {
         items(count = feedItems.itemCount) { index ->
-            val item = feedItems[index]
-            item?.let { item ->
+            feedItems[index]?.let { item ->
                 AsyncImage(
                     model = item.imageUrl,
                     contentDescription = item.imageUrl,
                     modifier = Modifier
                         .size(116.dp)
-                        .padding(top = 3.dp)
-                        .padding(bottom = 3.dp)
-                        .padding(horizontal = if (index % 3 == 1) 6.dp else 0.dp),
+                        .padding(top = 3.dp, bottom = 3.dp)
+                        .then(Modifier.padding(horizontal = if (index % 3 == 1) 6.dp else 0.dp)),
                     contentScale = ContentScale.FillBounds
                 )
             }
