@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,6 +50,7 @@ import org.prography.utility.extensions.toSp
 fun FeedDetailScreen(
     feedDetailViewModel: FeedDetailViewModel = hiltViewModel(),
     storeId: Int,
+    onNavigateHomeDetail: (Int) -> Unit,
     onClose: () -> Unit
 ) {
     LaunchedEffect(storeId) {
@@ -71,8 +73,10 @@ fun FeedDetailScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize(),
+            storeId = storeId,
             storeLocation = feedDetailUiState.storeDetailModel.location,
-            storeImageUrls = feedDetailUiState.storeDetailModel.imageUrls
+            storeImageUrls = feedDetailUiState.storeDetailModel.imageUrls,
+            onNavigateHomeDetail = onNavigateHomeDetail
         )
     }
 }
@@ -81,8 +85,10 @@ fun FeedDetailScreen(
 @Composable
 private fun FeedDetailContent(
     modifier: Modifier = Modifier,
+    storeId: Int,
     storeLocation: String,
-    storeImageUrls: List<String>
+    storeImageUrls: List<String>,
+    onNavigateHomeDetail: (Int) -> Unit,
 ) {
     val pagerState = rememberPagerState { storeImageUrls.size }
     val scope = rememberCoroutineScope()
@@ -185,7 +191,8 @@ private fun FeedDetailContent(
             Box(
                 modifier = Modifier
                     .size(260.dp, 56.dp)
-                    .background(Light_Deep_Pink, RoundedCornerShape(12.dp)),
+                    .background(Light_Deep_Pink, RoundedCornerShape(12.dp))
+                    .clickable { onNavigateHomeDetail(storeId) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(

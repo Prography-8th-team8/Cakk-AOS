@@ -126,9 +126,15 @@ fun CakkNavigationGraph(navController: NavHostController) {
             ) { navBackStackEntry ->
                 val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.FeedDetail.STORE_ID)
                 storeId?.let {
-                    FeedDetailScreen(storeId = it) {
-                        navController.popBackStack()
-                    }
+                    FeedDetailScreen(
+                        storeId = it,
+                        onNavigateHomeDetail = {
+                            navController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
+                        },
+                        onClose = {
+                            navController.popBackStack()
+                        }
+                    )
                 }
             }
 
