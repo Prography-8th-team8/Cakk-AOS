@@ -53,28 +53,44 @@ fun StoreItemContent(
             )
 
             StoreItemTagRow(
-                modifier = Modifier.padding(top = 12.dp),
                 storeTypes = storeModel.storeTypes,
-                maxCount = 3
-            ) { size ->
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = Black
-                ) {
-                    Text(
-                        text = String.format(stringResource(R.string.home_num_of_keyword), size),
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                        color = White,
-                        fontSize = 12.dp.toSp(),
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = pretendard
-                    )
+                emptyContent = {
+                    EmptyStoreItemTag(Modifier.padding(top = 12.dp))
+                },
+                content = {
+                    StoreItemTag(
+                        modifier = Modifier.padding(top = 12.dp),
+                        storeTypes = storeModel.storeTypes,
+                        maxCount = 3
+                    ) { size ->
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = Black
+                        ) {
+                            Text(
+                                text = String.format(stringResource(R.string.home_num_of_keyword), size),
+                                modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
+                                color = White,
+                                fontSize = 12.dp.toSp(),
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = pretendard
+                            )
+                        }
+                    }
                 }
-            }
+            )
 
             StoreItemImageRow(
-                modifier = Modifier.padding(top = 32.dp),
-                storeImageUrls = storeModel.imageUrls
+                storeImageUrls = storeModel.imageUrls,
+                emptyContent = {
+                    EmptyStoreItemImage(Modifier.padding(top = 32.dp))
+                },
+                content = {
+                    StoreItemImage(
+                        modifier = Modifier.padding(top = 32.dp),
+                        storeImageUrls = storeModel.imageUrls
+                    )
+                }
             )
         }
     }
@@ -82,87 +98,115 @@ fun StoreItemContent(
 
 @Composable
 internal fun StoreItemImageRow(
+    storeImageUrls: List<String> = listOf(),
+    emptyContent: @Composable () -> Unit = {},
+    content: @Composable () -> Unit = {}
+) {
+    if (storeImageUrls.isEmpty()) emptyContent() else content()
+}
+
+@Composable
+private fun EmptyStoreItemImage(
+    modifier: Modifier = Modifier
+) {
+    Image(
+        painter = painterResource(R.drawable.img_no_photo),
+        contentDescription = null,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(end = 20.dp)
+            .aspectRatio(320 / 96f)
+    )
+}
+
+@Composable
+private fun StoreItemImage(
     modifier: Modifier = Modifier,
     storeImageUrls: List<String> = listOf()
 ) {
-    if (storeImageUrls.isEmpty()) {
-        Image(
-            painter = painterResource(R.drawable.img_no_photo),
-            contentDescription = null,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(end = 20.dp)
-                .aspectRatio(320 / 96f)
-        )
-    } else {
-        LazyRow(modifier = modifier) {
-            items(storeImageUrls, key = { it }) { storeImageUrl ->
-                AsyncImage(
-                    model = storeImageUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(96.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                )
-            }
+    LazyRow(modifier = modifier) {
+        items(storeImageUrls, key = { it }) { storeImageUrl ->
+            AsyncImage(
+                model = storeImageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(96.dp)
+                    .clip(RoundedCornerShape(20.dp))
+            )
         }
     }
 }
 
 @Composable
 fun StoreItemTagRow(
+    storeTypes: List<String> = listOf(),
+    emptyContent: @Composable () -> Unit = {},
+    content: @Composable () -> Unit = {}
+) {
+    if (storeTypes.isEmpty()) {
+        emptyContent()
+    } else {
+        content()
+    }
+}
+
+@Composable
+fun StoreItemTag(
     modifier: Modifier = Modifier,
     storeTypes: List<String> = listOf(),
     maxCount: Int = storeTypes.size,
     overFlow: @Composable (Int) -> Unit = {}
 ) {
-    if (storeTypes.isEmpty()) {
-        Row(
-            modifier = modifier
-                .background(Raisin_Black.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
-                .padding(vertical = 7.dp, horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_alert),
-                contentDescription = null,
-                modifier = Modifier.size(14.dp),
-                tint = Color.Unspecified
-            )
-            Text(
-                text = stringResource(R.string.home_detail_empty_keyword),
-                modifier = Modifier.padding(start = 4.dp),
-                color = White,
-                fontSize = 12.dp.toSp(),
-                fontWeight = FontWeight.Bold,
-                fontFamily = pretendard
-            )
-        }
-    } else {
-        LazyRow(modifier) {
-            items(storeTypes.take(maxCount), key = { it }) { storeType ->
-                Surface(
-                    modifier = Modifier.padding(end = 4.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
-                ) {
-                    Text(
-                        text = StoreType.valueOf(storeType).tag,
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-                        color = StoreType.valueOf(storeType).toColor(),
-                        fontSize = 12.dp.toSp(),
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = pretendard
-                    )
-                }
+    LazyRow(modifier) {
+        items(storeTypes.take(maxCount), key = { it }) { storeType ->
+            Surface(
+                modifier = Modifier.padding(end = 4.dp),
+                shape = RoundedCornerShape(14.dp),
+                color = StoreType.valueOf(storeType).toColor().copy(alpha = 0.2f)
+            ) {
+                Text(
+                    text = StoreType.valueOf(storeType).tag,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
+                    color = StoreType.valueOf(storeType).toColor(),
+                    fontSize = 12.dp.toSp(),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = pretendard
+                )
             }
+        }
 
-            if (storeTypes.size > maxCount) {
-                item { overFlow(storeTypes.size - maxCount) }
-            }
+        if (storeTypes.size > maxCount) {
+            item { overFlow(storeTypes.size - maxCount) }
         }
+    }
+}
+
+@Composable
+fun EmptyStoreItemTag(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .background(Raisin_Black.copy(alpha = 0.8f), RoundedCornerShape(14.dp))
+            .padding(vertical = 7.dp, horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_alert),
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = Color.Unspecified
+        )
+        Text(
+            text = stringResource(R.string.home_detail_empty_keyword),
+            modifier = Modifier.padding(start = 4.dp),
+            color = White,
+            fontSize = 12.dp.toSp(),
+            fontWeight = FontWeight.Bold,
+            fontFamily = pretendard
+        )
     }
 }
 

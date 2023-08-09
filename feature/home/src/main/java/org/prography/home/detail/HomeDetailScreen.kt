@@ -57,6 +57,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import org.prography.designsystem.R
 import org.prography.designsystem.component.CakkAppbarWithBack
+import org.prography.designsystem.component.EmptyStoreItemTag
+import org.prography.designsystem.component.StoreItemTag
 import org.prography.designsystem.component.StoreItemTagRow
 import org.prography.designsystem.ui.theme.Black
 import org.prography.designsystem.ui.theme.Light_Deep_Pink
@@ -394,8 +396,16 @@ private fun HomeDetailKeywordRow(
             fontFamily = pretendard
         )
         StoreItemTagRow(
-            modifier = Modifier.padding(top = 16.dp),
-            storeTypes = storeTypes
+            storeTypes = storeTypes,
+            emptyContent = {
+                EmptyStoreItemTag(Modifier.padding(top = 16.dp))
+            },
+            content = {
+                StoreItemTag(
+                    modifier = Modifier.padding(top = 16.dp),
+                    storeTypes = storeTypes
+                )
+            }
         )
     }
 }
