@@ -1,8 +1,105 @@
 package org.prography.my
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import org.prography.designsystem.R
+import org.prography.designsystem.ui.theme.Raisin_Black
+import org.prography.designsystem.ui.theme.pretendard
 
 @Composable
 fun MyScreen() {
+    Column(modifier = Modifier.fillMaxSize().padding(top = 53.dp)) {
+        MyPage()
+        BookmarkCakeShop()
+        if (true) { // 북마크한 케이크 샵 있을 시
+            LazyColumn(
+                modifier = Modifier.padding(top = 20.dp),
+            ) {
+//                items(storeList) { store ->
+//                    StoreItemContent(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        storeModel = store,
+//                        onClick = { onNavigateToDetail(store.id) }
+//                    )
+//                }
+            }
+        } else { // 북마크한 케이크 샵 없을 시
+            EmptyBookmark()
+        }
+    }
+}
 
+@Composable
+private fun BookmarkCakeShop() {
+    Text(
+        text = stringResource(id = R.string.bookmark_bookmarked_cakk_shop),
+        modifier = Modifier.padding(start = 20.dp),
+        color = Raisin_Black.copy(alpha = 0.8f),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Normal,
+        fontFamily = pretendard
+    )
+}
+
+@Composable
+private fun MyPage() {
+    Text(
+        text = stringResource(id = R.string.bookmark_my_page),
+        modifier = Modifier.padding(start = 20.dp),
+        color = Raisin_Black,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        fontFamily = pretendard
+    )
+    Divider(
+        modifier = Modifier.padding(top = 10.dp, bottom = 25.dp),
+        thickness = 1.dp,
+        color = Raisin_Black.copy(alpha = 0.05f)
+    )
+}
+
+@Composable
+fun EmptyBookmark() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_cakk_character),
+            contentDescription = null
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = stringResource(id = R.string.bookmark_empty_bookmark_shop),
+            color = Raisin_Black,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = pretendard
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = stringResource(id = R.string.bookmark_try_bookmark),
+            color = Raisin_Black.copy(alpha = 0.6f),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            fontFamily = pretendard
+        )
+    }
 }
