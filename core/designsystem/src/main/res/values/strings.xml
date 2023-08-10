@@ -43,6 +43,7 @@
 
     <string name="dialog_cancel">취소</string>
     <string name="dialog_confirm">확인</string>
+    <string name="snackbar_not_provide_service">이 지역에서는 서비스를 제공하지 않아요! :(</string>
 
     <!-- feed -->
     <string name="feed_app_bar">Feed</string>
