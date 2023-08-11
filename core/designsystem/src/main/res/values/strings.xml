@@ -40,6 +40,11 @@
     <string name="infix_kakao_url">kakao</string>
     <string name="home_detail_find_naver_map">네이버 지도에서 여시겠어요?</string>
 
+    <!-- bookmark -->
+    <string name="bookmark_my_page">마이페이지</string>
+    <string name="bookmark_bookmarked_cakk_shop">북마크한 케이크샵</string>
+    <string name="bookmark_empty_bookmark_shop">북마크한 케이크샵이 없어요!</string>
+    <string name="bookmark_try_bookmark">원하는 케이크샵을 찜해보세요.</string>
 
     <string name="dialog_cancel">취소</string>
     <string name="dialog_confirm">확인</string>
