@@ -10,6 +10,7 @@ object CakkService {
         const val STORE_BLOG = "blog"
         const val STORE_RELOAD = "api/store/reload"
         const val STORE_TYPE = "type"
+        const val STORE_FEED = "api/store/feed"
     }
 
     object Parameter {

@@ -5,6 +5,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -48,6 +49,25 @@ fun CakkAppbarWithBack(
             fontFamily = pretendard,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun CakkAppbar(
+    modifier: Modifier = Modifier,
+    title: String
+) {
+    Row(
+        modifier = modifier.padding(start = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            color = Raisin_Black,
+            fontSize = 20.dp.toSp(),
+            fontWeight = FontWeight.Bold,
+            fontFamily = pretendard
         )
     }
 }

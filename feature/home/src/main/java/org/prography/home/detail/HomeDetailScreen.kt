@@ -32,6 +32,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -86,7 +87,7 @@ fun HomeDetailScreen(
         homeDetailViewModel.fetchStoreBlogInfos(storeId)
     }
 
-    val storeDetailUiState = homeDetailViewModel.state.collectAsStateWithLifecycle().value
+    val storeDetailUiState by homeDetailViewModel.state.collectAsStateWithLifecycle()
     Scaffold(
         topBar = {
             CakkAppbarWithBack(
@@ -103,6 +104,8 @@ fun HomeDetailScreen(
             fromHome = fromHome,
             storeDetailModel = storeDetailUiState.storeDetailModel,
             storeBlogPosts = storeDetailUiState.blogPosts,
+            showBlogPostCount = storeDetailUiState.showBlogPostCount,
+            onChangeBlogPostCount = { homeDetailViewModel.changeShowBlogCount(it) },
             storeLatitude = storeDetailUiState.storeDetailModel.latitude,
             storeLongitude = storeDetailUiState.storeDetailModel.longitude
         )
@@ -115,90 +118,94 @@ private fun HomeDetailContent(
     fromHome: Boolean = false,
     storeDetailModel: StoreDetailModel,
     storeBlogPosts: List<BlogPostModel>,
+    showBlogPostCount: Int,
+    onChangeBlogPostCount: (Int) -> Unit = {},
     storeLatitude: Double,
     storeLongitude: Double
 ) {
     var isVisibleDialog by remember { mutableStateOf(false) }
     var tabType by remember { mutableStateOf(TabType.IMAGES) }
     val context = LocalContext.current
+
+    if (isVisibleDialog) {
+        Dialog(onDismissRequest = { }) {
+            Surface(
+                modifier = Modifier.size(328.dp, 166.dp),
+                shape = RoundedCornerShape(14.dp),
+                color = White
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.home_detail_find_naver_map),
+                        modifier = Modifier.padding(top = 48.dp),
+                        color = Raisin_Black,
+                        fontSize = 18.dp.toSp(),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = pretendard
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 36.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(144.dp, 44.dp)
+                                .background(Raisin_Black.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
+                                .clickable { isVisibleDialog = false },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.dialog_cancel),
+                                color = Raisin_Black.copy(alpha = 0.6f),
+                                fontSize = 16.dp.toSp(),
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = pretendard
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .size(144.dp, 44.dp)
+                                .background(Light_Deep_Pink, RoundedCornerShape(12.dp))
+                                .clickable {
+                                    val naverMapUri = Uri
+                                        .Builder()
+                                        .scheme("nmap")
+                                        .authority("route")
+                                        .appendPath("public")
+                                        .appendQueryParameter("dlat", storeLatitude.toString())
+                                        .appendQueryParameter("dlng", storeLongitude.toString())
+                                        .appendQueryParameter("dname", storeDetailModel.name)
+                                        .appendQueryParameter("appname", "com.prography.cakk")
+                                        .build()
+
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, naverMapUri))
+                                    isVisibleDialog = false
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.dialog_confirm),
+                                color = White,
+                                fontSize = 16.dp.toSp(),
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = pretendard
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = modifier,
         userScrollEnabled = fromHome.not()
     ) {
         item(span = { GridItemSpan(3) }) {
-            if (isVisibleDialog) {
-                Dialog(onDismissRequest = { }) {
-                    Column(
-                        modifier = Modifier
-                            .size(328.dp, 166.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(White),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = stringResource(R.string.home_detail_find_naver_map),
-                            modifier = Modifier.padding(top = 48.dp),
-                            color = Raisin_Black,
-                            fontSize = 18.dp.toSp(),
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = pretendard
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .padding(top = 36.dp),
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(144.dp, 44.dp)
-                                    .background(Raisin_Black.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-                                    .clickable { isVisibleDialog = false },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.dialog_cancel),
-                                    color = Raisin_Black.copy(alpha = 0.6f),
-                                    fontSize = 16.dp.toSp(),
-                                    fontWeight = FontWeight.Normal,
-                                    fontFamily = pretendard
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                                    .size(144.dp, 44.dp)
-                                    .background(Light_Deep_Pink, RoundedCornerShape(12.dp))
-                                    .clickable {
-                                        val naverMapUri = Uri.Builder()
-                                            .scheme("nmap")
-                                            .authority("route")
-                                            .appendPath("public")
-                                            .appendQueryParameter("dlat", storeLatitude.toString())
-                                            .appendQueryParameter("dlng", storeLongitude.toString())
-                                            .appendQueryParameter("dname", storeDetailModel.name)
-                                            .appendQueryParameter("appname", "com.prography.cakk")
-                                            .build()
-
-                                        context.startActivity(Intent(Intent.ACTION_VIEW, naverMapUri))
-                                        isVisibleDialog = false
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.dialog_confirm),
-                                    color = White,
-                                    fontSize = 16.dp.toSp(),
-                                    fontWeight = FontWeight.Normal,
-                                    fontFamily = pretendard
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
             Column {
                 HomeDetailHeader(
                     modifier = Modifier.fillMaxWidth(),
@@ -228,18 +235,26 @@ private fun HomeDetailContent(
 
         when (tabType) {
             TabType.IMAGES -> showGridImage(storeDetailModel.imageUrls)
-            TabType.BLOG_REVIES -> showBlogReviews(storeBlogPosts)
+            TabType.BLOG_REVIES -> showBlogReviews(
+                storeBlogPosts = storeBlogPosts,
+                showBlogPostCount = showBlogPostCount,
+                onChangeBlogPostCount = onChangeBlogPostCount
+            )
         }
     }
 }
 
 private fun LazyGridScope.showBlogReviews(
     storeBlogPosts: List<BlogPostModel>,
+    showBlogPostCount: Int,
+    onChangeBlogPostCount: (Int) -> Unit = {}
 ) {
     item(span = { GridItemSpan(3) }) {
         HomeDetailBlogRow(
             modifier = Modifier.fillMaxWidth(),
-            blogPosts = storeBlogPosts
+            blogPosts = storeBlogPosts,
+            showBlogPostCount = showBlogPostCount,
+            onChangeBlogPostCount = onChangeBlogPostCount
         )
     }
 }
@@ -517,7 +532,7 @@ private fun HomeDetailHeaderTab(
         HomeDetailHeaderTabItem(
             iconRes = R.drawable.ic_navigation,
             stringRes = R.string.home_detail_navigation,
-            onClick = { onChangeDialogState() }
+            onClick = onChangeDialogState
         )
 
         Spacer(
@@ -540,7 +555,6 @@ private fun HomeDetailHeaderTab(
                         },
                         data
                     )
-
                 )
             }
         }
@@ -582,14 +596,15 @@ private fun RowScope.HomeDetailHeaderTabItem(
 private fun HomeDetailBlogRow(
     modifier: Modifier = Modifier,
     blogPosts: List<BlogPostModel>,
+    showBlogPostCount: Int,
+    onChangeBlogPostCount: (Int) -> Unit = {}
 ) {
-    var showCount by remember { mutableStateOf(3) }
     Column(
         modifier = modifier
             .padding(horizontal = 16.dp)
             .padding(top = 16.dp)
     ) {
-        blogPosts.take(showCount).forEachIndexed { index, blogPost ->
+        blogPosts.take(showBlogPostCount).forEachIndexed { index, blogPost ->
             HomeDetailBlogItem(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -598,7 +613,7 @@ private fun HomeDetailBlogRow(
                 blogPost = blogPost
             )
 
-            if (index < showCount - 1) {
+            if (index < showBlogPostCount - 1) {
                 Spacer(
                     modifier = Modifier
                         .height(1.dp)
@@ -608,9 +623,9 @@ private fun HomeDetailBlogRow(
             }
         }
 
-        if (showCount == 3 && blogPosts.size > showCount) {
+        if (showBlogPostCount == DEFAULT_BLOG_POST_COUNT && blogPosts.size > DEFAULT_BLOG_POST_COUNT) {
             Button(
-                onClick = { showCount = blogPosts.size },
+                onClick = { onChangeBlogPostCount(blogPosts.size) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),

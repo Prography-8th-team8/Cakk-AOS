@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.dagger.hilt)
 }
 
-
 android {
     namespace = "org.prography.feed"
 
@@ -35,6 +34,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.hilt.navigation)
     implementation(libs.androidx.compose.navigation)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
     implementation(libs.material)
     implementation(libs.timber)
     implementation(libs.coil.compose)

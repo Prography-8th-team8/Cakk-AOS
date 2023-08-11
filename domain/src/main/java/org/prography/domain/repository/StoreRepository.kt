@@ -1,7 +1,9 @@
 package org.prography.domain.repository
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import org.prography.domain.model.store.BookmarkModel
+import org.prography.domain.model.store.FeedModel
 import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.domain.model.store.StoreModel
@@ -23,6 +25,8 @@ interface StoreRepository {
         page: Int = 1,
         storeTypes: List<String> = listOf()
     ): Flow<List<StoreModel>>
+
+    fun fetchStoreFeed(): Flow<PagingData<FeedModel>>
 
     fun fetchBookmarks(): Flow<List<BookmarkModel>>
 
