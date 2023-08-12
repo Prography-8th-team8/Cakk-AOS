@@ -8,4 +8,5 @@ sealed class HomeDetailAction : BaseAction {
     object Loading : HomeDetailAction()
     data class LoadDetailInfo(val storeDetailModel: StoreDetailModel) : HomeDetailAction()
     data class LoadBlogInfos(val blogPosts: List<BlogPostModel>) : HomeDetailAction()
+    data class ChangeShowBlogCount(val count: Int) : HomeDetailAction()
 }
