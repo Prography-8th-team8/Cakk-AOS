@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.coil.compose)
     implementation(libs.dagger.hilt.android)
+    implementation(libs.accompanist.pager)
     implementation(libs.bundles.androidx.compose)
     implementation(libs.naver.map)
     implementation(libs.gms)

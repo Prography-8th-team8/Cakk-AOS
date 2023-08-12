@@ -37,6 +37,7 @@ import org.prography.designsystem.ui.theme.Raisin_Black
 import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.feed.FeedScreen
+import org.prography.feed.detail.FeedDetailScreen
 import org.prography.home.HomeScreen
 import org.prography.home.detail.HomeDetailScreen
 import org.prography.my.MyScreen
@@ -114,7 +115,27 @@ fun CakkNavigationGraph(navController: NavHostController) {
             }
 
             composable(route = CakkDestination.Feed.route) {
-                FeedScreen()
+                FeedScreen { storeId ->
+                    navController.navigate("${CakkDestination.FeedDetail.route}/$storeId")
+                }
+            }
+
+            composable(
+                route = CakkDestination.FeedDetail.routeWithArgs,
+                arguments = CakkDestination.FeedDetail.arguments
+            ) { navBackStackEntry ->
+                val storeId = navBackStackEntry.arguments?.getInt(CakkDestination.FeedDetail.STORE_ID)
+                storeId?.let {
+                    FeedDetailScreen(
+                        storeId = it,
+                        onNavigateHomeDetail = {
+                            navController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
+                        },
+                        onClose = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
             }
 
             composable(route = CakkDestination.My.route) {
