@@ -25,6 +25,7 @@ import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
+import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
 
@@ -32,7 +33,9 @@ import org.prography.utility.extensions.toSp
 fun StoreItemContent(
     modifier: Modifier = Modifier,
     storeModel: StoreModel = StoreModel(),
-    onFavoriteClick: () -> Unit = {},
+    bookmarkModel: BookmarkModel = BookmarkModel(),
+    bookmark: () -> Unit = {},
+    unBookmark: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     Surface(
@@ -45,55 +48,97 @@ fun StoreItemContent(
                 .padding(vertical = 20.dp)
                 .padding(start = 20.dp)
         ) {
-            StoreItemHeader(
-                storeName = storeModel.name,
-                storeDistrict = storeModel.district,
-                storeLocation = storeModel.location,
-                onClick = onFavoriteClick
-            )
-
-            StoreItemTagRow(
-                storeTypes = storeModel.storeTypes,
-                emptyContent = {
-                    EmptyStoreItemTag(Modifier.padding(top = 12.dp))
-                },
-                content = {
-                    StoreItemTag(
-                        modifier = Modifier.padding(top = 12.dp),
-                        storeTypes = storeModel.storeTypes,
-                        maxCount = 3
-                    ) { size ->
-                        Surface(
-                            shape = RoundedCornerShape(14.dp),
-                            color = Black
-                        ) {
-                            Text(
-                                text = String.format(stringResource(R.string.home_num_of_keyword), size),
-                                modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                                color = White,
-                                fontSize = 12.dp.toSp(),
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = pretendard
-                            )
-                        }
-                    }
-                }
-            )
-
-            StoreItemImageRow(
-                storeImageUrls = storeModel.imageUrls,
-                emptyContent = {
-                    EmptyStoreItemImage(Modifier.padding(top = 32.dp))
-                },
-                content = {
-                    StoreItemImage(
-                        modifier = Modifier.padding(top = 32.dp),
-                        storeImageUrls = storeModel.imageUrls
-                    )
-                }
-            )
+            if (storeModel.id != 0) {
+                StoreContent(storeModel, bookmark, unBookmark)
+            } else {
+                BookmarkContent(bookmarkModel, bookmark, unBookmark)
+            }
         }
     }
+}
+
+@Composable
+private fun StoreContent(
+    storeModel: StoreModel,
+    bookmark: () -> Unit,
+    unBookmark: () -> Unit
+) {
+    StoreItemHeader(
+        storeName = storeModel.name,
+        storeDistrict = storeModel.district,
+        storeLocation = storeModel.location,
+        bookmark = bookmark,
+        unBookmark = unBookmark
+    )
+
+    StoreItemTagRow(
+        storeTypes = storeModel.storeTypes,
+        emptyContent = {
+            EmptyStoreItemTag(Modifier.padding(top = 12.dp))
+        },
+        content = {
+            StoreItemTag(
+                modifier = Modifier.padding(top = 12.dp),
+                storeTypes = storeModel.storeTypes,
+                maxCount = 3
+            ) { size ->
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = Black
+                ) {
+                    Text(
+                        text = String.format(stringResource(R.string.home_num_of_keyword), size),
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
+                        color = White,
+                        fontSize = 12.dp.toSp(),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = pretendard
+                    )
+                }
+            }
+        }
+    )
+
+    StoreItemImageRow(
+        storeImageUrls = storeModel.imageUrls,
+        emptyContent = {
+            EmptyStoreItemImage(Modifier.padding(top = 32.dp))
+        },
+        content = {
+            StoreItemImage(
+                modifier = Modifier.padding(top = 32.dp),
+                storeImageUrls = storeModel.imageUrls
+            )
+        }
+    )
+}
+
+@Composable
+private fun BookmarkContent(
+    bookmarkModel: BookmarkModel,
+    bookmark: () -> Unit,
+    unBookmark: () -> Unit,
+) {
+    StoreItemHeader(
+        storeName = bookmarkModel.name,
+        storeDistrict = bookmarkModel.district,
+        storeLocation = bookmarkModel.location,
+        bookmark = bookmark,
+        unBookmark = unBookmark
+    )
+
+    StoreItemImageRow(
+        storeImageUrls = bookmarkModel.imageUrls,
+        emptyContent = {
+            EmptyStoreItemImage(Modifier.padding(top = 32.dp))
+        },
+        content = {
+            StoreItemImage(
+                modifier = Modifier.padding(top = 32.dp),
+                storeImageUrls = bookmarkModel.imageUrls
+            )
+        }
+    )
 }
 
 @Composable
@@ -216,9 +261,11 @@ internal fun StoreItemHeader(
     storeName: String,
     storeDistrict: String,
     storeLocation: String,
-    onClick: () -> Unit
+    bookmark: () -> Unit,
+    unBookmark: () -> Unit,
 ) {
     var isFavorite by remember { mutableStateOf(false) }
+
     Row(modifier) {
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -258,7 +305,11 @@ internal fun StoreItemHeader(
         IconButton(
             onClick = {
                 isFavorite = isFavorite.not()
-                onClick()
+                if (isFavorite) {
+                    bookmark()
+                } else {
+                    unBookmark()
+                }
             },
             modifier = Modifier
                 .padding(end = 20.dp)

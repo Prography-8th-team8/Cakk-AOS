@@ -13,6 +13,6 @@ interface BookmarkDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun bookmarkCakeStore(bookmarkEntity: BookmarkEntity)
 
-    @Delete
-    suspend fun unBookmarkCakeStore(bookmarkEntity: BookmarkEntity)
+    @Query("DELETE FROM cake_store_bookmark_table WHERE id = :id")
+    suspend fun unBookmarkCakeStore(id: Int)
 }

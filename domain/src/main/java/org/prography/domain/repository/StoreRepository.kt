@@ -32,5 +32,5 @@ interface StoreRepository {
 
     suspend fun bookmarkStore(bookmarkModel: BookmarkModel)
 
-    suspend fun unBookmarkStore(bookmarkModel: BookmarkModel)
+    suspend fun unBookmarkStore(id: Int)
 }

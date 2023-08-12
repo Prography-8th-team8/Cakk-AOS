@@ -54,6 +54,7 @@ import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
+import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.home.detail.HomeDetailScreen
 import org.prography.utility.extensions.toSp
@@ -201,7 +202,8 @@ private fun BottomSheet(
                                 offsetY = expandedType
                                     .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
                                     .value
-                            }
+                            },
+                            onFavoriteClick = { homeViewModel.bookmarkCakeShop(it) },
                         )
                     }
 
@@ -445,7 +447,8 @@ private fun CakeStoreContent(
     storeCount: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
-    openFilterSheet: () -> Unit
+    openFilterSheet: () -> Unit,
+    onFavoriteClick: (BookmarkModel) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -474,6 +477,18 @@ private fun CakeStoreContent(
                 StoreItemContent(
                     modifier = Modifier.fillMaxWidth(),
                     storeModel = store,
+                    bookmark = {
+                        onFavoriteClick(
+                            BookmarkModel(
+                                store.id,
+                                store.name,
+                                store.district,
+                                store.location,
+                                store.imageUrls,
+                                true
+                            )
+                        )
+                    },
                     onClick = { onNavigateToDetail(store.id) }
                 )
             }
@@ -587,7 +602,6 @@ private fun CakkMap(
 
                 else -> Unit
             }
-
         }
     } else {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)

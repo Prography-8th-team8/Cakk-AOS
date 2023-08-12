@@ -4,7 +4,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.prography.base.BaseViewModel
+import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.repository.StoreRepository
 import javax.inject.Inject
 
@@ -101,5 +103,11 @@ class HomeViewModel @Inject constructor(
             .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
             .launchIn(viewModelScope)
+    }
+
+    fun bookmarkCakeShop(bookmarkModel: BookmarkModel) {
+        viewModelScope.launch {
+            storeRepository.bookmarkStore(bookmarkModel = bookmarkModel)
+        }
     }
 }

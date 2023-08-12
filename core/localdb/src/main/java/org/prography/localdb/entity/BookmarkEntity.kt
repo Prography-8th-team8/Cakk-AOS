@@ -8,10 +8,18 @@ import org.prography.domain.model.store.BookmarkModel
 data class BookmarkEntity(
     @PrimaryKey
     val id: Int,
-    val name: String
+    val name: String,
+    val district: String,
+    val location: String,
+    val imageUrls: List<String>,
+    val bookmarked: Boolean,
 ) {
     fun toModel() = BookmarkModel(
         id = id,
-        name = name
+        name = name,
+        district = district,
+        location = location,
+        imageUrls = imageUrls,
+        bookmarked = bookmarked,
     )
 }
