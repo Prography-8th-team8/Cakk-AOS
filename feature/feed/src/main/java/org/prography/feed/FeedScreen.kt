@@ -1,6 +1,7 @@
 package org.prography.feed
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,19 +55,17 @@ private fun FeedContent(
     val feedItems = feedViewModel.feedItems.collectAsLazyPagingItems()
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         items(count = feedItems.itemCount) { index ->
-            val item = feedItems[index]
-            item?.let { item ->
+            feedItems[index]?.let { item ->
                 AsyncImage(
                     model = item.imageUrl,
                     contentDescription = item.imageUrl,
                     modifier = Modifier
                         .size(116.dp)
-                        .padding(top = 3.dp)
-                        .padding(bottom = 3.dp)
-                        .padding(horizontal = if (index % 3 == 1) 6.dp else 0.dp)
                         .clickable { onNavigateFeedDetail(item.storeId) },
                     contentScale = ContentScale.FillBounds
                 )
