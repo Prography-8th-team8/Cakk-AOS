@@ -11,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val storeRepository: StoreRepository,
-) : BaseViewModel<HomeUiAction, HomeUiState, Nothing>(
+) : BaseViewModel<HomeUiAction, HomeUiState, HomeSideEffect>(
     initialState = HomeUiState()
 ) {
     override fun reduceState(currentState: HomeUiState, action: HomeUiAction): HomeUiState = when (action) {
@@ -95,7 +95,10 @@ class HomeViewModel @Inject constructor(
             storeTypes = storeTypes
         )
             .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
-            .catch { sendAction(HomeUiAction.LoadStoreList(listOf())) }
+            .catch {
+                sendSideEffect(HomeSideEffect.ReloadError)
+                sendAction(HomeUiAction.LoadStoreList(listOf()))
+            }
             .flatMapMerge { it.asFlow() }
             .flatMapMerge { storeRepository.fetchStoreType(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }

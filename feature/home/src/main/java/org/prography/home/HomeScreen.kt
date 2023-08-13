@@ -43,11 +43,14 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.compose.*
 import com.naver.maps.map.overlay.OverlayImage
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.prography.common.navigation.destination.CakkDestination.Home.DEFAULT_DISTRICTS_INFO
 import org.prography.common.navigation.destination.CakkDestination.Home.DEFAULT_STORE_COUNT
 import org.prography.designsystem.R
+import org.prography.designsystem.component.CakkSnackbar
+import org.prography.designsystem.component.CakkSnackbarHost
 import org.prography.designsystem.component.StoreItemContent
 import org.prography.designsystem.mapper.toBackgroundColor
 import org.prography.designsystem.mapper.toIcon
@@ -126,6 +129,18 @@ private fun BottomSheet(
     var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
 
+    LaunchedEffect(homeViewModel) {
+        homeViewModel.sideEffect.collectLatest {
+            when (it) {
+                HomeSideEffect.ReloadError -> {
+                    bottomSheetScaffoldState.snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.snackbar_not_provide_service)
+                    )
+                }
+            }
+        }
+    }
+
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetElevation = 0.dp,
@@ -133,6 +148,14 @@ private fun BottomSheet(
             topStart = 16.dp,
             topEnd = 16.dp,
         ),
+        snackbarHost = { snackbarHostState ->
+            CakkSnackbarHost(snackbarHostState = snackbarHostState) { snackbarData ->
+                CakkSnackbar(
+                    snackbarData = snackbarData,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
+        },
         sheetContent = {
             Box(
                 Modifier
@@ -587,7 +610,6 @@ private fun CakkMap(
 
                 else -> Unit
             }
-
         }
     } else {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
