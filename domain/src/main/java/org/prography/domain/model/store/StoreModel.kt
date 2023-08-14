@@ -12,4 +12,5 @@ data class StoreModel(
     val longitude: Double = 0.0,
     val imageUrls: List<String> = listOf(),
     val storeTypes: List<String> = listOf(),
+    val bookmarked: Boolean = false,
 )
