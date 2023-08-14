@@ -57,6 +57,7 @@ import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
+import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.home.detail.HomeDetailScreen
 import org.prography.utility.extensions.toSp
@@ -214,7 +215,11 @@ private fun BottomSheet(
                             } else {
                                 listOf()
                             },
-                            storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) storeCountArg else homeUiState.storeModels.size,
+                            storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) {
+                                storeCountArg
+                            } else {
+                                homeUiState.storeModels.size
+                            },
                             onNavigateToOnBoarding = onNavigateToOnBoarding,
                             onNavigateToDetail = onNavigateToDetail,
                             openFilterSheet = {
@@ -224,7 +229,9 @@ private fun BottomSheet(
                                 offsetY = expandedType
                                     .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
                                     .value
-                            }
+                            },
+                            onFavoriteClick = { homeViewModel.bookmarkCakeShop(it) },
+                            onUnFavoriteClick = { homeViewModel.unBookmarkCakeShop(it) }
                         )
                     }
 
@@ -468,7 +475,9 @@ private fun CakeStoreContent(
     storeCount: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
-    openFilterSheet: () -> Unit
+    openFilterSheet: () -> Unit,
+    onFavoriteClick: (BookmarkModel) -> Unit,
+    onUnFavoriteClick: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -497,6 +506,22 @@ private fun CakeStoreContent(
                 StoreItemContent(
                     modifier = Modifier.fillMaxWidth(),
                     storeModel = store,
+                    bookmark = {
+                        onFavoriteClick(
+                            BookmarkModel(
+                                store.id,
+                                store.name,
+                                store.district,
+                                store.location,
+                                store.imageUrls,
+                                true
+                            )
+                        )
+                    },
+                    isFavorite = store.bookmarked,
+                    unBookmark = {
+                        onUnFavoriteClick(store.id)
+                    },
                     onClick = { onNavigateToDetail(store.id) }
                 )
             }

@@ -4,7 +4,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.prography.base.BaseViewModel
+import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.repository.StoreRepository
 import javax.inject.Inject
 
@@ -35,6 +37,42 @@ class HomeViewModel @Inject constructor(
             )
         }
 
+        is HomeUiAction.LoadBookmarkedCakeShop -> {
+            currentState.copy(
+                storeModels = currentState.storeModels.map {
+                    if (it.id == action.id) {
+                        it.copy(bookmarked = true)
+                    } else {
+                        it
+                    }
+                }
+            )
+        }
+
+        is HomeUiAction.BookmarkCakeShop -> {
+            currentState.copy(
+                storeModels = currentState.storeModels.map {
+                    if (it.id == action.id) {
+                        it.copy(bookmarked = true)
+                    } else {
+                        it
+                    }
+                }
+            )
+        }
+
+        is HomeUiAction.UnBookmarkCakeShop -> {
+            currentState.copy(
+                storeModels = currentState.storeModels.map {
+                    if (it.id == action.id) {
+                        it.copy(bookmarked = false)
+                    } else {
+                        it
+                    }
+                }
+            )
+        }
+
         is HomeUiAction.LoadStoreList -> {
             currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
         }
@@ -57,8 +95,8 @@ class HomeViewModel @Inject constructor(
     fun changeBottomSheetType(bottomSheetType: BottomSheetType) {
         when (bottomSheetType) {
             BottomSheetType.StoreList -> sendAction(HomeUiAction.BottomSheetStoreList)
-            is BottomSheetType.StoreDetail -> sendAction(HomeUiAction.BottomSheetStoreDetail(bottomSheetType.storeId))
             BottomSheetType.Filter -> sendAction(HomeUiAction.BottomSheetFilter)
+            is BottomSheetType.StoreDetail -> sendAction(HomeUiAction.BottomSheetStoreDetail(bottomSheetType.storeId))
         }
     }
 
@@ -71,6 +109,9 @@ class HomeViewModel @Inject constructor(
             .flatMapMerge { storeRepository.fetchStoreType(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
+            .flatMapMerge { storeRepository.fetchBookmarkedCakeShop(it.id) }
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.LoadBookmarkedCakeShop(it?.id)) }
             .launchIn(viewModelScope)
     }
 
@@ -103,6 +144,23 @@ class HomeViewModel @Inject constructor(
             .flatMapMerge { storeRepository.fetchStoreType(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
             .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
+            .flatMapMerge { storeRepository.fetchBookmarkedCakeShop(it.id) }
+            .onStart { sendAction(HomeUiAction.Loading) }
+            .onEach { sendAction(HomeUiAction.LoadBookmarkedCakeShop(it?.id)) }
             .launchIn(viewModelScope)
+    }
+
+    fun bookmarkCakeShop(bookmarkModel: BookmarkModel) {
+        viewModelScope.launch {
+            storeRepository.bookmarkStore(bookmarkModel = bookmarkModel)
+            sendAction(HomeUiAction.BookmarkCakeShop(bookmarkModel.id))
+        }
+    }
+
+    fun unBookmarkCakeShop(id: Int) {
+        viewModelScope.launch {
+            storeRepository.unBookmarkStore(id = id)
+            sendAction(HomeUiAction.UnBookmarkCakeShop(id))
+        }
     }
 }
