@@ -30,7 +30,9 @@ interface StoreRepository {
 
     fun fetchBookmarks(): Flow<List<BookmarkModel>>
 
+    fun fetchBookmarkedCakeShop(id: Int): Flow<BookmarkModel?>
+
     suspend fun bookmarkStore(bookmarkModel: BookmarkModel)
 
-    suspend fun unBookmarkStore(bookmarkModel: BookmarkModel)
+    suspend fun unBookmarkStore(id: Int)
 }

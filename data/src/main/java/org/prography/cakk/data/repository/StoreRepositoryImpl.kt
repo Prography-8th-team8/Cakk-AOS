@@ -76,9 +76,23 @@ class StoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun bookmarkStore(bookmarkModel: BookmarkModel) =
-        bookmarkDao.bookmarkCakeStore(BookmarkEntity(bookmarkModel.id, bookmarkModel.name))
+    override fun fetchBookmarkedCakeShop(id: Int): Flow<BookmarkModel?> = bookmarkDao.getCakeShop(id).map {
+        it?.toModel()
+    }
 
-    override suspend fun unBookmarkStore(bookmarkModel: BookmarkModel) =
-        bookmarkDao.unBookmarkCakeStore(BookmarkEntity(bookmarkModel.id, bookmarkModel.name))
+    override suspend fun bookmarkStore(bookmarkModel: BookmarkModel) {
+        bookmarkDao.bookmarkCakeStore(
+            BookmarkEntity(
+                bookmarkModel.id,
+                bookmarkModel.name,
+                bookmarkModel.district,
+                bookmarkModel.location,
+                bookmarkModel.imageUrls,
+                bookmarkModel.bookmarked
+            )
+        )
+    }
+
+    override suspend fun unBookmarkStore(id: Int) =
+        bookmarkDao.unBookmarkCakeStore(id)
 }
