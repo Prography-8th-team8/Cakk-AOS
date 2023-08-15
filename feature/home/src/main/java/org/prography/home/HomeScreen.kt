@@ -57,7 +57,6 @@ import org.prography.designsystem.mapper.toIcon
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
-import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.home.detail.HomeDetailScreen
 import org.prography.utility.extensions.toSp
@@ -476,7 +475,7 @@ private fun CakeStoreContent(
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
     openFilterSheet: () -> Unit,
-    onFavoriteClick: (BookmarkModel) -> Unit,
+    onFavoriteClick: (StoreModel) -> Unit,
     onUnFavoriteClick: (Int) -> Unit,
 ) {
     Column(
@@ -508,13 +507,13 @@ private fun CakeStoreContent(
                     storeModel = store,
                     bookmark = {
                         onFavoriteClick(
-                            BookmarkModel(
-                                store.id,
-                                store.name,
-                                store.district,
-                                store.location,
-                                store.imageUrls,
-                                true
+                            StoreModel(
+                                id = store.id,
+                                name = store.name,
+                                district = store.district,
+                                location = store.location,
+                                imageUrls = store.imageUrls,
+                                bookmarked = true
                             )
                         )
                     },

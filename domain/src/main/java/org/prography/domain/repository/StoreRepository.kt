@@ -2,7 +2,6 @@ package org.prography.domain.repository
 
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.FeedModel
 import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
@@ -28,11 +27,11 @@ interface StoreRepository {
 
     fun fetchStoreFeed(): Flow<PagingData<FeedModel>>
 
-    fun fetchBookmarks(): Flow<List<BookmarkModel>>
+    fun fetchBookmarks(): Flow<List<StoreModel>>
 
-    fun fetchBookmarkedCakeShop(id: Int): Flow<BookmarkModel?>
+    fun fetchBookmarkedCakeShop(id: Int): Flow<StoreModel?>
 
-    suspend fun bookmarkStore(bookmarkModel: BookmarkModel)
+    suspend fun bookmarkStore(bookmarkModel: StoreModel)
 
     suspend fun unBookmarkStore(id: Int)
 }

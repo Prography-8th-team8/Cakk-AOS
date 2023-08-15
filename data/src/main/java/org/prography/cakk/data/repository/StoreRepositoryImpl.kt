@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.map
 import org.prography.cakk.data.datasource.FeedPagingSource
 import org.prography.cakk.data.datasource.PAGE_SIZE
 import org.prography.cakk.data.datasource.StoreRemoteSource
-import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.FeedModel
 import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
@@ -70,17 +69,17 @@ class StoreRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun fetchBookmarks(): Flow<List<BookmarkModel>> = bookmarkDao.getAll().map {
+    override fun fetchBookmarks(): Flow<List<StoreModel>> = bookmarkDao.getAll().map {
         it.map { data ->
             data.toModel()
         }
     }
 
-    override fun fetchBookmarkedCakeShop(id: Int): Flow<BookmarkModel?> = bookmarkDao.getCakeShop(id).map {
+    override fun fetchBookmarkedCakeShop(id: Int): Flow<StoreModel?> = bookmarkDao.getCakeShop(id).map {
         it?.toModel()
     }
 
-    override suspend fun bookmarkStore(bookmarkModel: BookmarkModel) {
+    override suspend fun bookmarkStore(bookmarkModel: StoreModel) {
         bookmarkDao.bookmarkCakeStore(
             BookmarkEntity(
                 bookmarkModel.id,

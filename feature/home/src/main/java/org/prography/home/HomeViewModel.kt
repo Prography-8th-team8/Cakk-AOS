@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.prography.base.BaseViewModel
-import org.prography.domain.model.store.BookmarkModel
+import org.prography.domain.model.store.StoreModel
 import org.prography.domain.repository.StoreRepository
 import javax.inject.Inject
 
@@ -150,7 +150,7 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun bookmarkCakeShop(bookmarkModel: BookmarkModel) {
+    fun bookmarkCakeShop(bookmarkModel: StoreModel) {
         viewModelScope.launch {
             storeRepository.bookmarkStore(bookmarkModel = bookmarkModel)
             sendAction(HomeUiAction.BookmarkCakeShop(bookmarkModel.id))

@@ -49,8 +49,9 @@ fun MyScreen(
                 items(myUiState.bookmarkModels) { bookmarkedStore ->
                     StoreItemContent(
                         modifier = Modifier.fillMaxWidth(),
-                        bookmarkModel = bookmarkedStore,
+                        storeModel = bookmarkedStore,
                         isFavorite = bookmarkedStore.bookmarked,
+                        isHomeScreen = false,
                         bookmark = { myViewModel.bookmarkCakeShop(bookmarkedStore) },
                         unBookmark = { myViewModel.unBookmarkCakeShop(bookmarkedStore.id) },
                     )

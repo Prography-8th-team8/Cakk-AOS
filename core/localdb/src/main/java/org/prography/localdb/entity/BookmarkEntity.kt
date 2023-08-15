@@ -3,7 +3,7 @@ package org.prography.localdb.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
-import org.prography.domain.model.store.BookmarkModel
+import org.prography.domain.model.store.StoreModel
 
 @Serializable
 @Entity(tableName = "cake_store_bookmark_table")
@@ -16,7 +16,7 @@ data class BookmarkEntity(
     val imageUrls: List<String>,
     val bookmarked: Boolean,
 ) {
-    fun toModel() = BookmarkModel(
+    fun toModel() = StoreModel(
         id = id,
         name = name,
         district = district,

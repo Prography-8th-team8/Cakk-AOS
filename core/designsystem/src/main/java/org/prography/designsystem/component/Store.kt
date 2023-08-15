@@ -25,7 +25,6 @@ import org.prography.designsystem.mapper.toColor
 import org.prography.designsystem.ui.theme.*
 import org.prography.domain.model.enums.DistrictType
 import org.prography.domain.model.enums.StoreType
-import org.prography.domain.model.store.BookmarkModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
 
@@ -33,8 +32,8 @@ import org.prography.utility.extensions.toSp
 fun StoreItemContent(
     modifier: Modifier = Modifier,
     storeModel: StoreModel = StoreModel(),
-    bookmarkModel: BookmarkModel = BookmarkModel(),
     isFavorite: Boolean = false,
+    isHomeScreen: Boolean = true,
     bookmark: () -> Unit = {},
     unBookmark: () -> Unit = {},
     onClick: () -> Unit = {}
@@ -49,11 +48,7 @@ fun StoreItemContent(
                 .padding(vertical = 20.dp)
                 .padding(start = 20.dp)
         ) {
-            if (storeModel.id != 0) {
-                StoreContent(storeModel, bookmark, unBookmark, isFavorite)
-            } else {
-                BookmarkContent(bookmarkModel, bookmark, unBookmark, isFavorite)
-            }
+            StoreContent(storeModel, bookmark, unBookmark, isFavorite, isHomeScreen)
         }
     }
 }
@@ -64,6 +59,7 @@ private fun StoreContent(
     bookmark: () -> Unit,
     unBookmark: () -> Unit,
     isFavorite: Boolean,
+    isHomeScreen: Boolean
 ) {
     StoreItemHeader(
         storeName = storeModel.name,
@@ -74,33 +70,35 @@ private fun StoreContent(
         isFavorite = isFavorite,
     )
 
-    StoreItemTagRow(
-        storeTypes = storeModel.storeTypes,
-        emptyContent = {
-            EmptyStoreItemTag(Modifier.padding(top = 12.dp))
-        },
-        content = {
-            StoreItemTag(
-                modifier = Modifier.padding(top = 12.dp),
-                storeTypes = storeModel.storeTypes,
-                maxCount = 3
-            ) { size ->
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = Black
-                ) {
-                    Text(
-                        text = String.format(stringResource(R.string.home_num_of_keyword), size),
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                        color = White,
-                        fontSize = 12.dp.toSp(),
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = pretendard
-                    )
+    if (isHomeScreen) {
+        StoreItemTagRow(
+            storeTypes = storeModel.storeTypes,
+            emptyContent = {
+                EmptyStoreItemTag(Modifier.padding(top = 12.dp))
+            },
+            content = {
+                StoreItemTag(
+                    modifier = Modifier.padding(top = 12.dp),
+                    storeTypes = storeModel.storeTypes,
+                    maxCount = 3
+                ) { size ->
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = Black
+                    ) {
+                        Text(
+                            text = String.format(stringResource(R.string.home_num_of_keyword), size),
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
+                            color = White,
+                            fontSize = 12.dp.toSp(),
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = pretendard
+                        )
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 
     StoreItemImageRow(
         storeImageUrls = storeModel.imageUrls,
@@ -111,36 +109,6 @@ private fun StoreContent(
             StoreItemImage(
                 modifier = Modifier.padding(top = 32.dp),
                 storeImageUrls = storeModel.imageUrls
-            )
-        }
-    )
-}
-
-@Composable
-private fun BookmarkContent(
-    bookmarkModel: BookmarkModel,
-    bookmark: () -> Unit,
-    unBookmark: () -> Unit,
-    isFavorite: Boolean,
-) {
-    StoreItemHeader(
-        storeName = bookmarkModel.name,
-        storeDistrict = bookmarkModel.district,
-        storeLocation = bookmarkModel.location,
-        bookmark = bookmark,
-        unBookmark = unBookmark,
-        isFavorite = isFavorite
-    )
-
-    StoreItemImageRow(
-        storeImageUrls = bookmarkModel.imageUrls,
-        emptyContent = {
-            EmptyStoreItemImage(Modifier.padding(top = 32.dp))
-        },
-        content = {
-            StoreItemImage(
-                modifier = Modifier.padding(top = 32.dp),
-                storeImageUrls = bookmarkModel.imageUrls
             )
         }
     )
