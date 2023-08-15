@@ -1,16 +1,13 @@
 package org.prography.localdb.converter
 
 import androidx.room.TypeConverter
-import com.google.gson.Gson
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class ImageListConverters {
     @TypeConverter
-    fun listToJson(value: List<String>?): String {
-        return Gson().toJson(value)
-    }
+    fun listToJson(value: List<String>) = Json.encodeToString(value)
 
     @TypeConverter
-    fun jsonToList(value: String): List<String>? {
-        return Gson().fromJson(value, Array<String>::class.java)?.toList()
-    }
+    fun jsonToList(value: String) = Json.decodeFromString<List<String>>(value)
 }
