@@ -111,7 +111,7 @@ class HomeViewModel @Inject constructor(
             .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
             .flatMapMerge { storeRepository.fetchBookmarkedCakeShop(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
-            .onEach { sendAction(HomeUiAction.LoadBookmarkedCakeShop(it?.id)) }
+            .onEach { it?.id?.let { id -> sendAction(HomeUiAction.LoadBookmarkedCakeShop(id)) } }
             .launchIn(viewModelScope)
     }
 
@@ -146,7 +146,7 @@ class HomeViewModel @Inject constructor(
             .onEach { sendAction(HomeUiAction.LoadStoreType(it)) }
             .flatMapMerge { storeRepository.fetchBookmarkedCakeShop(it.id) }
             .onStart { sendAction(HomeUiAction.Loading) }
-            .onEach { sendAction(HomeUiAction.LoadBookmarkedCakeShop(it?.id)) }
+            .onEach { it?.id?.let { id -> sendAction(HomeUiAction.LoadBookmarkedCakeShop(id)) } }
             .launchIn(viewModelScope)
     }
 
