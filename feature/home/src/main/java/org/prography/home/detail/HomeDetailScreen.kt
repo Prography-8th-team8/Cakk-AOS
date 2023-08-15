@@ -69,6 +69,7 @@ import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
 import org.prography.domain.model.store.BlogPostModel
 import org.prography.domain.model.store.StoreDetailModel
+import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
 
 private enum class TabType(val label: String) {
@@ -105,6 +106,9 @@ fun HomeDetailScreen(
             storeDetailModel = storeDetailUiState.storeDetailModel,
             storeBlogPosts = storeDetailUiState.blogPosts,
             showBlogPostCount = storeDetailUiState.showBlogPostCount,
+            isFavorite = storeDetailUiState.storeDetailModel.bookmarked,
+            onFavoriteClick = { homeDetailViewModel.bookmarkCakeShop(it) },
+            onUnFavoriteClick = { homeDetailViewModel.unBookmarkCakeShop(it) },
             onChangeBlogPostCount = { homeDetailViewModel.changeShowBlogCount(it) },
             storeLatitude = storeDetailUiState.storeDetailModel.latitude,
             storeLongitude = storeDetailUiState.storeDetailModel.longitude
@@ -119,6 +123,9 @@ private fun HomeDetailContent(
     storeDetailModel: StoreDetailModel,
     storeBlogPosts: List<BlogPostModel>,
     showBlogPostCount: Int,
+    isFavorite: Boolean = false,
+    onFavoriteClick: (StoreModel) -> Unit = {},
+    onUnFavoriteClick: (Int) -> Unit = {},
     onChangeBlogPostCount: (Int) -> Unit = {},
     storeLatitude: Double,
     storeLongitude: Double
@@ -213,6 +220,22 @@ private fun HomeDetailContent(
                     storeLocation = storeDetailModel.location,
                     storeLink = storeDetailModel.link,
                     storeThumbnail = storeDetailModel.thumbnail,
+                    isFavorite = isFavorite,
+                    bookmark = {
+                        onFavoriteClick(
+                            StoreModel(
+                                id = storeDetailModel.id,
+                                name = storeDetailModel.name,
+                                district = storeDetailModel.district,
+                                location = storeDetailModel.location,
+                                imageUrls = storeDetailModel.imageUrls,
+                                bookmarked = true
+                            )
+                        )
+                    },
+                    unBookmark = {
+                        onUnFavoriteClick(storeDetailModel.id)
+                    },
                     onChangeDialogState = { isVisibleDialog = isVisibleDialog.not() }
                 )
                 HomeDetailKeywordRow(
@@ -417,6 +440,9 @@ private fun HomeDetailHeader(
     storeLocation: String,
     storeLink: String,
     storeThumbnail: String? = null,
+    isFavorite: Boolean = false,
+    bookmark: () -> Unit,
+    unBookmark: () -> Unit,
     onChangeDialogState: () -> Unit
 ) {
     Column(
@@ -438,7 +464,10 @@ private fun HomeDetailHeader(
             storeName = storeName,
             storeLocation = storeLocation,
             storeLink = storeLink,
-            onChangeDialogState = onChangeDialogState
+            isFavorite = isFavorite,
+            bookmark = bookmark,
+            unBookmark = unBookmark,
+            onChangeDialogState = onChangeDialogState,
         )
     }
 }
@@ -491,7 +520,10 @@ private fun HomeDetailHeaderTab(
     storeName: String,
     storeLocation: String,
     storeLink: String,
-    onChangeDialogState: () -> Unit
+    isFavorite: Boolean = false,
+    bookmark: () -> Unit,
+    unBookmark: () -> Unit,
+    onChangeDialogState: () -> Unit,
 ) {
     val context = LocalContext.current
     Row(modifier) {
@@ -519,8 +551,19 @@ private fun HomeDetailHeaderTab(
         )
 
         HomeDetailHeaderTabItem(
-            iconRes = R.drawable.ic_heart,
-            stringRes = R.string.home_detail_bookmark
+            iconRes = if (isFavorite) {
+                R.drawable.ic_heart_sel
+            } else {
+                R.drawable.ic_heart
+            },
+            stringRes = R.string.home_detail_bookmark,
+            onClick = {
+                if (isFavorite.not()) {
+                    bookmark()
+                } else {
+                    unBookmark()
+                }
+            },
         )
 
         Spacer(
