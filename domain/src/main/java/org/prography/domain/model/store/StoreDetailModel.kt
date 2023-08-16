@@ -17,4 +17,5 @@ data class StoreDetailModel(
     val phoneNumber: String = "",
     val imageUrls: List<String> = listOf(),
     val storeTypes: List<String> = listOf(),
+    val bookmarked: Boolean = false,
 )

@@ -44,6 +44,7 @@ import org.prography.designsystem.ui.theme.Light_Deep_Pink
 import org.prography.designsystem.ui.theme.Raisin_Black
 import org.prography.designsystem.ui.theme.White
 import org.prography.designsystem.ui.theme.pretendard
+import org.prography.domain.model.store.StoreModel
 import org.prography.utility.extensions.toSp
 
 @Composable
@@ -76,6 +77,22 @@ fun FeedDetailScreen(
             storeId = storeId,
             storeLocation = feedDetailUiState.storeDetailModel.location,
             storeImageUrls = feedDetailUiState.storeDetailModel.imageUrls,
+            bookmarked = feedDetailUiState.storeDetailModel.bookmarked,
+            bookmark = {
+                feedDetailViewModel.bookmarkCakeShop(
+                    StoreModel(
+                        id = feedDetailUiState.storeDetailModel.id,
+                        name = feedDetailUiState.storeDetailModel.name,
+                        district = feedDetailUiState.storeDetailModel.district,
+                        location = feedDetailUiState.storeDetailModel.location,
+                        imageUrls = feedDetailUiState.storeDetailModel.imageUrls,
+                        bookmarked = true
+                    )
+                )
+            },
+            unBookmark = {
+                feedDetailViewModel.unBookmarkCakeShop(feedDetailUiState.storeDetailModel.id)
+            },
             onNavigateHomeDetail = onNavigateHomeDetail
         )
     }
@@ -88,6 +105,9 @@ private fun FeedDetailContent(
     storeId: Int,
     storeLocation: String,
     storeImageUrls: List<String>,
+    bookmarked: Boolean = false,
+    bookmark: () -> Unit = {},
+    unBookmark: () -> Unit = {},
     onNavigateHomeDetail: (Int) -> Unit,
 ) {
     val pagerState = rememberPagerState { storeImageUrls.size }
@@ -205,13 +225,25 @@ private fun FeedDetailContent(
             }
             Spacer(Modifier.weight(1f))
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    if (bookmarked.not()) {
+                        bookmark()
+                    } else {
+                        unBookmark()
+                    }
+                },
                 modifier = Modifier
                     .size(56.dp)
                     .border(1.dp, Raisin_Black.copy(0.1f), RoundedCornerShape(12.dp))
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_heart),
+                    painter = painterResource(
+                        if (bookmarked.not()) {
+                            R.drawable.ic_heart
+                        } else {
+                            R.drawable.ic_heart_sel
+                        }
+                    ),
                     contentDescription = null,
                     modifier = Modifier.size(30.dp),
                     tint = Raisin_Black.copy(0.4f)

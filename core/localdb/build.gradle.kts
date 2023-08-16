@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -18,6 +19,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.datastore)
+    implementation(libs.gson)
+    implementation(libs.kotlin.serialization)
     implementation(libs.bundles.androidx.room)
     kapt(libs.androidx.room.compiler)
     kapt(libs.dagger.hilt.compiler)

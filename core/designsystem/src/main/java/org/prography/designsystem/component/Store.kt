@@ -32,7 +32,10 @@ import org.prography.utility.extensions.toSp
 fun StoreItemContent(
     modifier: Modifier = Modifier,
     storeModel: StoreModel = StoreModel(),
-    onFavoriteClick: () -> Unit = {},
+    isFavorite: Boolean = false,
+    isHomeScreen: Boolean = true,
+    bookmark: () -> Unit = {},
+    unBookmark: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     Surface(
@@ -45,55 +48,70 @@ fun StoreItemContent(
                 .padding(vertical = 20.dp)
                 .padding(start = 20.dp)
         ) {
-            StoreItemHeader(
-                storeName = storeModel.name,
-                storeDistrict = storeModel.district,
-                storeLocation = storeModel.location,
-                onClick = onFavoriteClick
-            )
-
-            StoreItemTagRow(
-                storeTypes = storeModel.storeTypes,
-                emptyContent = {
-                    EmptyStoreItemTag(Modifier.padding(top = 12.dp))
-                },
-                content = {
-                    StoreItemTag(
-                        modifier = Modifier.padding(top = 12.dp),
-                        storeTypes = storeModel.storeTypes,
-                        maxCount = 3
-                    ) { size ->
-                        Surface(
-                            shape = RoundedCornerShape(14.dp),
-                            color = Black
-                        ) {
-                            Text(
-                                text = String.format(stringResource(R.string.home_num_of_keyword), size),
-                                modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
-                                color = White,
-                                fontSize = 12.dp.toSp(),
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = pretendard
-                            )
-                        }
-                    }
-                }
-            )
-
-            StoreItemImageRow(
-                storeImageUrls = storeModel.imageUrls,
-                emptyContent = {
-                    EmptyStoreItemImage(Modifier.padding(top = 32.dp))
-                },
-                content = {
-                    StoreItemImage(
-                        modifier = Modifier.padding(top = 32.dp),
-                        storeImageUrls = storeModel.imageUrls
-                    )
-                }
-            )
+            StoreContent(storeModel, bookmark, unBookmark, isFavorite, isHomeScreen)
         }
     }
+}
+
+@Composable
+private fun StoreContent(
+    storeModel: StoreModel,
+    bookmark: () -> Unit,
+    unBookmark: () -> Unit,
+    isFavorite: Boolean,
+    isHomeScreen: Boolean
+) {
+    StoreItemHeader(
+        storeName = storeModel.name,
+        storeDistrict = storeModel.district,
+        storeLocation = storeModel.location,
+        bookmark = bookmark,
+        unBookmark = unBookmark,
+        isFavorite = isFavorite,
+    )
+
+    if (isHomeScreen) {
+        StoreItemTagRow(
+            storeTypes = storeModel.storeTypes,
+            emptyContent = {
+                EmptyStoreItemTag(Modifier.padding(top = 12.dp))
+            },
+            content = {
+                StoreItemTag(
+                    modifier = Modifier.padding(top = 12.dp),
+                    storeTypes = storeModel.storeTypes,
+                    maxCount = 3
+                ) { size ->
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = Black
+                    ) {
+                        Text(
+                            text = String.format(stringResource(R.string.home_num_of_keyword), size),
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp),
+                            color = White,
+                            fontSize = 12.dp.toSp(),
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = pretendard
+                        )
+                    }
+                }
+            }
+        )
+    }
+
+    StoreItemImageRow(
+        storeImageUrls = storeModel.imageUrls,
+        emptyContent = {
+            EmptyStoreItemImage(Modifier.padding(top = 32.dp))
+        },
+        content = {
+            StoreItemImage(
+                modifier = Modifier.padding(top = 32.dp),
+                storeImageUrls = storeModel.imageUrls
+            )
+        }
+    )
 }
 
 @Composable
@@ -216,9 +234,10 @@ internal fun StoreItemHeader(
     storeName: String,
     storeDistrict: String,
     storeLocation: String,
-    onClick: () -> Unit
+    bookmark: () -> Unit,
+    unBookmark: () -> Unit,
+    isFavorite: Boolean = false
 ) {
-    var isFavorite by remember { mutableStateOf(false) }
     Row(modifier) {
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -257,8 +276,11 @@ internal fun StoreItemHeader(
 
         IconButton(
             onClick = {
-                isFavorite = isFavorite.not()
-                onClick()
+                if (isFavorite.not()) {
+                    bookmark()
+                } else {
+                    unBookmark()
+                }
             },
             modifier = Modifier
                 .padding(end = 20.dp)

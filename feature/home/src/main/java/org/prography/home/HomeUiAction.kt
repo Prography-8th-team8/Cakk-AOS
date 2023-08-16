@@ -9,6 +9,12 @@ sealed class HomeUiAction : BaseAction {
 
     data class LoadStoreType(val storeModel: StoreModel) : HomeUiAction()
 
+    data class LoadBookmarkedCakeShop(val id: Int) : HomeUiAction()
+
+    data class BookmarkCakeShop(val id: Int) : HomeUiAction()
+
+    data class UnBookmarkCakeShop(val id: Int) : HomeUiAction()
+
     data class ReloadStore(val storeModels: List<StoreModel>) : HomeUiAction()
 
     object BottomSheetExpandFull : HomeUiAction()

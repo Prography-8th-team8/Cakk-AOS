@@ -214,7 +214,11 @@ private fun BottomSheet(
                             } else {
                                 listOf()
                             },
-                            storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) storeCountArg else homeUiState.storeModels.size,
+                            storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) {
+                                storeCountArg
+                            } else {
+                                homeUiState.storeModels.size
+                            },
                             onNavigateToOnBoarding = onNavigateToOnBoarding,
                             onNavigateToDetail = onNavigateToDetail,
                             openFilterSheet = {
@@ -224,7 +228,9 @@ private fun BottomSheet(
                                 offsetY = expandedType
                                     .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
                                     .value
-                            }
+                            },
+                            onFavoriteClick = { homeViewModel.bookmarkCakeShop(it) },
+                            onUnFavoriteClick = { homeViewModel.unBookmarkCakeShop(it) }
                         )
                     }
 
@@ -468,7 +474,9 @@ private fun CakeStoreContent(
     storeCount: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
-    openFilterSheet: () -> Unit
+    openFilterSheet: () -> Unit,
+    onFavoriteClick: (StoreModel) -> Unit,
+    onUnFavoriteClick: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -497,6 +505,22 @@ private fun CakeStoreContent(
                 StoreItemContent(
                     modifier = Modifier.fillMaxWidth(),
                     storeModel = store,
+                    bookmark = {
+                        onFavoriteClick(
+                            StoreModel(
+                                id = store.id,
+                                name = store.name,
+                                district = store.district,
+                                location = store.location,
+                                imageUrls = store.imageUrls,
+                                bookmarked = true
+                            )
+                        )
+                    },
+                    isFavorite = store.bookmarked,
+                    unBookmark = {
+                        onUnFavoriteClick(store.id)
+                    },
                     onClick = { onNavigateToDetail(store.id) }
                 )
             }
