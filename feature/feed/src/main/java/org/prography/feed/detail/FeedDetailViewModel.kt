@@ -59,7 +59,7 @@ class FeedDetailViewModel @Inject constructor(
             .onEach { sendAction(FeedDetailAction.LoadDetailInfo(it)) }
             .flatMapMerge { storeRepository.fetchBookmarkedCakeShop(it.id) }
             .onStart { sendAction(FeedDetailAction.Loading) }
-            .onEach { it?.id?.let { id -> sendAction(FeedDetailAction.LoadBookmarkedCakeShop(id)) } }
+            .onEach { it?.let { bookmarkedCakeShop -> sendAction(FeedDetailAction.LoadBookmarkedCakeShop(bookmarkedCakeShop.id)) } }
             .launchIn(viewModelScope)
     }
 

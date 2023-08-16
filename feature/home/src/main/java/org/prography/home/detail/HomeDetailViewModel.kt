@@ -71,7 +71,7 @@ class HomeDetailViewModel @Inject constructor(
             .onEach { sendAction(HomeDetailAction.LoadDetailInfo(it)) }
             .flatMapMerge { storeRepository.fetchBookmarkedCakeShop(it.id) }
             .onStart { sendAction(HomeDetailAction.Loading) }
-            .onEach { it?.id?.let { id -> sendAction(HomeDetailAction.LoadBookmarkedCakeShop(id)) } }
+            .onEach { it?.let { bookmarkedCakeShop -> sendAction(HomeDetailAction.LoadBookmarkedCakeShop(bookmarkedCakeShop.id)) } }
             .launchIn(viewModelScope)
     }
 
