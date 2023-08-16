@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -124,10 +125,10 @@ private fun BottomSheet(
     )
     val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
     var isFullDetailScreen = false
-
     var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
     var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
+    val modifier = if (homeUiState.bottomSheetType != BottomSheetType.Filter) Modifier.height(height) else Modifier.wrapContentHeight()
 
     LaunchedEffect(homeViewModel) {
         homeViewModel.sideEffect.collectLatest {
@@ -158,9 +159,8 @@ private fun BottomSheet(
         },
         sheetContent = {
             Box(
-                Modifier
+                modifier
                     .fillMaxWidth()
-                    .height(height)
                     .background(White)
                     .pointerInput(Unit) {
                         detectDragGestures(
@@ -235,24 +235,28 @@ private fun BottomSheet(
                     }
 
                     BottomSheetType.Filter -> {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .fillMaxHeight()
-                                .padding(horizontal = 20.dp),
+                                .wrapContentHeight(),
+                            verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             val selectFilter = remember {
-                                mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
+                                mutableStateListOf(false, false, false, false, false, false, false, false, false, false)
                             }
                             val filters = remember { mutableStateOf("") }
 
-                            FilterTopBar(selectFilter) {
-                                homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
-                                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
-                                expandedType = ExpandedType.QUARTER
-                                offsetY = expandedType
-                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                    .value
+                            Column {
+                                FilterTopBar(selectFilter = selectFilter) {
+                                    homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
+                                    homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
+                                    expandedType = ExpandedType.QUARTER
+                                    offsetY = expandedType
+                                        .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                        .value
+                                }
+                                Spacer(modifier = Modifier.height(21.dp))
+                                Filters(selectFilter = selectFilter)
                             }
                             FilterSelectButton(
                                 selectFilter,
@@ -312,25 +316,39 @@ private fun FilterTopBar(
             painterResource(R.drawable.ic_close),
             contentDescription = null,
             modifier = Modifier
-                .padding(top = 22.dp)
+                .padding(top = 20.dp, end = 20.dp)
                 .align(Alignment.End)
                 .clickable { backToCakeStore() },
         )
+        Spacer(modifier = Modifier.height(9.dp))
         Text(
-            text = stringResource(id = R.string.home_filter_recommend),
-            color = Black.copy(alpha = 0.6f),
-            fontSize = 16.dp.toSp(),
-            fontWeight = FontWeight.Normal,
+            text = stringResource(id = R.string.home_filter),
+            modifier = Modifier.padding(start = 20.dp),
+            color = Raisin_Black,
+            fontSize = 18.dp.toSp(),
+            fontWeight = FontWeight.Bold,
             fontFamily = pretendard,
         )
-        Spacer(modifier = Modifier.width(9.dp))
-        Image(
-            painterResource(id = R.drawable.ic_refresh),
-            contentDescription = stringResource(id = R.string.home_content_description_filter_refresh_btn),
-            modifier = Modifier.clickable {
-                selectFilter.indices.forEach { selectFilter[it] = false }
-            }
-        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(id = R.string.home_filter_recommend),
+                modifier = Modifier.padding(start = 20.dp),
+                color = Raisin_Black.copy(alpha = 0.6f),
+                fontSize = 14.dp.toSp(),
+                fontWeight = FontWeight.Normal,
+                fontFamily = pretendard,
+                letterSpacing = (-0.03).em
+            )
+            Spacer(modifier = Modifier.width(13.dp))
+            Image(
+                painterResource(id = R.drawable.ic_refresh),
+                contentDescription = stringResource(id = R.string.home_content_description_filter_refresh_btn),
+                modifier = Modifier.clickable {
+                    selectFilter.indices.forEach { selectFilter[it] = false }
+                }
+            )
+        }
     }
 }
 
@@ -338,7 +356,7 @@ private fun FilterTopBar(
 @OptIn(ExperimentalLayoutApi::class)
 private fun Filters(selectFilter: SnapshotStateList<Boolean>) {
     FlowRow(
-        modifier = Modifier.padding(start = 16.dp, top = 25.dp, end = 16.dp)
+        modifier = Modifier.padding(start = 16.dp, end = 18.dp)
     ) {
         StoreType.values().forEachIndexed { index, storeType ->
             Row(
@@ -364,11 +382,12 @@ private fun Filters(selectFilter: SnapshotStateList<Boolean>) {
                 Spacer(modifier = Modifier.width(if (storeType.toIcon() == null) 12.dp else 4.dp))
                 Text(
                     text = storeType.tag,
-                    modifier = Modifier.padding(top = 9.dp, end = 12.dp, bottom = 9.dp),
+                    modifier = Modifier.padding(top = 10.dp, end = 12.dp, bottom = 10.dp),
                     color = Raisin_Black,
                     fontSize = 14.dp.toSp(),
                     fontWeight = FontWeight.Bold,
                     fontFamily = pretendard,
+                    letterSpacing = (-0.03).em
                 )
             }
         }
@@ -386,22 +405,20 @@ private fun FilterSelectButton(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
             .padding(start = 16.dp, bottom = 12.dp, end = 16.dp)
             .clickable(enabled = selectFilter.count { it } > 0) {
-                StoreType
-                    .values()
-                    .forEachIndexed { index, storeType ->
-                        if (selectFilter[index]) filters.value += "${storeType.name},"
-                    }
-                homeViewModel.fetchStoreList(
-                    districts = districtsArg.split(" "),
-                    storeTypes = filters.value
-                )
+                StoreType.values().forEachIndexed { index, storeType ->
+                    if (selectFilter[index]) filters.value += "${storeType.name},"
+                }
+                homeViewModel.saveStoreTypes(filters.value)
+//                homeViewModel.fetchStoreList(
+//                    districts = districtsArg.split(" "),
+//                    storeTypes = filters.value
+//                )
                 homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                 backToCakeStore()
             },
-        shape = RoundedCornerShape(15.dp),
+        shape = RoundedCornerShape(12.dp),
         color = if (selectFilter.count { it } > 0) Light_Deep_Pink else Raisin_Black.copy(alpha = 0.2f),
     ) {
         Text(
