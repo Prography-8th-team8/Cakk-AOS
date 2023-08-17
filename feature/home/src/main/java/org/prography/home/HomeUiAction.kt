@@ -17,6 +17,8 @@ sealed class HomeUiAction : BaseAction {
 
     data class ReloadStore(val storeModels: List<StoreModel>) : HomeUiAction()
 
+    data class LoadStoreTypes(val storeTypes: String) : HomeUiAction()
+
     object BottomSheetExpandFull : HomeUiAction()
 
     object BottomSheetExpandQuarter : HomeUiAction()
