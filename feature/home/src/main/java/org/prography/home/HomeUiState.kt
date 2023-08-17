@@ -7,6 +7,7 @@ import org.prography.domain.model.store.StoreModel
 
 data class HomeUiState(
     val storeModels: List<StoreModel> = listOf(),
+    val storeTypes: String = "LETTERING, CHARACTER, MEALBOX, TIARA, RICE, FLOWER, PHOTO, FIGURE, SOLID, ETC",
     val bottomSheetType: BottomSheetType = BottomSheetType.StoreList,
     val expandedType: ExpandedType = ExpandedType.QUARTER,
     val isReload: Boolean = false
