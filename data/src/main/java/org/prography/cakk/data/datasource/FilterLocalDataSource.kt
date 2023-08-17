@@ -12,7 +12,7 @@ class FilterLocalDataSource @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     fun fetchFilters(): Flow<String> = dataStore.data.map { preferences ->
-        preferences[FILTER] ?: ""
+        preferences[FILTER] ?: "LETTERING,CHARACTER,MEALBOX,TIARA,RICE,FLOWER,PHOTO,FIGURE,SOLID,ETC"
     }
 
     suspend fun saveFilters(filters: String) {
