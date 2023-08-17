@@ -75,6 +75,8 @@ fun HomeScreen(
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
+    val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
+
     val fromOnBoarding = districtsArg != DEFAULT_DISTRICTS_INFO && storeCountArg != DEFAULT_STORE_COUNT
     LocationPermission(
         fromOnBoarding = fromOnBoarding,
@@ -94,7 +96,7 @@ fun HomeScreen(
         if (fromOnBoarding) {
             homeViewModel.fetchStoreList(
                 districts = districtsArg.split(" "),
-                storeTypes = StoreType.values().joinToString(",") { it.name }
+                storeTypes = homeUiState.storeTypes
             )
         }
     }
@@ -129,13 +131,24 @@ private fun BottomSheet(
     var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
     val modifier = if (homeUiState.bottomSheetType != BottomSheetType.Filter) Modifier.height(height) else Modifier.wrapContentHeight()
+    val cameraPositionState: CameraPositionState =
+        rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
+    val clickLocationChange = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(homeViewModel) {
         homeViewModel.sideEffect.collectLatest {
             when (it) {
                 HomeSideEffect.ReloadError -> {
                     bottomSheetScaffoldState.snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.snackbar_not_provide_service)
+                        message = context.getString(R.string.snackbar_not_provide_service),
+                        actionLabel = "reload"
+                    )
+                }
+
+                HomeSideEffect.FilterCakeShop -> {
+                    bottomSheetScaffoldState.snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.snackbar_filter_cake_shop_success),
+                        actionLabel = "filter"
                     )
                 }
             }
@@ -153,7 +166,11 @@ private fun BottomSheet(
             CakkSnackbarHost(snackbarHostState = snackbarHostState) { snackbarData ->
                 CakkSnackbar(
                     snackbarData = snackbarData,
-                    modifier = Modifier.align(Alignment.BottomCenter)
+                    modifier = if (snackbarData.actionLabel == "filter") {
+                        Modifier.align(Alignment.TopCenter)
+                    } else {
+                        Modifier.align(Alignment.BottomCenter)
+                    }
                 )
             }
         },
@@ -219,6 +236,7 @@ private fun BottomSheet(
                             } else {
                                 homeUiState.storeModels.size
                             },
+                            storeTypesSize = homeUiState.storeTypes.split(",").size - 1,
                             onNavigateToOnBoarding = onNavigateToOnBoarding,
                             onNavigateToDetail = onNavigateToDetail,
                             openFilterSheet = {
@@ -230,7 +248,8 @@ private fun BottomSheet(
                                     .value
                             },
                             onFavoriteClick = { homeViewModel.bookmarkCakeShop(it) },
-                            onUnFavoriteClick = { homeViewModel.unBookmarkCakeShop(it) }
+                            onUnFavoriteClick = { homeViewModel.unBookmarkCakeShop(it) },
+                            clickLocationChange = clickLocationChange
                         )
                     }
 
@@ -259,10 +278,12 @@ private fun BottomSheet(
                                 Filters(selectFilter = selectFilter)
                             }
                             FilterSelectButton(
-                                selectFilter,
-                                filters,
-                                homeViewModel,
-                                districtsArg,
+                                selectFilter = selectFilter,
+                                filters = filters,
+                                homeViewModel = homeViewModel,
+                                districtsArg = districtsArg,
+                                cameraPositionState = cameraPositionState,
+                                clickLocationChange = clickLocationChange
                             ) {
                                 homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
                                 homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
@@ -286,8 +307,6 @@ private fun BottomSheet(
         },
         sheetPeekHeight = height,
     ) {
-        val cameraPositionState: CameraPositionState =
-            rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
         Box(modifier = Modifier.fillMaxSize()) {
             CakkMap(
                 homeViewModel = homeViewModel,
@@ -300,7 +319,8 @@ private fun BottomSheet(
             SearchArea(
                 homeViewModel = homeViewModel,
                 modifier = Modifier.align(Alignment.TopCenter),
-                cameraPositionState = cameraPositionState
+                cameraPositionState = cameraPositionState,
+                clickLocationChange = clickLocationChange
             )
         }
     }
@@ -400,6 +420,8 @@ private fun FilterSelectButton(
     filters: MutableState<String>,
     homeViewModel: HomeViewModel,
     districtsArg: String,
+    cameraPositionState: CameraPositionState,
+    clickLocationChange: MutableState<Boolean>,
     backToCakeStore: () -> Unit,
 ) {
     Surface(
@@ -407,14 +429,28 @@ private fun FilterSelectButton(
             .fillMaxWidth()
             .padding(start = 16.dp, bottom = 12.dp, end = 16.dp)
             .clickable(enabled = selectFilter.count { it } > 0) {
-                StoreType.values().forEachIndexed { index, storeType ->
-                    if (selectFilter[index]) filters.value += "${storeType.name},"
+                StoreType
+                    .values()
+                    .forEachIndexed { index, storeType ->
+                        if (selectFilter[index]) filters.value += "${storeType.name},"
+                    }
+
+                if (clickLocationChange.value) {
+                    homeViewModel.saveStoreTypes(
+                        cameraPositionState.contentBounds?.southWest?.latitude,
+                        cameraPositionState.contentBounds?.southWest?.longitude,
+                        cameraPositionState.contentBounds?.northEast?.latitude,
+                        cameraPositionState.contentBounds?.northEast?.longitude,
+                        storeTypes = filters.value,
+                        clickLocationChange = clickLocationChange.value
+                    )
+                } else {
+                    homeViewModel.saveStoreTypes(
+                        districts = districtsArg.split(" "),
+                        storeTypes = filters.value,
+                        clickLocationChange = clickLocationChange.value
+                    )
                 }
-                homeViewModel.saveStoreTypes(filters.value)
-//                homeViewModel.fetchStoreList(
-//                    districts = districtsArg.split(" "),
-//                    storeTypes = filters.value
-//                )
                 homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                 backToCakeStore()
             },
@@ -437,7 +473,8 @@ private fun FilterSelectButton(
 private fun SearchArea(
     homeViewModel: HomeViewModel,
     modifier: Modifier,
-    cameraPositionState: CameraPositionState
+    cameraPositionState: CameraPositionState,
+    clickLocationChange: MutableState<Boolean>
 ) {
     var canReload by remember { mutableStateOf(false) }
     LaunchedEffect(cameraPositionState) {
@@ -453,9 +490,10 @@ private fun SearchArea(
                 cameraPositionState.contentBounds?.southWest?.latitude,
                 cameraPositionState.contentBounds?.southWest?.longitude,
                 cameraPositionState.contentBounds?.northEast?.latitude,
-                cameraPositionState.contentBounds?.northEast?.longitude
+                cameraPositionState.contentBounds?.northEast?.longitude,
             )
             canReload = false
+            clickLocationChange.value = true
         },
         modifier = modifier.padding(top = 24.dp),
         enabled = canReload,
@@ -489,11 +527,13 @@ private fun CakeStoreContent(
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
+    storeTypesSize: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
     openFilterSheet: () -> Unit,
     onFavoriteClick: (StoreModel) -> Unit,
     onUnFavoriteClick: (Int) -> Unit,
+    clickLocationChange: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -512,7 +552,9 @@ private fun CakeStoreContent(
             },
             storeCount = storeCount,
             onNavigateToOnBoarding = onNavigateToOnBoarding,
-            openFilterSheet = openFilterSheet
+            openFilterSheet = openFilterSheet,
+            storeTypesSize = storeTypesSize,
+            clickLocationChange = clickLocationChange
         )
 
         LazyColumn(
@@ -550,8 +592,10 @@ private fun CakkStoreTopBar(
     modifier: Modifier,
     title: String,
     storeCount: Int,
+    storeTypesSize: Int,
     onNavigateToOnBoarding: () -> Unit,
     openFilterSheet: () -> Unit,
+    clickLocationChange: MutableState<Boolean>,
 ) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
@@ -595,7 +639,10 @@ private fun CakkStoreTopBar(
                     text = stringResource(id = R.string.home_change_location),
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .clickable { onNavigateToOnBoarding() },
+                        .clickable {
+                            onNavigateToOnBoarding()
+                            clickLocationChange.value = false
+                        },
                     fontFamily = pretendard,
                     fontSize = 12.dp.toSp(),
                     color = Raisin_Black.copy(alpha = 0.8f),
@@ -603,11 +650,41 @@ private fun CakkStoreTopBar(
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Image(
-                painter = painterResource(id = R.drawable.ic_filter),
-                contentDescription = null,
-                modifier = Modifier.clickable { openFilterSheet() }
-            )
+            Box(
+                modifier = Modifier
+                    .width(41.dp)
+                    .height(41.dp)
+            ) {
+                Image(
+                    painter = if (storeTypesSize != 10) {
+                        painterResource(id = R.drawable.ic_filter_black)
+                    } else {
+                        painterResource(id = R.drawable.ic_filter)
+                    },
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .clickable { openFilterSheet() }
+                )
+                if (storeTypesSize != 10) {
+                    Box(
+                        Modifier.align(Alignment.TopEnd),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_circle),
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = "$storeTypesSize",
+                            color = White,
+                            fontSize = 10.dp.toSp(),
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = pretendard
+                        )
+                    }
+                }
+            }
         }
     }
 }
