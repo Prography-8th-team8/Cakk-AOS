@@ -232,7 +232,7 @@ private fun BottomSheet(
                                 listOf()
                             },
                             storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) {
-                                storeCountArg
+                                homeUiState.storeModels.size
                             } else {
                                 homeUiState.storeModels.size
                             },
