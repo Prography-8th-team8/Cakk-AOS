@@ -1,6 +1,6 @@
 [versions]
 androidGradlePlugin = "8.0.1"
-accompanist = "0.31.5-beta"
+accompanist = "0.33.0-alpha"
 
 # androidX
 androidxComposeCompiler = "1.4.3"
@@ -46,7 +46,7 @@ plugin-androidGradle = { group = "com.android.tools.build", name = "gradle", ver
 plugin-secrets-gradle = { group = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", name = "secrets-gradle-plugin", version.ref = "secrets-gradle" }
 
 # accompanist
-accompanist-systemuicontroller = "com.google.accompanist:accompanist-systemuicontroller:0.33.0-alpha"
+accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
 accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanist" }
 
 # AndroidX
