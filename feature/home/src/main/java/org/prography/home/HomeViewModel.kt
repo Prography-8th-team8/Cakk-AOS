@@ -75,6 +75,10 @@ class HomeViewModel @Inject constructor(
             )
         }
 
+        is HomeUiAction.FilterCakeShop -> {
+            currentState.copy(storeModels = listOf())
+        }
+
         is HomeUiAction.LoadStoreList -> {
             currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
         }
@@ -192,6 +196,7 @@ class HomeViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             filterRepository.saveFilters(storeTypes)
+            sendAction(HomeUiAction.FilterCakeShop)
             sendAction(HomeUiAction.LoadStoreTypes(storeTypes))
             if (clickLocationChange) {
                 fetchStoreReload(
