@@ -4,7 +4,7 @@
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -24,6 +24,6 @@ dependencies {
     implementation(libs.kotlin.serialization.json)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.room.compiler)
+    ksp(libs.hilt.compiler)
 }

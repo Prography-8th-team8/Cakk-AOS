@@ -4,7 +4,7 @@
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
 
@@ -31,5 +31,5 @@ dependencies {
     implementation(libs.junit4)
     implementation(libs.androidx.test.ext)
     implementation(libs.androidx.test.espresso.core)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 }

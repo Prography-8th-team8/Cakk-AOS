@@ -4,7 +4,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
     id("dagger.hilt.android.plugin")
 }
@@ -50,5 +50,5 @@ dependencies {
     implementation(libs.hilt.android.testing)
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.androidx.test.espresso.core)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 }
