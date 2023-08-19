@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -44,17 +44,23 @@ dependencies {
     implementation(project(":feature:feed"))
     implementation(project(":feature:my"))
 
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.dagger.hilt.android)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.android.testing)
     implementation(libs.timber)
-    implementation(libs.bundles.androidx.compose)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.junit)
-    androidTestImplementation(libs.androidx.test.espresso)
-    kapt(libs.bundles.compiler)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.navigation.compose)
+    testImplementation(libs.junit4)
+    androidTestImplementation(libs.androidx.test.ext)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    kapt(libs.hilt.compiler)
 }
 
 ktlint {

@@ -25,7 +25,12 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core:utility"))
 
-    implementation(libs.coil.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.coil.kt.compose)
     implementation(libs.material)
-    implementation(libs.bundles.androidx.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.navigation.compose)
 }

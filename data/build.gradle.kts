@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -18,15 +18,18 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(libs.gson)
-    implementation(libs.dagger.hilt.android)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.android.testing)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.dataStore.preferences)
     implementation(libs.androidx.paging.runtime)
-    implementation(libs.bundles.ktor)
+    implementation(libs.ktor.android)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.logging)
     implementation(libs.material)
-    implementation(libs.junit)
-    implementation(libs.androidx.test.junit)
-    implementation(libs.androidx.test.espresso)
-    kapt(libs.bundles.compiler)
+    implementation(libs.junit4)
+    implementation(libs.androidx.test.ext)
+    implementation(libs.androidx.test.espresso.core)
+    kapt(libs.hilt.compiler)
 }

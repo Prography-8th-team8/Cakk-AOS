@@ -6,9 +6,9 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -21,12 +21,15 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(libs.dagger.hilt.android)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.android.testing)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.bundles.ktor)
+    implementation(libs.ktor.android)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.logging)
     implementation(libs.material)
-    implementation(libs.junit)
+    implementation(libs.junit4)
     implementation(libs.timber)
-    kapt(libs.bundles.compiler)
+    kapt(libs.hilt.compiler)
 }
