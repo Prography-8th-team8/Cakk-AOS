@@ -82,9 +82,9 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
-plugin-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-plugin-androidGradle = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
-plugin-secrets = { group = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", name = "secrets-gradle-plugin", version.ref = "secrets" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+secrets-gradlePlugin = { group = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", name = "secrets-gradle-plugin", version.ref = "secrets" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
