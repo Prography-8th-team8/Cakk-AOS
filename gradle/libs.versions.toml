@@ -1,6 +1,6 @@
 [versions]
 androidGradlePlugin = "8.0.1"
-accompanist = "0.31.5-beta"
+accompanist = "0.33.0-alpha"
 
 # androidX
 androidxComposeCompiler = "1.4.3"

@@ -7,12 +7,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.prography.base.BaseViewModel
 import org.prography.domain.model.store.StoreModel
+import org.prography.domain.repository.FilterRepository
 import org.prography.domain.repository.StoreRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val storeRepository: StoreRepository,
+    private val filterRepository: FilterRepository,
 ) : BaseViewModel<HomeUiAction, HomeUiState, HomeSideEffect>(
     initialState = HomeUiState()
 ) {
@@ -73,6 +75,10 @@ class HomeViewModel @Inject constructor(
             )
         }
 
+        is HomeUiAction.FilterCakeShop -> {
+            currentState.copy(storeModels = listOf())
+        }
+
         is HomeUiAction.LoadStoreList -> {
             currentState.copy(storeModels = currentState.storeModels + action.storeModels, isReload = false)
         }
@@ -80,6 +86,14 @@ class HomeViewModel @Inject constructor(
         is HomeUiAction.ReloadStore -> {
             currentState.copy(storeModels = action.storeModels, isReload = true)
         }
+
+        is HomeUiAction.LoadStoreTypes -> {
+            currentState.copy(storeTypes = action.storeTypes)
+        }
+    }
+
+    init {
+        getStoreTypes()
     }
 
     fun changeBottomSheetState(expandedType: ExpandedType) {
@@ -161,6 +175,41 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             storeRepository.unBookmarkStore(id = id)
             sendAction(HomeUiAction.UnBookmarkCakeShop(id))
+        }
+    }
+
+    private fun getStoreTypes() {
+        filterRepository.fetchFilters()
+            .onStart { HomeUiAction.Loading }
+            .onEach { sendAction(HomeUiAction.LoadStoreTypes(it)) }
+            .launchIn(viewModelScope)
+    }
+
+    fun saveStoreTypes(
+        southwestLatitude: Double? = null,
+        southwestLongitude: Double? = null,
+        northeastLatitude: Double? = null,
+        northeastLongitude: Double? = null,
+        districts: List<String> = listOf(),
+        storeTypes: String,
+        clickLocationChange: Boolean
+    ) {
+        viewModelScope.launch {
+            filterRepository.saveFilters(storeTypes)
+            sendAction(HomeUiAction.FilterCakeShop)
+            sendAction(HomeUiAction.LoadStoreTypes(storeTypes))
+            if (clickLocationChange) {
+                fetchStoreReload(
+                    southwestLatitude,
+                    southwestLongitude,
+                    northeastLatitude,
+                    northeastLongitude,
+                    storeTypes = storeTypes.split(",").filter { it != "" }
+                )
+            } else {
+                fetchStoreList(districts, storeTypes)
+            }
+            sendSideEffect(HomeSideEffect.FilterCakeShop)
         }
     }
 }

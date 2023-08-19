@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.hilt.navigation)
     implementation(libs.androidx.compose.navigation)
+    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.material)
     implementation(libs.timber)
     implementation(libs.coil.compose)

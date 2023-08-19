@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,6 +75,8 @@ fun HomeScreen(
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
+    val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
+
     val fromOnBoarding = districtsArg != DEFAULT_DISTRICTS_INFO && storeCountArg != DEFAULT_STORE_COUNT
     LocationPermission(
         fromOnBoarding = fromOnBoarding,
@@ -93,7 +96,7 @@ fun HomeScreen(
         if (fromOnBoarding) {
             homeViewModel.fetchStoreList(
                 districts = districtsArg.split(" "),
-                storeTypes = StoreType.values().joinToString(",") { it.name }
+                storeTypes = homeUiState.storeTypes
             )
         }
     }
@@ -124,17 +127,28 @@ private fun BottomSheet(
     )
     val homeUiState by homeViewModel.state.collectAsStateWithLifecycle()
     var isFullDetailScreen = false
-
     var offsetY by rememberSaveable { mutableStateOf(((screenHeight / 2.5).toInt()).dp.value) }
     var expandedType by rememberSaveable { mutableStateOf(homeUiState.expandedType) }
     val height by animateDpAsState(expandedType.getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY))
+    val modifier = if (homeUiState.bottomSheetType != BottomSheetType.Filter) Modifier.height(height) else Modifier.wrapContentHeight()
+    val cameraPositionState: CameraPositionState =
+        rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
+    val clickLocationChange = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(homeViewModel) {
         homeViewModel.sideEffect.collectLatest {
             when (it) {
                 HomeSideEffect.ReloadError -> {
                     bottomSheetScaffoldState.snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.snackbar_not_provide_service)
+                        message = context.getString(R.string.snackbar_not_provide_service),
+                        actionLabel = "reload"
+                    )
+                }
+
+                HomeSideEffect.FilterCakeShop -> {
+                    bottomSheetScaffoldState.snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.snackbar_filter_cake_shop_success),
+                        actionLabel = "filter"
                     )
                 }
             }
@@ -152,15 +166,18 @@ private fun BottomSheet(
             CakkSnackbarHost(snackbarHostState = snackbarHostState) { snackbarData ->
                 CakkSnackbar(
                     snackbarData = snackbarData,
-                    modifier = Modifier.align(Alignment.BottomCenter)
+                    modifier = if (snackbarData.actionLabel == "filter") {
+                        Modifier.align(Alignment.TopCenter)
+                    } else {
+                        Modifier.align(Alignment.BottomCenter)
+                    }
                 )
             }
         },
         sheetContent = {
             Box(
-                Modifier
+                modifier
                     .fillMaxWidth()
-                    .height(height)
                     .background(White)
                     .pointerInput(Unit) {
                         detectDragGestures(
@@ -215,10 +232,11 @@ private fun BottomSheet(
                                 listOf()
                             },
                             storeCount = if (storeCountArg >= 0 && homeUiState.isReload.not()) {
-                                storeCountArg
+                                homeUiState.storeModels.size
                             } else {
                                 homeUiState.storeModels.size
                             },
+                            storeTypesSize = homeUiState.storeTypes.split(",").size - 1,
                             onNavigateToOnBoarding = onNavigateToOnBoarding,
                             onNavigateToDetail = onNavigateToDetail,
                             openFilterSheet = {
@@ -230,35 +248,42 @@ private fun BottomSheet(
                                     .value
                             },
                             onFavoriteClick = { homeViewModel.bookmarkCakeShop(it) },
-                            onUnFavoriteClick = { homeViewModel.unBookmarkCakeShop(it) }
+                            onUnFavoriteClick = { homeViewModel.unBookmarkCakeShop(it) },
+                            clickLocationChange = clickLocationChange
                         )
                     }
 
                     BottomSheetType.Filter -> {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .fillMaxHeight()
-                                .padding(horizontal = 20.dp),
+                                .wrapContentHeight(),
+                            verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             val selectFilter = remember {
-                                mutableStateListOf(false, false, false, false, false, false, false, false, false, false, false)
+                                mutableStateListOf(false, false, false, false, false, false, false, false, false, false)
                             }
                             val filters = remember { mutableStateOf("") }
 
-                            FilterTopBar(selectFilter) {
-                                homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
-                                homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
-                                expandedType = ExpandedType.QUARTER
-                                offsetY = expandedType
-                                    .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
-                                    .value
+                            Column {
+                                FilterTopBar(selectFilter = selectFilter) {
+                                    homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
+                                    homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
+                                    expandedType = ExpandedType.QUARTER
+                                    offsetY = expandedType
+                                        .getByScreenHeight(expandedType, screenHeight, statusBarHeight, offsetY)
+                                        .value
+                                }
+                                Spacer(modifier = Modifier.height(21.dp))
+                                Filters(selectFilter = selectFilter)
                             }
                             FilterSelectButton(
-                                selectFilter,
-                                filters,
-                                homeViewModel,
-                                districtsArg,
+                                selectFilter = selectFilter,
+                                filters = filters,
+                                homeViewModel = homeViewModel,
+                                districtsArg = districtsArg,
+                                cameraPositionState = cameraPositionState,
+                                clickLocationChange = clickLocationChange
                             ) {
                                 homeViewModel.changeBottomSheetType(BottomSheetType.StoreList)
                                 homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
@@ -282,8 +307,6 @@ private fun BottomSheet(
         },
         sheetPeekHeight = height,
     ) {
-        val cameraPositionState: CameraPositionState =
-            rememberCameraPositionState { position = CameraPosition(LatLng(37.566535, 126.9779692), 16.0) }
         Box(modifier = Modifier.fillMaxSize()) {
             CakkMap(
                 homeViewModel = homeViewModel,
@@ -296,7 +319,8 @@ private fun BottomSheet(
             SearchArea(
                 homeViewModel = homeViewModel,
                 modifier = Modifier.align(Alignment.TopCenter),
-                cameraPositionState = cameraPositionState
+                cameraPositionState = cameraPositionState,
+                clickLocationChange = clickLocationChange
             )
         }
     }
@@ -312,25 +336,39 @@ private fun FilterTopBar(
             painterResource(R.drawable.ic_close),
             contentDescription = null,
             modifier = Modifier
-                .padding(top = 22.dp)
+                .padding(top = 20.dp, end = 20.dp)
                 .align(Alignment.End)
                 .clickable { backToCakeStore() },
         )
+        Spacer(modifier = Modifier.height(9.dp))
         Text(
-            text = stringResource(id = R.string.home_filter_recommend),
-            color = Black.copy(alpha = 0.6f),
-            fontSize = 16.dp.toSp(),
-            fontWeight = FontWeight.Normal,
+            text = stringResource(id = R.string.home_filter),
+            modifier = Modifier.padding(start = 20.dp),
+            color = Raisin_Black,
+            fontSize = 18.dp.toSp(),
+            fontWeight = FontWeight.Bold,
             fontFamily = pretendard,
         )
-        Spacer(modifier = Modifier.width(9.dp))
-        Image(
-            painterResource(id = R.drawable.ic_refresh),
-            contentDescription = stringResource(id = R.string.home_content_description_filter_refresh_btn),
-            modifier = Modifier.clickable {
-                selectFilter.indices.forEach { selectFilter[it] = false }
-            }
-        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(id = R.string.home_filter_recommend),
+                modifier = Modifier.padding(start = 20.dp),
+                color = Raisin_Black.copy(alpha = 0.6f),
+                fontSize = 14.dp.toSp(),
+                fontWeight = FontWeight.Normal,
+                fontFamily = pretendard,
+                letterSpacing = (-0.03).em
+            )
+            Spacer(modifier = Modifier.width(13.dp))
+            Image(
+                painterResource(id = R.drawable.ic_refresh),
+                contentDescription = stringResource(id = R.string.home_content_description_filter_refresh_btn),
+                modifier = Modifier.clickable {
+                    selectFilter.indices.forEach { selectFilter[it] = false }
+                }
+            )
+        }
     }
 }
 
@@ -338,7 +376,7 @@ private fun FilterTopBar(
 @OptIn(ExperimentalLayoutApi::class)
 private fun Filters(selectFilter: SnapshotStateList<Boolean>) {
     FlowRow(
-        modifier = Modifier.padding(start = 16.dp, top = 25.dp, end = 16.dp)
+        modifier = Modifier.padding(start = 16.dp, end = 18.dp)
     ) {
         StoreType.values().forEachIndexed { index, storeType ->
             Row(
@@ -364,11 +402,12 @@ private fun Filters(selectFilter: SnapshotStateList<Boolean>) {
                 Spacer(modifier = Modifier.width(if (storeType.toIcon() == null) 12.dp else 4.dp))
                 Text(
                     text = storeType.tag,
-                    modifier = Modifier.padding(top = 9.dp, end = 12.dp, bottom = 9.dp),
+                    modifier = Modifier.padding(top = 10.dp, end = 12.dp, bottom = 10.dp),
                     color = Raisin_Black,
                     fontSize = 14.dp.toSp(),
                     fontWeight = FontWeight.Bold,
                     fontFamily = pretendard,
+                    letterSpacing = (-0.03).em
                 )
             }
         }
@@ -381,12 +420,13 @@ private fun FilterSelectButton(
     filters: MutableState<String>,
     homeViewModel: HomeViewModel,
     districtsArg: String,
+    cameraPositionState: CameraPositionState,
+    clickLocationChange: MutableState<Boolean>,
     backToCakeStore: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
             .padding(start = 16.dp, bottom = 12.dp, end = 16.dp)
             .clickable(enabled = selectFilter.count { it } > 0) {
                 StoreType
@@ -394,14 +434,27 @@ private fun FilterSelectButton(
                     .forEachIndexed { index, storeType ->
                         if (selectFilter[index]) filters.value += "${storeType.name},"
                     }
-                homeViewModel.fetchStoreList(
-                    districts = districtsArg.split(" "),
-                    storeTypes = filters.value
-                )
+
+                if (clickLocationChange.value) {
+                    homeViewModel.saveStoreTypes(
+                        cameraPositionState.contentBounds?.southWest?.latitude,
+                        cameraPositionState.contentBounds?.southWest?.longitude,
+                        cameraPositionState.contentBounds?.northEast?.latitude,
+                        cameraPositionState.contentBounds?.northEast?.longitude,
+                        storeTypes = filters.value,
+                        clickLocationChange = clickLocationChange.value
+                    )
+                } else {
+                    homeViewModel.saveStoreTypes(
+                        districts = districtsArg.split(" "),
+                        storeTypes = filters.value,
+                        clickLocationChange = clickLocationChange.value
+                    )
+                }
                 homeViewModel.changeBottomSheetState(ExpandedType.QUARTER)
                 backToCakeStore()
             },
-        shape = RoundedCornerShape(15.dp),
+        shape = RoundedCornerShape(12.dp),
         color = if (selectFilter.count { it } > 0) Light_Deep_Pink else Raisin_Black.copy(alpha = 0.2f),
     ) {
         Text(
@@ -420,7 +473,8 @@ private fun FilterSelectButton(
 private fun SearchArea(
     homeViewModel: HomeViewModel,
     modifier: Modifier,
-    cameraPositionState: CameraPositionState
+    cameraPositionState: CameraPositionState,
+    clickLocationChange: MutableState<Boolean>
 ) {
     var canReload by remember { mutableStateOf(false) }
     LaunchedEffect(cameraPositionState) {
@@ -436,9 +490,10 @@ private fun SearchArea(
                 cameraPositionState.contentBounds?.southWest?.latitude,
                 cameraPositionState.contentBounds?.southWest?.longitude,
                 cameraPositionState.contentBounds?.northEast?.latitude,
-                cameraPositionState.contentBounds?.northEast?.longitude
+                cameraPositionState.contentBounds?.northEast?.longitude,
             )
             canReload = false
+            clickLocationChange.value = true
         },
         modifier = modifier.padding(top = 24.dp),
         enabled = canReload,
@@ -472,11 +527,13 @@ private fun CakeStoreContent(
     storeList: List<StoreModel>,
     districts: List<DistrictType>,
     storeCount: Int,
+    storeTypesSize: Int,
     onNavigateToOnBoarding: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
     openFilterSheet: () -> Unit,
     onFavoriteClick: (StoreModel) -> Unit,
     onUnFavoriteClick: (Int) -> Unit,
+    clickLocationChange: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -495,7 +552,9 @@ private fun CakeStoreContent(
             },
             storeCount = storeCount,
             onNavigateToOnBoarding = onNavigateToOnBoarding,
-            openFilterSheet = openFilterSheet
+            openFilterSheet = openFilterSheet,
+            storeTypesSize = storeTypesSize,
+            clickLocationChange = clickLocationChange
         )
 
         LazyColumn(
@@ -533,8 +592,10 @@ private fun CakkStoreTopBar(
     modifier: Modifier,
     title: String,
     storeCount: Int,
+    storeTypesSize: Int,
     onNavigateToOnBoarding: () -> Unit,
     openFilterSheet: () -> Unit,
+    clickLocationChange: MutableState<Boolean>,
 ) {
     Image(
         painter = painterResource(id = R.drawable.ic_line),
@@ -578,7 +639,10 @@ private fun CakkStoreTopBar(
                     text = stringResource(id = R.string.home_change_location),
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .clickable { onNavigateToOnBoarding() },
+                        .clickable {
+                            onNavigateToOnBoarding()
+                            clickLocationChange.value = false
+                        },
                     fontFamily = pretendard,
                     fontSize = 12.dp.toSp(),
                     color = Raisin_Black.copy(alpha = 0.8f),
@@ -586,11 +650,41 @@ private fun CakkStoreTopBar(
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Image(
-                painter = painterResource(id = R.drawable.ic_filter),
-                contentDescription = null,
-                modifier = Modifier.clickable { openFilterSheet() }
-            )
+            Box(
+                modifier = Modifier
+                    .width(41.dp)
+                    .height(41.dp)
+            ) {
+                Image(
+                    painter = if (storeTypesSize != 10) {
+                        painterResource(id = R.drawable.ic_filter_black)
+                    } else {
+                        painterResource(id = R.drawable.ic_filter)
+                    },
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .clickable { openFilterSheet() }
+                )
+                if (storeTypesSize != 10) {
+                    Box(
+                        Modifier.align(Alignment.TopEnd),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_circle),
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = "$storeTypesSize",
+                            color = White,
+                            fontSize = 10.dp.toSp(),
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = pretendard
+                        )
+                    }
+                }
+            }
         }
     }
 }

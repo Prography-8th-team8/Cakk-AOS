@@ -3,10 +3,12 @@ package org.prography.home
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.prography.base.BaseState
+import org.prography.domain.model.enums.StoreType
 import org.prography.domain.model.store.StoreModel
 
 data class HomeUiState(
     val storeModels: List<StoreModel> = listOf(),
+    val storeTypes: String = StoreType.values().joinToString(","),
     val bottomSheetType: BottomSheetType = BottomSheetType.StoreList,
     val expandedType: ExpandedType = ExpandedType.QUARTER,
     val isReload: Boolean = false
