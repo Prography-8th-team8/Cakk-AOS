@@ -4,7 +4,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
     id("dagger.hilt.android.plugin")
 }
@@ -18,7 +18,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
@@ -31,13 +31,24 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":domain"))
 
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.material)
-    implementation(libs.bundles.androidx.compose)
-    implementation(libs.bundles.androidx.lifeycle)
-    implementation(libs.androidx.compose.hilt.navigation)
-    testImplementation(libs.junit)
-    implementation(libs.dagger.hilt.android)
-    androidTestImplementation(libs.androidx.test.junit)
-    androidTestImplementation(libs.androidx.test.espresso)
-    kapt(libs.bundles.compiler)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewModelCompose)
+    implementation(libs.androidx.lifecycle.runtimeTesting)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.java8)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    testImplementation(libs.junit4)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.androidx.test.ext)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    ksp(libs.hilt.compiler)
 }
