@@ -14,7 +14,7 @@ interface StoreRepository {
 
     fun fetchDetailStore(storeId: Int): Flow<StoreDetailModel>
 
-    fun fetchStoreBlog(storeId: Int): Flow<StoreBlogModel>
+    fun fetchStoreBlog(storeId: Int,num: Int): Flow<StoreBlogModel>
 
     fun fetchStoreReload(
         southwestLatitude: Double,

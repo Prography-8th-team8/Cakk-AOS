@@ -8,6 +8,7 @@ object CakkService {
         const val STORE_DETAIL = "api/store"
         const val DISTRICT_LIST = "api/store/district/count"
         const val STORE_BLOG = "blog"
+        const val STORE_BLOG_NUM = "num"
         const val STORE_RELOAD = "api/store/reload"
         const val STORE_TYPE = "type"
         const val STORE_FEED = "api/store/feed"

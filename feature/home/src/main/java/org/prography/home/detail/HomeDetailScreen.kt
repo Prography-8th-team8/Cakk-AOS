@@ -105,11 +105,11 @@ fun HomeDetailScreen(
             fromHome = fromHome,
             storeDetailModel = storeDetailUiState.storeDetailModel,
             storeBlogPosts = storeDetailUiState.blogPosts,
-            showBlogPostCount = storeDetailUiState.showBlogPostCount,
+            showBlogPostCount = storeDetailUiState.blogPosts.size,
             isFavorite = storeDetailUiState.storeDetailModel.bookmarked,
             onFavoriteClick = { homeDetailViewModel.bookmarkCakeShop(it) },
             onUnFavoriteClick = { homeDetailViewModel.unBookmarkCakeShop(it) },
-            onChangeBlogPostCount = { homeDetailViewModel.changeShowBlogCount(it) },
+            onChangeBlogPostCount = { homeDetailViewModel.fetchStoreBlogInfos(storeId) },
             storeLatitude = storeDetailUiState.storeDetailModel.latitude,
             storeLongitude = storeDetailUiState.storeDetailModel.longitude
         )
@@ -126,7 +126,7 @@ private fun HomeDetailContent(
     isFavorite: Boolean = false,
     onFavoriteClick: (StoreModel) -> Unit = {},
     onUnFavoriteClick: (Int) -> Unit = {},
-    onChangeBlogPostCount: (Int) -> Unit = {},
+    onChangeBlogPostCount: () -> Unit = {},
     storeLatitude: Double,
     storeLongitude: Double
 ) {
@@ -270,7 +270,7 @@ private fun HomeDetailContent(
 private fun LazyGridScope.showBlogReviews(
     storeBlogPosts: List<BlogPostModel>,
     showBlogPostCount: Int,
-    onChangeBlogPostCount: (Int) -> Unit = {}
+    onChangeBlogPostCount: () -> Unit = {}
 ) {
     item(span = { GridItemSpan(3) }) {
         HomeDetailBlogRow(
@@ -640,7 +640,7 @@ private fun HomeDetailBlogRow(
     modifier: Modifier = Modifier,
     blogPosts: List<BlogPostModel>,
     showBlogPostCount: Int,
-    onChangeBlogPostCount: (Int) -> Unit = {}
+    onChangeBlogPostCount: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -666,28 +666,26 @@ private fun HomeDetailBlogRow(
             }
         }
 
-        if (showBlogPostCount == DEFAULT_BLOG_POST_COUNT && blogPosts.size > DEFAULT_BLOG_POST_COUNT) {
-            Button(
-                onClick = { onChangeBlogPostCount(blogPosts.size) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
-                elevation = ButtonDefaults.elevation(0.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = White
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.home_detail_blog_review_more),
-                    color = Raisin_Black,
-                    fontSize = 14.dp.toSp(),
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.03).em
-                )
-            }
+        Button(
+            onClick = { onChangeBlogPostCount() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, Raisin_Black.copy(alpha = 0.1f)),
+            elevation = ButtonDefaults.elevation(0.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = White
+            )
+        ) {
+            Text(
+                text = stringResource(R.string.home_detail_blog_review_more),
+                color = Raisin_Black,
+                fontSize = 14.dp.toSp(),
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.03).em
+            )
         }
     }
 }

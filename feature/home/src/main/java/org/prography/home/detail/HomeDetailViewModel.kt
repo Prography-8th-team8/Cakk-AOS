@@ -29,10 +29,6 @@ class HomeDetailViewModel @Inject constructor(
             currentState.copy(blogPosts = action.blogPosts)
         }
 
-        is HomeDetailAction.ChangeShowBlogCount -> {
-            currentState.copy(showBlogPostCount = action.count)
-        }
-
         is HomeDetailAction.LoadBookmarkedCakeShop -> {
             currentState.copy(
                 storeDetailModel = if (currentState.storeDetailModel.id == action.id) {
@@ -76,16 +72,10 @@ class HomeDetailViewModel @Inject constructor(
     }
 
     fun fetchStoreBlogInfos(id: Int) {
-        storeRepository.fetchStoreBlog(id)
+        storeRepository.fetchStoreBlog(id, state.value.blogPosts.size + 3)
             .onStart { sendAction(HomeDetailAction.Loading) }
             .onEach { sendAction(HomeDetailAction.LoadBlogInfos(it.blogPosts)) }
             .launchIn(viewModelScope)
-    }
-
-    fun changeShowBlogCount(count: Int) {
-        viewModelScope.launch {
-            sendAction(HomeDetailAction.ChangeShowBlogCount(count))
-        }
     }
 
     fun bookmarkCakeShop(bookmarkModel: StoreModel) {
