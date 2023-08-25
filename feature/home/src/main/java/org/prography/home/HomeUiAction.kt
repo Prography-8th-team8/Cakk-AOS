@@ -19,7 +19,7 @@ sealed class HomeUiAction : BaseAction {
 
     data class LoadStoreTypes(val storeTypes: String) : HomeUiAction()
 
-    object FilterCakeShop : HomeUiAction()
+    object InitCakeShop : HomeUiAction()
 
     object BottomSheetExpandFull : HomeUiAction()
 
