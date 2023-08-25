@@ -75,7 +75,7 @@ class HomeViewModel @Inject constructor(
             )
         }
 
-        is HomeUiAction.FilterCakeShop -> {
+        is HomeUiAction.InitCakeShop -> {
             currentState.copy(storeModels = listOf())
         }
 
@@ -117,6 +117,7 @@ class HomeViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun fetchStoreList(districts: List<String>, storeTypes: String) {
         districts.sorted().asFlow()
+            .onEach { sendAction(HomeUiAction.InitCakeShop) }
             .flatMapMerge { storeRepository.fetchStoreList(it, storeTypes, 1) }
             .onEach { sendAction(HomeUiAction.LoadStoreList(it)) }
             .flatMapMerge { it.asFlow() }
@@ -149,6 +150,7 @@ class HomeViewModel @Inject constructor(
             northeastLongitude,
             storeTypes = storeTypes
         )
+            .onEach { sendAction(HomeUiAction.InitCakeShop) }
             .onEach { sendAction(HomeUiAction.ReloadStore(it)) }
             .catch {
                 sendSideEffect(HomeSideEffect.ReloadError)
@@ -196,7 +198,7 @@ class HomeViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             filterRepository.saveFilters(storeTypes)
-            sendAction(HomeUiAction.FilterCakeShop)
+            sendAction(HomeUiAction.InitCakeShop)
             sendAction(HomeUiAction.LoadStoreTypes(storeTypes))
             if (clickLocationChange) {
                 fetchStoreReload(
