@@ -716,13 +716,13 @@ private fun CakkMap(
         if (storeList.isNotEmpty()) {
             when (bottomSheetType) {
                 BottomSheetType.StoreList -> {
-                    cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 16.0)
+                    cameraPositionState.position = CameraPosition(LatLng(storeList[0].latitude, storeList[0].longitude), 12.0)
                 }
 
                 is BottomSheetType.StoreDetail -> {
                     val detailStore = storeList.find { it.id == bottomSheetType.storeId }
                     detailStore?.let { store ->
-                        cameraPositionState.position = CameraPosition(LatLng(store.latitude, store.longitude), 16.0)
+                        cameraPositionState.position = CameraPosition(LatLng(store.latitude, store.longitude), 12.0)
                     }
                 }
 
@@ -734,7 +734,7 @@ private fun CakkMap(
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
-                    cameraPositionState.position = CameraPosition(LatLng(location.latitude, location.longitude), 16.0)
+                    cameraPositionState.position = CameraPosition(LatLng(location.latitude, location.longitude), 12.0)
                     homeViewModel.fetchStoreReload(
                         cameraPositionState.contentBounds?.southWest?.latitude,
                         cameraPositionState.contentBounds?.southWest?.longitude,

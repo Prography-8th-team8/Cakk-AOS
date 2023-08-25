@@ -34,8 +34,8 @@ class StoreRepositoryImpl @Inject constructor(
     override fun fetchDetailStore(storeId: Int): Flow<StoreDetailModel> =
         storeRemoteSource.fetchDetailStore(storeId).map { it.toModel() }
 
-    override fun fetchStoreBlog(storeId: Int): Flow<StoreBlogModel> =
-        storeRemoteSource.fetchStoreBlog(storeId).map { it.toModel() }
+    override fun fetchStoreBlog(storeId: Int, num: Int): Flow<StoreBlogModel> =
+        storeRemoteSource.fetchStoreBlog(storeId, num).map { it.toModel() }
 
     override fun fetchStoreReload(
         southwestLatitude: Double,

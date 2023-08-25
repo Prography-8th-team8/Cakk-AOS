@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.prography.network.CakkService.BASE_URL
 import org.prography.network.CakkService.Endpoint.STORE_BLOG
+import org.prography.network.CakkService.Endpoint.STORE_BLOG_NUM
 import org.prography.network.CakkService.Endpoint.STORE_DETAIL
 import org.prography.network.CakkService.Endpoint.STORE_LIST
 import org.prography.network.CakkService.Endpoint.STORE_RELOAD
@@ -51,10 +52,11 @@ class StoreRemoteSource @Inject constructor(
         )
     }
 
-    fun fetchStoreBlog(storeId: Int): Flow<StoreBlogResponse> = flow {
+    fun fetchStoreBlog(storeId: Int, num: Int): Flow<StoreBlogResponse> = flow {
         emit(
             httpClient.get {
                 url("$BASE_URL$STORE_DETAIL/$storeId/$STORE_BLOG")
+                parameter(STORE_BLOG_NUM, num)
             }
         )
     }
