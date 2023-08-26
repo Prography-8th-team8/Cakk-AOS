@@ -31,7 +31,8 @@ import org.prography.designsystem.ui.theme.pretendard
 
 @Composable
 fun MyScreen(
-    myViewModel: MyViewModel = hiltViewModel()
+    myViewModel: MyViewModel = hiltViewModel(),
+    onNavigateToDetail: (Int) -> Unit
 ) {
     LaunchedEffect(myViewModel.state) {
         myViewModel.fetchBookmarkedList()
@@ -54,6 +55,7 @@ fun MyScreen(
                         isHomeScreen = false,
                         bookmark = { myViewModel.bookmarkCakeShop(bookmarkedStore) },
                         unBookmark = { myViewModel.unBookmarkCakeShop(bookmarkedStore.id) },
+                        onClick = { onNavigateToDetail(bookmarkedStore.id) }
                     )
                 }
             }
