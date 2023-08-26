@@ -139,7 +139,9 @@ fun CakkNavigationGraph(navController: NavHostController) {
             }
 
             composable(route = CakkDestination.My.route) {
-                MyScreen()
+                MyScreen(onNavigateToDetail = { storeId ->
+                    navController.navigate("${CakkDestination.HomeDetail.route}/$storeId")
+                })
             }
         }
     }
