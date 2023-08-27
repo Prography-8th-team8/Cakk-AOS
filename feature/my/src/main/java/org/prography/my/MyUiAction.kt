@@ -5,7 +5,7 @@ import org.prography.domain.model.store.StoreModel
 
 sealed class MyUiAction : BaseAction {
 
-    object Loading : MyUiAction()
+    data object Loading : MyUiAction()
 
     data class LoadBookmarkedStoreList(val bookmarkModels: List<StoreModel>) : MyUiAction()
 }

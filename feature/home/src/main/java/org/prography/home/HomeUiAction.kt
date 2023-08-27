@@ -4,7 +4,8 @@ import org.prography.base.BaseAction
 import org.prography.domain.model.store.StoreModel
 
 sealed class HomeUiAction : BaseAction {
-    object Loading : HomeUiAction()
+    data object Loading : HomeUiAction()
+
     data class LoadStoreList(val storeModels: List<StoreModel>) : HomeUiAction()
 
     data class LoadStoreType(val storeModel: StoreModel) : HomeUiAction()
@@ -19,17 +20,19 @@ sealed class HomeUiAction : BaseAction {
 
     data class LoadStoreTypes(val storeTypes: String) : HomeUiAction()
 
-    object InitCakeShop : HomeUiAction()
-
-    object BottomSheetExpandFull : HomeUiAction()
-
-    object BottomSheetExpandQuarter : HomeUiAction()
-
-    object BottomSheetExpandCollapsed : HomeUiAction()
-
-    object BottomSheetExpandHalf : HomeUiAction()
-
-    object BottomSheetStoreList : HomeUiAction()
     data class BottomSheetStoreDetail(val storeId: Int) : HomeUiAction()
-    object BottomSheetFilter : HomeUiAction()
+
+    data object InitCakeShop : HomeUiAction()
+
+    data object BottomSheetExpandFull : HomeUiAction()
+
+    data object BottomSheetExpandQuarter : HomeUiAction()
+
+    data object BottomSheetExpandCollapsed : HomeUiAction()
+
+    data object BottomSheetExpandHalf : HomeUiAction()
+
+    data object BottomSheetStoreList : HomeUiAction()
+
+    data object BottomSheetFilter : HomeUiAction()
 }
