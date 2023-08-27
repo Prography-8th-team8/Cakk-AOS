@@ -14,13 +14,13 @@ import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.domain.repository.StoreRepository
-import org.prography.localdb.dao.BookmarkDao
+import org.prography.localdb.dao.BookmarkDataSource
 import org.prography.localdb.entity.BookmarkEntity
 import org.prography.utility.mapper.toModel
 import javax.inject.Inject
 
 class StoreRepositoryImpl @Inject constructor(
-    private val bookmarkDao: BookmarkDao,
+    private val bookmarkDataSource: BookmarkDataSource,
     private val storeRemoteSource: StoreRemoteSource,
     private val feedPagingSource: FeedPagingSource
 ) : StoreRepository {
@@ -69,18 +69,18 @@ class StoreRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun fetchBookmarks(): Flow<List<StoreModel>> = bookmarkDao.getAll().map {
+    override fun fetchBookmarks(): Flow<List<StoreModel>> = bookmarkDataSource.getAll().map {
         it.map { data ->
             data.toModel()
         }
     }
 
-    override fun fetchBookmarkedCakeShop(id: Int): Flow<StoreModel?> = bookmarkDao.getCakeShop(id).map {
+    override fun fetchBookmarkedCakeShop(id: Int): Flow<StoreModel?> = bookmarkDataSource.getCakeShop(id).map {
         it?.toModel()
     }
 
     override suspend fun bookmarkStore(bookmarkModel: StoreModel) {
-        bookmarkDao.bookmarkCakeStore(
+        bookmarkDataSource.bookmarkCakeStore(
             BookmarkEntity(
                 bookmarkModel.id,
                 bookmarkModel.name,
@@ -93,5 +93,5 @@ class StoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unBookmarkStore(id: Int) =
-        bookmarkDao.unBookmarkCakeStore(id)
+        bookmarkDataSource.unBookmarkCakeStore(id)
 }
