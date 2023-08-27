@@ -8,7 +8,7 @@ import org.prography.network.CakkService
 import org.prography.network.api.dto.response.DistrictResponse
 import javax.inject.Inject
 
-class DistrictRemoteSource @Inject constructor(
+class DistrictDataSource @Inject constructor(
     private val httpClient: HttpClient
 ) {
     fun fetchDistrictList(): Flow<List<DistrictResponse>> = flow {
