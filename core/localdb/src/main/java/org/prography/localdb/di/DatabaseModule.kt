@@ -14,7 +14,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import org.prography.localdb.dao.BookmarkDao
+import org.prography.localdb.dao.BookmarkDataSource
 import org.prography.localdb.database.CakkDatabase
 import javax.inject.Singleton
 
@@ -34,7 +34,7 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideBookmarkDao(cakkDatabase: CakkDatabase): BookmarkDao = cakkDatabase.bookmarkDao()
+    fun provideBookmarkDao(cakkDatabase: CakkDatabase): BookmarkDataSource = cakkDatabase.bookmarkDao()
 
     @Singleton
     @Provides

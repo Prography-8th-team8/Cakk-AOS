@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import org.prography.localdb.entity.BookmarkEntity
 
 @Dao
-interface BookmarkDao {
+interface BookmarkDataSource {
 
     @Query("SELECT * FROM cake_store_bookmark_table")
     fun getAll(): Flow<List<BookmarkEntity>>

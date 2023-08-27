@@ -1,14 +1,14 @@
 package org.prography.cakk.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import org.prography.cakk.data.datasource.FilterLocalDataSource
+import org.prography.cakk.data.datasource.FilterDataSource
 import org.prography.domain.repository.FilterRepository
 import javax.inject.Inject
 
 class FilterRepositoryImpl @Inject constructor(
-    private val filterLocalDataSource: FilterLocalDataSource
+    private val filterDataSource: FilterDataSource
 ) : FilterRepository {
-    override fun fetchFilters(): Flow<String> = filterLocalDataSource.fetchFilters()
+    override fun fetchFilters(): Flow<String> = filterDataSource.fetchFilters()
 
-    override suspend fun saveFilters(filters: String) = filterLocalDataSource.saveFilters(filters)
+    override suspend fun saveFilters(filters: String) = filterDataSource.saveFilters(filters)
 }
