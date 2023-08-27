@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.prography.cakk.data.datasource.FeedPagingSource
 import org.prography.cakk.data.datasource.PAGE_SIZE
-import org.prography.cakk.data.datasource.StoreRemoteSource
+import org.prography.cakk.data.datasource.StoreDataSource
 import org.prography.domain.model.store.FeedModel
 import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
@@ -21,21 +21,21 @@ import javax.inject.Inject
 
 class StoreRepositoryImpl @Inject constructor(
     private val bookmarkDataSource: BookmarkDataSource,
-    private val storeRemoteSource: StoreRemoteSource,
+    private val storeDataSource: StoreDataSource,
     private val feedPagingSource: FeedPagingSource
 ) : StoreRepository {
 
     override fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreModel>> =
-        storeRemoteSource.fetchStoreList(district, storeTypes, page).map { it.toModel() }
+        storeDataSource.fetchStoreList(district, storeTypes, page).map { it.toModel() }
 
     override fun fetchStoreType(storeId: Int): Flow<StoreModel> =
-        storeRemoteSource.fetchStoreType(storeId).map { it.toModel() }
+        storeDataSource.fetchStoreType(storeId).map { it.toModel() }
 
     override fun fetchDetailStore(storeId: Int): Flow<StoreDetailModel> =
-        storeRemoteSource.fetchDetailStore(storeId).map { it.toModel() }
+        storeDataSource.fetchDetailStore(storeId).map { it.toModel() }
 
     override fun fetchStoreBlog(storeId: Int, num: Int): Flow<StoreBlogModel> =
-        storeRemoteSource.fetchStoreBlog(storeId, num).map { it.toModel() }
+        storeDataSource.fetchStoreBlog(storeId, num).map { it.toModel() }
 
     override fun fetchStoreReload(
         southwestLatitude: Double,
@@ -45,7 +45,7 @@ class StoreRepositoryImpl @Inject constructor(
         page: Int,
         storeTypes: List<String>
     ): Flow<List<StoreModel>> =
-        storeRemoteSource.fetchStoreReload(
+        storeDataSource.fetchStoreReload(
             southwestLatitude = southwestLatitude,
             southwestLongitude = southwestLongitude,
             northeastLatitude = northeastLatitude,
