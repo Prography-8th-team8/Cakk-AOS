@@ -6,7 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.prography.cakk.data.datasource.FeedPagingSource
+import org.prography.cakk.data.datasource.FeedDataSource
 import org.prography.cakk.data.datasource.PAGE_SIZE
 import org.prography.cakk.data.datasource.StoreDataSource
 import org.prography.domain.model.store.FeedModel
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class StoreRepositoryImpl @Inject constructor(
     private val bookmarkDataSource: BookmarkDataSource,
     private val storeDataSource: StoreDataSource,
-    private val feedPagingSource: FeedPagingSource
+    private val feedDataSource: FeedDataSource
 ) : StoreRepository {
 
     override fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreModel>> =
@@ -60,7 +60,7 @@ class StoreRepositoryImpl @Inject constructor(
                 pageSize = PAGE_SIZE,
                 initialLoadSize = PAGE_SIZE
             ),
-            pagingSourceFactory = { feedPagingSource }
+            pagingSourceFactory = { feedDataSource }
         ).flow
             .map { pagingData ->
                 pagingData.map { response ->

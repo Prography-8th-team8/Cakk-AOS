@@ -14,7 +14,7 @@ import javax.inject.Inject
 private const val STARTING_KEY = 1
 const val PAGE_SIZE = 100
 
-class FeedPagingSource @Inject constructor(
+class FeedDataSource @Inject constructor(
     private val httpClient: HttpClient
 ) : PagingSource<Int, FeedResponse>() {
     override fun getRefreshKey(state: PagingState<Int, FeedResponse>): Int? {
