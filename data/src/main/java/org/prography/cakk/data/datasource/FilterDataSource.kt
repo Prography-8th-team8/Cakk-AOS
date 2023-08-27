@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import org.prography.domain.model.enums.StoreType
 import javax.inject.Inject
 
-class FilterLocalDataSource @Inject constructor(
+class FilterDataSource @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     fun fetchFilters(): Flow<String> = dataStore.data.map { preferences ->
