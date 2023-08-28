@@ -6,36 +6,36 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.prography.cakk.data.datasource.FeedPagingSource
+import org.prography.cakk.data.datasource.FeedDataSource
 import org.prography.cakk.data.datasource.PAGE_SIZE
-import org.prography.cakk.data.datasource.StoreRemoteSource
+import org.prography.cakk.data.datasource.StoreDataSource
 import org.prography.domain.model.store.FeedModel
 import org.prography.domain.model.store.StoreBlogModel
 import org.prography.domain.model.store.StoreDetailModel
 import org.prography.domain.model.store.StoreModel
 import org.prography.domain.repository.StoreRepository
-import org.prography.localdb.dao.BookmarkDao
+import org.prography.localdb.dao.BookmarkDataSource
 import org.prography.localdb.entity.BookmarkEntity
 import org.prography.utility.mapper.toModel
 import javax.inject.Inject
 
 class StoreRepositoryImpl @Inject constructor(
-    private val bookmarkDao: BookmarkDao,
-    private val storeRemoteSource: StoreRemoteSource,
-    private val feedPagingSource: FeedPagingSource
+    private val bookmarkDataSource: BookmarkDataSource,
+    private val storeDataSource: StoreDataSource,
+    private val feedDataSource: FeedDataSource
 ) : StoreRepository {
 
     override fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreModel>> =
-        storeRemoteSource.fetchStoreList(district, storeTypes, page).map { it.toModel() }
+        storeDataSource.fetchStoreList(district, storeTypes, page).map { it.toModel() }
 
     override fun fetchStoreType(storeId: Int): Flow<StoreModel> =
-        storeRemoteSource.fetchStoreType(storeId).map { it.toModel() }
+        storeDataSource.fetchStoreType(storeId).map { it.toModel() }
 
     override fun fetchDetailStore(storeId: Int): Flow<StoreDetailModel> =
-        storeRemoteSource.fetchDetailStore(storeId).map { it.toModel() }
+        storeDataSource.fetchDetailStore(storeId).map { it.toModel() }
 
     override fun fetchStoreBlog(storeId: Int, num: Int): Flow<StoreBlogModel> =
-        storeRemoteSource.fetchStoreBlog(storeId, num).map { it.toModel() }
+        storeDataSource.fetchStoreBlog(storeId, num).map { it.toModel() }
 
     override fun fetchStoreReload(
         southwestLatitude: Double,
@@ -45,7 +45,7 @@ class StoreRepositoryImpl @Inject constructor(
         page: Int,
         storeTypes: List<String>
     ): Flow<List<StoreModel>> =
-        storeRemoteSource.fetchStoreReload(
+        storeDataSource.fetchStoreReload(
             southwestLatitude = southwestLatitude,
             southwestLongitude = southwestLongitude,
             northeastLatitude = northeastLatitude,
@@ -60,7 +60,7 @@ class StoreRepositoryImpl @Inject constructor(
                 pageSize = PAGE_SIZE,
                 initialLoadSize = PAGE_SIZE
             ),
-            pagingSourceFactory = { feedPagingSource }
+            pagingSourceFactory = { feedDataSource }
         ).flow
             .map { pagingData ->
                 pagingData.map { response ->
@@ -69,18 +69,18 @@ class StoreRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun fetchBookmarks(): Flow<List<StoreModel>> = bookmarkDao.getAll().map {
+    override fun fetchBookmarks(): Flow<List<StoreModel>> = bookmarkDataSource.getAll().map {
         it.map { data ->
             data.toModel()
         }
     }
 
-    override fun fetchBookmarkedCakeShop(id: Int): Flow<StoreModel?> = bookmarkDao.getCakeShop(id).map {
+    override fun fetchBookmarkedCakeShop(id: Int): Flow<StoreModel?> = bookmarkDataSource.getCakeShop(id).map {
         it?.toModel()
     }
 
     override suspend fun bookmarkStore(bookmarkModel: StoreModel) {
-        bookmarkDao.bookmarkCakeStore(
+        bookmarkDataSource.bookmarkCakeStore(
             BookmarkEntity(
                 bookmarkModel.id,
                 bookmarkModel.name,
@@ -93,5 +93,5 @@ class StoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unBookmarkStore(id: Int) =
-        bookmarkDao.unBookmarkCakeStore(id)
+        bookmarkDataSource.unBookmarkCakeStore(id)
 }

@@ -22,7 +22,7 @@ import org.prography.network.CakkService.Parameter.STORE_TYPES
 import org.prography.network.api.dto.response.*
 import javax.inject.Inject
 
-class StoreRemoteSource @Inject constructor(
+class StoreDataSource @Inject constructor(
     private val httpClient: HttpClient
 ) {
     fun fetchStoreList(district: String, storeTypes: String, page: Int): Flow<List<StoreResponse>> = flow {
