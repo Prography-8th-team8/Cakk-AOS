@@ -8,6 +8,7 @@ Cake shop information provision service based on user location
 ## Download
 Go to the [Release](https://play.google.com/store/apps/details?id=com.prography.cakk&hl=ko&gl=US) to download the latest APK.
 But, the service was terminated due to lack of server maintenance.
+<br>
 
 ## Tech stack & Open-source libraries
 - Min SDK 26
